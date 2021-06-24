@@ -9,6 +9,7 @@ from transformers.optimization import get_cosine_schedule_with_warmup
 from torch import nn
 from tqdm import tqdm, tqdm_notebook
 from torch.utils.data import Dataset
+import numpy as np
 
 class KoBERTDataset(Dataset):
   def __init__(self, dataset, sent_idx, label_idx, bert_tokenizer, max_len,
