@@ -3,12 +3,26 @@ from kobert.pytorch_kobert import get_pytorch_kobert_model
 import random
 import torch
 import gluonnlp as nlp
-from kobert_dataset import KoBERTDataset
 from kobert_classifier import KoBERTClassifier
 from transformers import AdamW
 from transformers.optimization import get_cosine_schedule_with_warmup
 from torch import nn
 from tqdm import tqdm, tqdm_notebook
+
+class KoBERTDataset(Dataset):
+  def __init__(self, dataset, sent_idx, label_idx, bert_tokenizer, max_len,
+              pad, pair):
+    transform = nlp.data.BERTSentenceTransform(
+        bert_tokenizer, max_seq_length=max_len, pad=pad, pair=pair)
+
+    self.sentences = [transform([i[sent_idx]]) for i in dataset]
+    self.labels = [np.int32(i[label_idx]) for i in dataset]
+
+  def __getitem__(self, i):
+    return (self.sentences[i] + (self.labels[i], ))
+
+  def __len__(self):
+    return (len(self.labels))
 
 class KobertClassficationTrainer:
   def __init__(self):
@@ -19,7 +33,7 @@ class KobertClassficationTrainer:
     train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
     return train_acc
 
-  def train(self, reviewData, labelData, config):
+  def train(self, reviewData, labelData, config, model_output_path):
     device = torch.device("cuda:0")
 
     bertmodel, vocab = get_pytorch_kobert_model()

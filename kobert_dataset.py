@@ -1,5 +1,6 @@
 import gluonnlp as nlp
 import numpy as np
+from torch.utils.data import Dataset
 
 class KoBERTDataset(Dataset):
   def __init__(self, dataset, sent_idx, label_idx, bert_tokenizer, max_len,
