@@ -19,25 +19,23 @@ class KobertClassficationTrainer:
     train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
     return train_acc
 
-  def train(self, reviewData, labelData, config, model_output_path):
+  def train(self, bert_model, vocab, review_data, label_data, config, model_output_path):
     device = torch.device("cuda:0")
 
-    bertmodel, vocab = get_pytorch_kobert_model()
+    zipped_data = []
 
-    zippedData = []
-
-    for i in range(len(reviewData)):
+    for i in range(len(review_data)):
         row = []
 
-        row.append(reviewData[i])
-        row.append(labelData[i])
+        row.append(review_data[i])
+        row.append(label_data[i])
 
-        zippedData.append(row)
+        zipped_data.append(row)
 
-    random.shuffle(zippedData)
+    random.shuffle(zipped_data)
 
-    dataset_train = zippedData[:config.num_of_train_data]
-    dataset_test = zippedData[config.num_of_train_data:]
+    dataset_train = zipped_data[:config.num_of_train_data]
+    dataset_test = zipped_data[config.num_of_train_data:]
 
     tokenizer = get_tokenizer()
     tok = nlp.data.BERTSPTokenizer(tokenizer, vocab, lower=False)
@@ -56,7 +54,7 @@ class KobertClassficationTrainer:
     train_dataloader = torch.utils.data.DataLoader(data_train, batch_size=batch_size, num_workers=5)
     test_dataloader = torch.utils.data.DataLoader(data_test, batch_size=batch_size, num_workers=5)
     
-    model = KoBERTClassifier(bertmodel,  dr_rate=0.5, num_classes=config.num_of_classes).to(device)
+    model = KoBERTClassifier(bert_model,  dr_rate=0.5, num_classes=config.num_of_classes).to(device)
 
     no_decay = ['bias', 'LayerNorm.weight']
     optimizer_grouped_parameters = [
