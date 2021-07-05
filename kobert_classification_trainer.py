@@ -19,7 +19,7 @@ class KobertClassficationTrainer:
     train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
     return train_acc
 
-  def train(self, bert_model, vocab, review_data, label_data, config, model_output_path):
+  def train(self, bert_model, vocab, review_data, label_data, config, model_output_path, device):
     
 
     zipped_data = []
@@ -46,7 +46,7 @@ class KobertClassficationTrainer:
     train_dataloader = torch.utils.data.DataLoader(data_train, batch_size=config.batch_size, num_workers=5)
     test_dataloader = torch.utils.data.DataLoader(data_test, batch_size=config.batch_size, num_workers=5)
     
-    model = KoBERTClassifier(bert_model,  dr_rate=0.5, num_classes=config.num_of_classes).to(config.device)
+    model = KoBERTClassifier(bert_model,  dr_rate=0.5, num_classes=config.num_of_classes).to(device)
 
     no_decay = ['bias', 'LayerNorm.weight']
     optimizer_grouped_parameters = [
@@ -66,10 +66,10 @@ class KobertClassficationTrainer:
         model.train()
         for batch_id, (token_ids, valid_length, segment_ids, label) in enumerate(tqdm_notebook(train_dataloader)):
             optimizer.zero_grad()
-            token_ids = token_ids.long().to(config.device)
-            segment_ids = segment_ids.long().to(config.device)
+            token_ids = token_ids.long().to(device)
+            segment_ids = segment_ids.long().to(device)
             valid_length= valid_length
-            label = label.long().to(config.device)
+            label = label.long().to(device)
             out = model(token_ids, valid_length, segment_ids)
             loss = loss_fn(out, label)
             loss.backward()
@@ -82,10 +82,10 @@ class KobertClassficationTrainer:
         print("epoch {} train acc {}".format(e+1, train_acc / (batch_id+1)))
         model.eval()
         for batch_id, (token_ids, valid_length, segment_ids, label) in enumerate(tqdm_notebook(test_dataloader)):
-            token_ids = token_ids.long().to(config.device)
-            segment_ids = segment_ids.long().to(config.device)
+            token_ids = token_ids.long().to(device)
+            segment_ids = segment_ids.long().to(device)
             valid_length= valid_length
-            label = label.long().to(config.device)
+            label = label.long().to(device)
             out = model(token_ids, valid_length, segment_ids)
             test_acc += self.calc_accuracy(out, label)
         print("epoch {} test acc {}".format(e+1, test_acc / (batch_id+1)))
