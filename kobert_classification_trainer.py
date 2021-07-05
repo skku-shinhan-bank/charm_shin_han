@@ -19,8 +19,8 @@ class KobertClassficationTrainer:
     train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
     return train_acc
 
-  def train(self, bert_model, vocab, review_data, label_data, config, model_output_path):
-    device = torch.device("cuda:0")
+  def train(self, bert_model, vocab, review_data, label_data, config, model_output_path, device):
+    
 
     zipped_data = []
 
@@ -40,19 +40,11 @@ class KobertClassficationTrainer:
     tokenizer = get_tokenizer()
     tok = nlp.data.BERTSPTokenizer(tokenizer, vocab, lower=False)
 
-    max_len = 64
-    batch_size = 64
-    warmup_ratio = 0.1
-    num_epochs = 10
-    max_grad_norm = 1
-    log_interval = 200
-    learning_rate =  5e-5
+    data_train = KoBERTDataset(dataset_train, 0, 1, tok, config.max_len, True, False)
+    data_test = KoBERTDataset(dataset_test, 0, 1, tok, config.max_len, True, False)
 
-    data_train = KoBERTDataset(dataset_train, 0, 1, tok, max_len, True, False)
-    data_test = KoBERTDataset(dataset_test, 0, 1, tok, max_len, True, False)
-
-    train_dataloader = torch.utils.data.DataLoader(data_train, batch_size=batch_size, num_workers=5)
-    test_dataloader = torch.utils.data.DataLoader(data_test, batch_size=batch_size, num_workers=5)
+    train_dataloader = torch.utils.data.DataLoader(data_train, batch_size=config.batch_size, num_workers=5)
+    test_dataloader = torch.utils.data.DataLoader(data_test, batch_size=config.batch_size, num_workers=5)
     
     model = KoBERTClassifier(bert_model,  dr_rate=0.5, num_classes=config.num_of_classes).to(device)
 
@@ -62,13 +54,13 @@ class KobertClassficationTrainer:
         {'params': [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
     ]
 
-    optimizer = AdamW(optimizer_grouped_parameters, lr=learning_rate)
+    optimizer = AdamW(optimizer_grouped_parameters, lr=config.learning_rate)
     loss_fn = nn.CrossEntropyLoss()
-    t_total = len(train_dataloader) * num_epochs
-    warmup_step = int(t_total * warmup_ratio)
+    t_total = len(train_dataloader) * config.num_epochs
+    warmup_step = int(t_total * config.warmup_ratio)
     scheduler = get_cosine_schedule_with_warmup(optimizer, num_warmup_steps=warmup_step, num_training_steps=t_total)
 
-    for e in range(num_epochs):
+    for e in range(config.num_epochs):
         train_acc = 0.0
         test_acc = 0.0
         model.train()
@@ -81,11 +73,11 @@ class KobertClassficationTrainer:
             out = model(token_ids, valid_length, segment_ids)
             loss = loss_fn(out, label)
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), config.max_grad_norm)
             optimizer.step()
             scheduler.step()  # Update learning rate schedule
             train_acc += self.calc_accuracy(out, label)
-            if batch_id % log_interval == 0:
+            if batch_id % config.log_interval == 0:
                 print("epoch {} batch id {} loss {} train acc {}".format(e+1, batch_id+1, loss.data.cpu().numpy(), train_acc / (batch_id+1)))
         print("epoch {} train acc {}".format(e+1, train_acc / (batch_id+1)))
         model.eval()
