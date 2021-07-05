@@ -1,6 +1,6 @@
 git+https://git@github.com/SKTBrain/KoBERT.git@master
 mxnet
-glunnlp
+gluonnlp
 pandas
 tqdm
 sentencepiece
