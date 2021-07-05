@@ -1,14 +1,14 @@
 from kobert.utils import get_tokenizer
-from kobert.pytorch_kobert import get_pytorch_kobert_model
 import random
 import torch
 import gluonnlp as nlp
-from kobert_classifier import KoBERTClassifier
-from kobert_dataset import KoBERTDataset
+from model.kobert_classifier import KoBERTClassifier
 from transformers import AdamW
 from transformers.optimization import get_cosine_schedule_with_warmup
 from torch import nn
 from tqdm import tqdm, tqdm_notebook
+import numpy as np
+from torch.utils.data import Dataset
 
 class KobertClassficationTrainer:
   def __init__(self):
@@ -20,8 +20,6 @@ class KobertClassficationTrainer:
     return train_acc
 
   def train(self, bert_model, vocab, review_data, label_data, config, model_output_path, device):
-    
-
     zipped_data = []
 
     for i in range(len(review_data)):
@@ -91,3 +89,18 @@ class KobertClassficationTrainer:
         print("epoch {} test acc {}".format(e+1, test_acc / (batch_id+1)))
 
     torch.save(model.state_dict(), model_output_path)
+
+class KoBERTDataset(Dataset):
+  def __init__(self, dataset, sent_idx, label_idx, bert_tokenizer, max_len,
+              pad, pair):
+    transform = nlp.data.BERTSentenceTransform(
+        bert_tokenizer, max_seq_length=max_len, pad=pad, pair=pair)
+
+    self.sentences = [transform([i[sent_idx]]) for i in dataset]
+    self.labels = [np.int32(i[label_idx]) for i in dataset]
+
+  def __getitem__(self, i):
+    return (self.sentences[i] + (self.labels[i], ))
+
+  def __len__(self):
+    return (len(self.labels))

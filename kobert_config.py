@@ -1,4 +1,4 @@
-class Config:
+class KoBERTConfig:
   def __init__(
 	self,
 	num_of_train_data,
