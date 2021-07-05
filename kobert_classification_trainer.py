@@ -2,7 +2,7 @@ from kobert.utils import get_tokenizer
 import random
 import torch
 import gluonnlp as nlp
-from model.kobert_classifier import KoBERTClassifier
+from .model.kobert_classifier import KoBERTClassifier
 from transformers import AdamW
 from transformers.optimization import get_cosine_schedule_with_warmup
 from torch import nn
