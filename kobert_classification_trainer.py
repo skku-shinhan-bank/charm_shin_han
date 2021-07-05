@@ -1,4 +1,5 @@
 from kobert.utils import get_tokenizer
+from kobert.pytorch_kobert import get_pytorch_kobert_model
 import random
 import torch
 import gluonnlp as nlp
@@ -12,6 +13,10 @@ from torch.utils.data import Dataset
 
 class KobertClassficationTrainer:
   def __init__(self):
+    model, vocab = get_pytorch_kobert_model()
+
+    self.bert_model = model
+    self.vocab = vocab
     pass
 
   def calc_accuracy(self,X,Y):
@@ -19,7 +24,7 @@ class KobertClassficationTrainer:
     train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
     return train_acc
 
-  def train(self, bert_model, vocab, review_data, label_data, config, model_output_path, device):
+  def train(self, review_data, label_data, config, model_output_path, device):
     zipped_data = []
 
     for i in range(len(review_data)):
@@ -36,7 +41,7 @@ class KobertClassficationTrainer:
     dataset_test = zipped_data[config.num_of_train_data:]
 
     tokenizer = get_tokenizer()
-    tok = nlp.data.BERTSPTokenizer(tokenizer, vocab, lower=False)
+    tok = nlp.data.BERTSPTokenizer(tokenizer, self.vocab, lower=False)
 
     data_train = KoBERTDataset(dataset_train, 0, 1, tok, config.max_len, True, False)
     data_test = KoBERTDataset(dataset_test, 0, 1, tok, config.max_len, True, False)
@@ -44,7 +49,7 @@ class KobertClassficationTrainer:
     train_dataloader = torch.utils.data.DataLoader(data_train, batch_size=config.batch_size, num_workers=5)
     test_dataloader = torch.utils.data.DataLoader(data_test, batch_size=config.batch_size, num_workers=5)
     
-    model = KoBERTClassifier(bert_model,  dr_rate=0.5, num_classes=config.num_of_classes).to(device)
+    model = KoBERTClassifier(self.bert_model,  dr_rate=0.5, num_classes=config.num_of_classes).to(device)
 
     no_decay = ['bias', 'LayerNorm.weight']
     optimizer_grouped_parameters = [
