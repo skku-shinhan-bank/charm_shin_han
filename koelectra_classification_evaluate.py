@@ -42,7 +42,7 @@ class KoElectraClassificationEvaluate():
 
 		return model, tokenizer
 
-	def get_model_input(data):
+	def get_model_input(self, data):
 		return {'input_ids': data['input_ids'],
 					'attention_mask': data['attention_mask'],
 					'labels': data['labels']
