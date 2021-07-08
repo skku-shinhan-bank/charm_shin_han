@@ -62,7 +62,7 @@ class KoElectraClassficationEvaluator:
         for data in tqdm(eval_dataloader, desc="Evaluating"):
             with torch.no_grad():
                 inputs = self.get_model_input(data)
-                outputs = self.model(**inputs)
+                outputs = model(**inputs)
                 loss += outputs[0]
                 logit = outputs[1]
                 acc += (logit.argmax(1)==inputs['labels']).sum().item()
