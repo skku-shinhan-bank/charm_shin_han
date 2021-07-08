@@ -14,42 +14,47 @@ from torch.utils.data import Dataset
 class KobertClassficationTrainer:
   def __init__(self):
     model, vocab = get_pytorch_kobert_model()
+    tok = get_tokenizer()
+    tokenizer = nlp.data.BERTSPTokenizer(tok, vocab, lower=False)
 
-    self.bert_model = model
-    self.vocab = vocab
-    pass
+    self.model = model
+    self.tokenizer = tokenizer
 
   def calc_accuracy(self,X,Y):
     max_vals, max_indices = torch.max(X, 1)
     train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
     return train_acc
 
-  def train(self, review_data, label_data, config, model_output_path, device):
-    zipped_data = []
+  def train(self, train_data, train_label, test_data, test_label, config, model_output_path, device):
+    dataset_train = []
+    dataset_test = []
 
-    for i in range(len(review_data)):
+    for i in range(len(train_data)):
         row = []
 
-        row.append(review_data[i])
-        row.append(label_data[i])
+        row.append(train_data[i])
+        row.append(train_label[i])
 
-        zipped_data.append(row)
+        dataset_train.append(row)
 
-    random.shuffle(zipped_data)
+    for i in range(len(test_data)):
+        row = []
 
-    dataset_train = zipped_data[:config.num_of_train_data]
-    dataset_test = zipped_data[config.num_of_train_data:]
+        row.append(test_data[i])
+        row.append(test_label[i])
 
-    tokenizer = get_tokenizer()
-    tok = nlp.data.BERTSPTokenizer(tokenizer, self.vocab, lower=False)
+        dataset_test.append(row)
 
-    data_train = KoBERTDataset(dataset_train, 0, 1, tok, config.max_len, True, False)
-    data_test = KoBERTDataset(dataset_test, 0, 1, tok, config.max_len, True, False)
+    random.shuffle(dataset_train)
+    random.shuffle(dataset_test)
+
+    data_train = KoBERTDataset(dataset_train, 0, 1, self.tokenizer, config.max_len, True, False)
+    data_test = KoBERTDataset(dataset_test, 0, 1, self.tokenizer, config.max_len, True, False)
 
     train_dataloader = torch.utils.data.DataLoader(data_train, batch_size=config.batch_size, num_workers=5)
     test_dataloader = torch.utils.data.DataLoader(data_test, batch_size=config.batch_size, num_workers=5)
     
-    model = KoBERTClassifier(self.bert_model,  dr_rate=0.5, num_classes=config.num_of_classes).to(device)
+    model = KoBERTClassifier(self.model,  dr_rate=0.5, num_classes=config.num_of_classes).to(device)
 
     no_decay = ['bias', 'LayerNorm.weight']
     optimizer_grouped_parameters = [
