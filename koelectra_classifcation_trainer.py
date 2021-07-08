@@ -23,73 +23,8 @@ class KoElectraClassficationTrainer :
 		self.tokenizer = tokenizer
 		pass
 
-
-	def make_zip_data(self, data, label):		
-		zippedData = []
-
-		for i in range(len(data)):
-			row = []
-			row.append(data[i])
-			row.append(label[i])
-			zippedData.append(row)
-
-			# print(zippedData)
-			# print(len(zippedData))
-
-			return zippedData
-
-
-	def train(self, epoch, model, optimizer, train_loader, save_step, save_ckpt_path, train_step = 0):
-		losses = []
-		train_start_index = train_step+1 if train_step != 0 else 0
-		total_train_step = len(train_loader)
-		self.model.train()
-
-		with tqdm(total= total_train_step, desc=f"Train({epoch})") as pbar:
-			pbar.update(train_step)
-			for i, data in enumerate(train_loader, train_start_index):
-				optimizer.zero_grad()
-
-				'''
-				inputs = {'input_ids': batch[0],
-				'attention_mask': batch[1],
-				'bias_labels': batch[3],
-				'hate_labels': batch[4]}
-				if self.args.model_type != 'distilkobert':
-				inputs['token_type_ids'] = batch[2]
-				'''
-				inputs = {'input_ids': data['input_ids'],
-					'attention_mask': data['attention_mask'],
-					'labels': data['labels']
-					}
-
-				outputs = model(**inputs)
-
-				loss = outputs[0]
-
-				losses.append(loss.item())
-
-				loss.backward()
-				optimizer.step()
-
-				pbar.update(1)
-				pbar.set_postfix_str(f"Loss: {loss.item():.3f} ({np.mean(losses):.3f})")
-
-				if i >= total_train_step or i % save_step == 0:
-					torch.save({
-						'epoch': epoch,  # 현재 학습 epoch
-						'model_state_dict': model.state_dict(),  # 모델 저장
-						'optimizer_state_dict': optimizer.state_dict(),  # 옵티마이저 저장
-						'loss': loss.item(),  # Loss 저장
-						'train_step': i,  # 현재 진행한 학습
-						'total_train_step': len(train_loader)  # 현재 epoch에 학습 할 총 train step
-					}, save_ckpt_path)
-
-		return np.mean(losses)
-
-
-	def train_model(self, data, label, config, device):
-		zipped_data = self.make_zip_data(data, label)
+	def train(self, data, label, config, device):
+		zipped_data = make_zip_data(data, label)
 
 		n_epoch = config.num_epochs        # Num of Epoch
 		batch_size = config.batch_size      # 배치 사이즈
@@ -148,6 +83,57 @@ class KoElectraClassficationTrainer :
 		plt.xlabel('Epoch')
 		plt.ylabel('Loss')
 		plt.show()
+
+	def train_model(self, epoch, model, optimizer, train_loader, save_step, save_ckpt_path, train_step = 0):
+		losses = []
+		train_start_index = train_step+1 if train_step != 0 else 0
+		total_train_step = len(train_loader)
+		self.model.train()
+
+		with tqdm(total= total_train_step, desc=f"Train({epoch})") as pbar:
+			pbar.update(train_step)
+			for i, data in enumerate(train_loader, train_start_index):
+				optimizer.zero_grad()
+
+				'''
+				inputs = {'input_ids': batch[0],
+				'attention_mask': batch[1],
+				'bias_labels': batch[3],
+				'hate_labels': batch[4]}
+				if self.args.model_type != 'distilkobert':
+				inputs['token_type_ids'] = batch[2]
+				'''
+				inputs = {'input_ids': data['input_ids'],
+					'attention_mask': data['attention_mask'],
+					'labels': data['labels']
+					}
+
+				outputs = model(**inputs)
+
+				loss = outputs[0]
+
+				losses.append(loss.item())
+
+				loss.backward()
+				optimizer.step()
+
+				pbar.update(1)
+				pbar.set_postfix_str(f"Loss: {loss.item():.3f} ({np.mean(losses):.3f})")
+
+				if i >= total_train_step or i % save_step == 0:
+					torch.save({
+						'epoch': epoch,  # 현재 학습 epoch
+						'model_state_dict': model.state_dict(),  # 모델 저장
+						'optimizer_state_dict': optimizer.state_dict(),  # 옵티마이저 저장
+						'loss': loss.item(),  # Loss 저장
+						'train_step': i,  # 현재 진행한 학습
+						'total_train_step': len(train_loader)  # 현재 epoch에 학습 할 총 train step
+					}, save_ckpt_path)
+
+		return np.mean(losses)
+
+
+	
 
 
 
@@ -218,3 +204,17 @@ class WellnessTextClassificationDataset(Dataset):
 	def __getitem__(self,index):
 		item = self.data[index]
 		return item
+
+def make_zip_data(self, data, label):		
+	zippedData = []
+
+	for i in range(len(data)):
+		row = []
+		row.append(data[i])
+		row.append(label[i])
+		zippedData.append(row)
+
+		# print(zippedData)
+		# print(len(zippedData))
+
+		return zippedData
