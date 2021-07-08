@@ -88,15 +88,11 @@ class KoElectraClassficationTrainer :
 		return np.mean(losses)
 
 
-	def train(self, data, label, config):
+	def train(self, data, label, config, device):
 		zipped_data = self.make_zip_data(data, label)
-		electra_config = ElectraConfig.from_pretrained("monologg/koelectra-small-v2-discriminator")
-		model = koElectraForSequenceClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-small-v2-discriminator", config = electra_config, num_labels = config.num_of_classes)
 
 		n_epoch = config.num_epochs        # Num of Epoch
 		batch_size = config.batch_size      # 배치 사이즈
-		ctx = "cuda" if torch.cuda.is_available() else "cpu"
-		device = torch.device(ctx)
 		save_step = 100 # 학습 저장 주기
 		learning_rate = config.learning_rate
 
