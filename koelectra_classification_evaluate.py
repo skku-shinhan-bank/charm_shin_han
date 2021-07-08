@@ -5,6 +5,7 @@ from torch.nn import functional as F
 from torch.utils.data import DataLoader, Dataset
 from transformers import AutoTokenizer, ElectraForSequenceClassification, AdamW
 from .model.koelectra_classifier import koElectraForSequenceClassification
+from .koelectra_classification_trainer import WellnessTextClassificationDataset
 from tqdm.notebook import tqdm
 import torch
 import os
