@@ -16,7 +16,7 @@ from transformers import (
 class KoElectraClassficationTrainer :
 	def __init__(self, config):
 		electra_config = ElectraConfig.from_pretrained("monologg/koelectra-small-v2-discriminator")
-		model = koElectraForSequenceClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-small-v2-discriminator", config = electra_config, num_label = config.num_of_classes)
+		model = koElectraForSequenceClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-small-v2-discriminator", config = electra_config, num_labels = config.num_of_classes)
 		tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-small-v2-discriminator")
 
 		self.model = model
@@ -98,7 +98,7 @@ class KoElectraClassficationTrainer :
 
 		self.model.to(device)
 
-		dataset = WellnessTextClassificationDataset(tokenizer=self.tokenizer, device=device, zippedData=zipped_data, num_label=config.num_of_classes, max_seq_len=config.max_len)
+		dataset = WellnessTextClassificationDataset(tokenizer=self.tokenizer, device=device, zippedData=zipped_data, num_labels=config.num_of_classes, max_seq_len=config.max_len)
 		train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 		checkpoint_path ="checkpoint"
@@ -158,7 +158,7 @@ class WellnessTextClassificationDataset(Dataset):
 			device = 'cpu',
 			tokenizer=None,
 			zippedData=None,
-			num_label=None,
+			num_labels=None,
 			max_seq_len=None # KoBERT max_length
 			):
 		self.device = device

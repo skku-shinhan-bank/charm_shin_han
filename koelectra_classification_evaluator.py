@@ -25,7 +25,7 @@ class KoElectraClassficationEvaluator:
         electra_config = ElectraConfig.from_pretrained(model_name_or_path)
         model = koElectraForSequenceClassifier.from_pretrained(pretrained_model_name_or_path=model_name_or_path,
                                                                     config=electra_config,
-                                                                    num_label=config.num_of_classes)
+                                                                    num_labels=config.num_of_classes)
 
         if os.path.isfile(save_ckpt_path):
             checkpoint = torch.load(save_ckpt_path, map_location=device)
@@ -49,7 +49,7 @@ class KoElectraClassficationEvaluator:
         model.to(device)
 
         # WellnessTextClassificationDataset 데이터 로더
-        eval_dataset = WellnessTextClassificationDataset(device=device, tokenizer=tokenizer, zippedData=test_datas, num_label=config.num_of_classes, max_seq_len=config.max_len)
+        eval_dataset = WellnessTextClassificationDataset(device=device, tokenizer=tokenizer, zippedData=test_datas, num_labels=config.num_of_classes, max_seq_len=config.max_len)
         eval_dataloader = torch.utils.data.DataLoader(eval_dataset, batch_size=config.batch_size)
 
         # logger.info("***** Running evaluation on %s dataset *****")
