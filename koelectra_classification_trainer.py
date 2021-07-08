@@ -194,7 +194,7 @@ class KoelectraClassificationTrainer:
 
 class WellnessTextClassificationDataset(Dataset):
   def __init__(self,
-               device = 'cpu',
+               device = None,
                tokenizer = None,
                zippedData = None,
         	   num_label = None,
