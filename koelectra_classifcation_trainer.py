@@ -131,7 +131,7 @@ class KoElectraClassificationDataset(Dataset):
 		self.data =[]
 		self.tokenizer = tokenizer if tokenizer is not None else get_tokenizer()
 
-		mock_datas = []
+		sliced_datas = []
 
 		for zd in zipped_data:
 			d = []
@@ -142,10 +142,10 @@ class KoElectraClassificationDataset(Dataset):
 				d.append(zd[0])
 
 			d.append(zd[1])
-			mock_datas.append(d)
+			sliced_datas.append(d)
 
-		for mock_data in mock_datas:
-			index_of_words = self.tokenizer.encode(mock_data[0])
+		for sliced_data in sliced_datas:
+			index_of_words = self.tokenizer.encode(sliced_data[0])
 			token_type_ids = [0] * len(index_of_words)
 			attention_mask = [1] * len(index_of_words)
 
@@ -158,7 +158,7 @@ class KoElectraClassificationDataset(Dataset):
 			attention_mask += [0] * padding_length
 
 			# Label
-			label = int(mock_data[1])
+			label = int(sliced_data[1])
 			data = {
 				'input_ids': torch.tensor(index_of_words).to(self.device),
 				'token_type_ids': torch.tensor(token_type_ids).to(self.device),
