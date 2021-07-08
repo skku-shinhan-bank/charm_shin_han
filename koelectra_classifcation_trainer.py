@@ -132,7 +132,7 @@ class KoElectraClassficationTrainer :
 		offset = pre_epoch
 		for step in range(config.num_epochs):
 			epoch = step + offset
-			loss = self.train_model( epoch, self.model, optimizer, train_loader, save_step, save_ckpt_path, train_step)
+			loss = self.train( epoch, self.model, optimizer, train_loader, save_step, save_ckpt_path, train_step)
 			losses.append(loss)
 
 		# data
