@@ -15,7 +15,6 @@ from tqdm import tqdm
 from kobert_transformers import get_tokenizer
 from transformers import (
   ElectraConfig,
-  ElectraTokenizer
 )
 
 class KoelectraClassificationTrainer:
@@ -143,7 +142,6 @@ class WellnessTextClassificationDataset(Dataset):
                device = None,
                tokenizer = None,
                zippedData = None,
-        	   num_label = None,
                max_seq_len = None, # KoBERT max_length
                ):
 

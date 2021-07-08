@@ -13,20 +13,20 @@ from IPython.display import display
 from tqdm import tqdm
 from kobert_transformers import get_tokenizer
 from transformers import (
-  ElectraConfig,
+	ElectraConfig,
 )
 
 
 class KoElectraClassificationEvaluate():
-    def __init__(self):
-        pass
+	def __init__(self):
+		pass
 
-    def evaluate(self, dataset_test, config, save_ckpt_path):
-        ctx = "cuda" if torch.cuda.is_available() else "cpu"
-        device = torch.device(ctx)
-        eval_loss, eval_acc = self.evaluate_model(device=device, batch_size=config.batch_size, dataset_test=dataset_test, num_label=config.num_label, max_seq_len=config.max_seq_len, save_ckpt_path=save_ckpt_path)
-        print(f'\tLoss: {eval_loss:.4f}(valid)\t|\tAcc: {eval_acc * 100:.1f}%(valid)')
-
+	def evaluate(self, dataset_test, config, save_ckpt_path):
+		ctx = "cuda" if torch.cuda.is_available() else "cpu"
+		device = torch.device(ctx)
+		eval_loss, eval_acc = self.evaluate_model(device=device, batch_size=config.batch_size, dataset_test=dataset_test, num_label=config.num_label, max_seq_len=config.max_seq_len, save_ckpt_path=save_ckpt_path)
+		print(f'\tLoss: {eval_loss:.4f}(valid)\t|\tAcc: {eval_acc * 100:.1f}%(valid)')
+		
 	def get_model_and_tokenizer(self, device, save_ckpt_path, num_label):
 		electra_config = ElectraConfig.from_pretrained("monologg/koelectra-small-v2-discriminator")
 		model = koElectraForSequenceClassification.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-small-v2-discriminator", config = electra_config, num_labels = num_label)
@@ -41,13 +41,13 @@ class KoElectraClassificationEvaluate():
 
 		return model, tokenizer
 
-    def get_model_input(data):
-        return {'input_ids': data['input_ids'],
-                    'attention_mask': data['attention_mask'],
-                    'labels': data['labels']
-                }
+	def get_model_input(data):
+		return {'input_ids': data['input_ids'],
+					'attention_mask': data['attention_mask'],
+					'labels': data['labels']
+				}
 
-    def evaluate_model(self, device, batch_size, dataset_test, num_label, max_seq_len, save_ckpt_path):
+	def evaluate_model(self, device, batch_size, dataset_test, num_label, max_seq_len, save_ckpt_path):
 
 		model, tokenizer = self.get_model_and_tokenizer(device=device, save_ckpt_path=save_ckpt_path, num_label=num_label)
 		model.to(device)
