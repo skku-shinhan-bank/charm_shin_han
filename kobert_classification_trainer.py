@@ -14,10 +14,11 @@ from torch.utils.data import Dataset
 class KobertClassficationTrainer:
   def __init__(self):
     model, vocab = get_pytorch_kobert_model()
+    tok = get_tokenizer()
+    tokenizer = nlp.data.BERTSPTokenizer(tok, vocab, lower=False)
 
-    self.bert_model = model
-    self.vocab = vocab
-    pass
+    self.model = model
+    self.tokenizer = tokenizer
 
   def calc_accuracy(self,X,Y):
     max_vals, max_indices = torch.max(X, 1)
@@ -47,16 +48,13 @@ class KobertClassficationTrainer:
     random.shuffle(dataset_train)
     random.shuffle(dataset_test)
 
-    tokenizer = get_tokenizer()
-    tok = nlp.data.BERTSPTokenizer(tokenizer, self.vocab, lower=False)
-
-    data_train = KoBERTDataset(dataset_train, 0, 1, tok, config.max_len, True, False)
-    data_test = KoBERTDataset(dataset_test, 0, 1, tok, config.max_len, True, False)
+    data_train = KoBERTDataset(dataset_train, 0, 1, self.tokenizer, config.max_len, True, False)
+    data_test = KoBERTDataset(dataset_test, 0, 1, self.tokenizer, config.max_len, True, False)
 
     train_dataloader = torch.utils.data.DataLoader(data_train, batch_size=config.batch_size, num_workers=5)
     test_dataloader = torch.utils.data.DataLoader(data_test, batch_size=config.batch_size, num_workers=5)
     
-    model = KoBERTClassifier(self.bert_model,  dr_rate=0.5, num_classes=config.num_of_classes).to(device)
+    model = KoBERTClassifier(self.model,  dr_rate=0.5, num_classes=config.num_of_classes).to(device)
 
     no_decay = ['bias', 'LayerNorm.weight']
     optimizer_grouped_parameters = [
