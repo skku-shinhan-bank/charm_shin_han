@@ -37,8 +37,7 @@ class KoElectraClassficationEvaluator:
                 'labels': data['labels']
                 }
 
-    def evaluate_model(self, data, label, device, config, model_output_path):
-        test_datas = make_zipped_data(data, label)
+    def evaluate_model(self, test_datas, device, config, model_output_path):
 
         model, tokenizer = self.get_model_and_tokenizer(device, model_output_path, config)
         model.to(device)
@@ -63,6 +62,7 @@ class KoElectraClassficationEvaluator:
         return loss / len(eval_dataset), acc / len(eval_dataset)
 
     def evaluate(self, data, label, config, device, model_path):
-        eval_loss, eval_acc = self.evaluate_model(data, label, device, config, model_path)
+        test_datas = make_zipped_data(data, label)
+        eval_loss, eval_acc = self.evaluate_model(test_datas, device, config, model_path)
         print(f'\tLoss: {eval_loss:.4f}(valid)\t|\tAcc: {eval_acc * 100:.1f}%(valid)')
 
