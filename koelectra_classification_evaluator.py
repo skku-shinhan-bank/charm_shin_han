@@ -1,24 +1,16 @@
-import pandas as pd
-import numpy as np
 import torch
-from torch.nn import functional as F
-from torch.utils.data import DataLoader, Dataset
-from transformers import AutoTokenizer, ElectraForSequenceClassification, AdamW
-from .model.koelectra_classifier import koElectraForSequenceClassification
-from .koelectra_classification_trainer import WellnessTextClassificationDataset
+from transformers import AutoTokenizer
+from .model.koelectra_classifier import KoElectraClassifier
+from .koelectra_classification_trainer import TextClassificationDataset
 from tqdm.notebook import tqdm
 import torch
 import os
-import matplotlib.pyplot as plt
-from IPython.display import display
 from tqdm import tqdm
-from kobert_transformers import get_tokenizer
 from transformers import (
 	ElectraConfig,
 )
 
-
-class KoElectraClassificationEvaluate():
+class KoElectraClassificationEvaluator():
 	def __init__(self):
 		pass
 
@@ -30,7 +22,7 @@ class KoElectraClassificationEvaluate():
 		
 	def get_model_and_tokenizer(self, device, save_ckpt_path, num_label):
 		electra_config = ElectraConfig.from_pretrained("monologg/koelectra-small-v2-discriminator")
-		model = koElectraForSequenceClassification.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-small-v2-discriminator", config = electra_config, num_labels = num_label)
+		model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-small-v2-discriminator", config = electra_config, num_labels = num_label)
 		tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-small-v2-discriminator")
 
 		if os.path.isfile(save_ckpt_path):
@@ -53,7 +45,7 @@ class KoElectraClassificationEvaluate():
 		model, tokenizer = self.get_model_and_tokenizer(device=device, save_ckpt_path=save_ckpt_path, num_label=num_label)
 		model.to(device)
 
-		eval_dataset = WellnessTextClassificationDataset(tokenizer=tokenizer, device=device, zippedData=dataset_test, max_seq_len = max_seq_len)
+		eval_dataset = TextClassificationDataset(tokenizer=tokenizer, device=device, zippedData=dataset_test, max_seq_len = max_seq_len)
 		eval_dataloader = torch.utils.data.DataLoader(eval_dataset, batch_size=batch_size)
 
 		loss = 0

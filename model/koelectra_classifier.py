@@ -1,4 +1,3 @@
-import torch
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss, MSELoss
 from transformers.activations import get_activation
@@ -7,14 +6,14 @@ from transformers import (
   ElectraModel
 )
 
-class koElectraForSequenceClassification(ElectraPreTrainedModel):
+class KoElectraClassifier(ElectraPreTrainedModel):
     def __init__(self, 
                 config,
                 num_labels):
       super().__init__(config)
       self.num_labels = num_labels
       self.electra = ElectraModel(config)
-      self.classifier = ElectraClassificationHead(config, num_labels)
+      self.model = KoElectra(config, num_labels)
 
       self.init_weights()
     def forward(
@@ -29,13 +28,6 @@ class koElectraForSequenceClassification(ElectraPreTrainedModel):
             output_attentions=None,
             output_hidden_states=None,
     ):
-      r"""
-      labels (:obj:`torch.LongTensor` of shape :obj:`(batch_size,)`, `optional`, defaults to :obj:`None`):
-          Labels for computing the sequence classification/regression loss.
-          Indices should be in :obj:`[0, ..., config.num_labels - 1]`.
-          If :obj:`config.num_labels == 1` a regression loss is computed (Mean-Square loss),
-          If :obj:`config.num_labels > 1` a classification loss is computed (Cross-Entropy).
-      """
       discriminator_hidden_states = self.electra(
         input_ids,
         attention_mask,
@@ -48,7 +40,7 @@ class koElectraForSequenceClassification(ElectraPreTrainedModel):
       )
 
       sequence_output = discriminator_hidden_states[0]
-      logits = self.classifier(sequence_output)
+      logits = self.model(sequence_output)
 
       outputs = (logits,) + discriminator_hidden_states[1:]  # add hidden states and attention if they are here
 
@@ -64,7 +56,7 @@ class koElectraForSequenceClassification(ElectraPreTrainedModel):
 
       return outputs  # (loss), (logits), (hidden_states), (attentions)
 
-class ElectraClassificationHead(nn.Module):
+class KoElectra(nn.Module):
 
   def __init__(self, config, num_labels):
     super().__init__()
@@ -80,3 +72,4 @@ class ElectraClassificationHead(nn.Module):
     x = self.dropout(x)
     x = self.out_proj(x)
     return x
+    

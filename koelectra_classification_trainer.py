@@ -5,7 +5,7 @@ import random
 from torch.nn import functional as F
 from torch.utils.data import DataLoader, Dataset
 from transformers import AutoTokenizer, ElectraForSequenceClassification, AdamW
-from .model.koelectra_classifier import koElectraForSequenceClassification
+from .model.koelectra_classifier import KoElectraClassifier
 from tqdm.notebook import tqdm
 import torch
 import os
@@ -20,7 +20,7 @@ from transformers import (
 class KoelectraClassificationTrainer:
 	def __init__(self, config):
 		electra_config = ElectraConfig.from_pretrained("monologg/koelectra-small-v2-discriminator")
-		model = koElectraForSequenceClassification.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-small-v2-discriminator", config = electra_config, num_labels = config.num_label)
+		model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-small-v2-discriminator", config = electra_config, num_labels = config.num_label)
 		tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-small-v2-discriminator")
 
 		self.tokenizer = tokenizer
@@ -28,7 +28,7 @@ class KoelectraClassificationTrainer:
 		pass
 
 	def train(self, data, label, config, device, model_output_path):
-		zippedData = []
+		zipped_data = []
 
 		for i in range(len(data)):
 			row = []
@@ -36,13 +36,13 @@ class KoelectraClassificationTrainer:
 			row.append(data[i])
 			row.append(label[i])
 
-			zippedData.append(row)
+			zipped_data.append(row)
 
 		learning_rate = config.learning_rate
 
 		self.model.to(device)
 
-		dataset = WellnessTextClassificationDataset(tokenizer=self.tokenizer, device=device, zippedData=zippedData, max_seq_len = config.max_seq_len)
+		dataset = TextClassificationDataset(tokenizer=self.tokenizer, device=device, zipped_data=zipped_data, max_seq_len = config.max_seq_len)
 		train_loader = torch.utils.data.DataLoader(dataset, batch_size=config.batch_size, shuffle=True)
 
 		no_decay = ['bias', 'LayerNorm.weight']
@@ -99,14 +99,6 @@ class KoelectraClassificationTrainer:
 			for i, data in enumerate(train_loader, train_start_index):
 				optimizer.zero_grad()
 
-				'''
-				inputs = {'input_ids': batch[0],
-						'attention_mask': batch[1],
-						'bias_labels': batch[3],
-						'hate_labels': batch[4]}
-				if self.args.model_type != 'distilkobert':
-				inputs['token_type_ids'] = batch[2]
-				'''
 				inputs = {'input_ids': data['input_ids'],
 						'attention_mask': data['attention_mask'],
 						'labels': data['labels']
@@ -137,11 +129,11 @@ class KoelectraClassificationTrainer:
 		return np.mean(losses)
 
 
-class WellnessTextClassificationDataset(Dataset):
+class TextClassificationDataset(Dataset):
   def __init__(self,
                device = None,
                tokenizer = None,
-               zippedData = None,
+               zipped_data = None,
                max_seq_len = None, # KoBERT max_length
                ):
 
@@ -149,9 +141,9 @@ class WellnessTextClassificationDataset(Dataset):
     self.data =[]
     self.tokenizer = tokenizer if tokenizer is not None else get_tokenizer()
 
-    mock_datas = []
+    sliced_datas = []
 
-    for zd in zippedData:
+    for zd in zipped_data:
       d = []
 
       if len(zd[0]) > max_seq_len:
@@ -160,10 +152,10 @@ class WellnessTextClassificationDataset(Dataset):
         d.append(zd[0])
       
       d.append(zd[1])
-      mock_datas.append(d)
+      sliced_datas.append(d)
 
-    for mock_data in mock_datas:
-      index_of_words = self.tokenizer.encode(mock_data[0])
+    for sliced_data in sliced_datas:
+      index_of_words = self.tokenizer.encode(sliced_data[0])
       token_type_ids = [0] * len(index_of_words)
       attention_mask = [1] * len(index_of_words)
 
@@ -176,7 +168,7 @@ class WellnessTextClassificationDataset(Dataset):
       attention_mask += [0] * padding_length
 
       # Label
-      label = int(mock_data[1])
+      label = int(sliced_data[1])
       data = {
               'input_ids': torch.tensor(index_of_words).to(self.device),
               'token_type_ids': torch.tensor(token_type_ids).to(self.device),
