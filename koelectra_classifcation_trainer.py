@@ -205,7 +205,7 @@ class WellnessTextClassificationDataset(Dataset):
 		item = self.data[index]
 		return item
 
-def make_zip_data(self, data, label):		
+def make_zip_data(data, label):		
 	zippedData = []
 
 	for i in range(len(data)):
