@@ -94,7 +94,7 @@ class KoelectraClassificationTrainer:
 		plt.show()
 	
 		
-	def train_model(epoch, model, optimizer, train_loader, save_step, save_ckpt_path, train_step = 0):
+	def train_model(self, epoch, model, optimizer, train_loader, save_step, save_ckpt_path, train_step = 0):
 		losses = []
 		train_start_index = train_step+1 if train_step != 0 else 0
 		total_train_step = len(train_loader)
