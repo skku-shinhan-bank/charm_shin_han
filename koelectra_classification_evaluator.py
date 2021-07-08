@@ -73,11 +73,11 @@ class KoElectraClassficationEvaluator:
 
         return loss / len(eval_dataset), acc / len(eval_dataset)
 
-    def evaluate_koelectra(self, test_datas, config):
-        n_epoch = config.num_epochs  # Num of Epoch
+    def evaluate_koelectra(self, test_datas, config, device):
+        #n_epoch = config.num_epochs  # Num of Epoch
         batch_size = config.batch_size  # 배치 사이즈
-        ctx = "cuda" if torch.cuda.is_available() else "cpu"
-        device = torch.device(ctx)
+        # ctx = "cuda" if torch.cuda.is_available() else "cpu"
+        # device = torch.device(ctx)
         # model_names=["kobert","koelectra"]
         # for model_name in model_names:
         eval_loss, eval_acc = self.evaluate(device, batch_size, test_datas)
