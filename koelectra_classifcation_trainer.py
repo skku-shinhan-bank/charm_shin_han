@@ -23,7 +23,7 @@ class KoElectraClassficationTrainer :
 		self.tokenizer = tokenizer
 		pass
 
-	def train(self, data, label, config, device):
+	def train(self, data, label, config, device, model_output_path):
 		zipped_data = make_zip_data(data, label)
 
 		n_epoch = config.num_epochs        # Num of Epoch
@@ -36,11 +36,6 @@ class KoElectraClassficationTrainer :
 		dataset = WellnessTextClassificationDataset(tokenizer=self.tokenizer, device=device, zippedData=zipped_data, num_labels=config.num_of_classes, max_seq_len=config.max_len)
 		train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-		checkpoint_path ="checkpoint"
-		if not os.path.isdir(checkpoint_path):
-			os.mkdir(checkpoint_path)
-		save_ckpt_path = f"{checkpoint_path}/config.model_output_path"
-
 		no_decay = ['bias', 'LayerNorm.weight']
 		optimizer_grouped_parameters = [
 		{'params': [p for n, p in self.model.named_parameters() if not any(nd in n for nd in no_decay)],
@@ -50,8 +45,8 @@ class KoElectraClassficationTrainer :
 		optimizer = AdamW(optimizer_grouped_parameters, lr=learning_rate)
 
 		pre_epoch, pre_loss, train_step = 0, 0, 0
-		if os.path.isfile(save_ckpt_path):
-			checkpoint = torch.load(save_ckpt_path, map_location=device)
+		if os.path.isfile(model_output_path):
+			checkpoint = torch.load(model_output_path, map_location=device)
 			pre_epoch = checkpoint['epoch']
 			pre_loss = checkpoint['loss']
 			train_step =  checkpoint['train_step']
@@ -60,14 +55,14 @@ class KoElectraClassficationTrainer :
 			self.model.load_state_dict(checkpoint['model_state_dict'])
 			optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
-			print(f"load pretrain from: {save_ckpt_path}, epoch={pre_epoch}, loss={pre_loss}")
+			print(f"load pretrain from: {model_output_path}, epoch={pre_epoch}, loss={pre_loss}")
 
 		losses = []
 
 		offset = pre_epoch
 		for step in range(config.num_epochs):
 			epoch = step + offset
-			loss = self.train_model( config.num_epochs, self.model, optimizer, train_loader, save_step, save_ckpt_path, train_step)
+			loss = self.train_model( config.num_epochs, self.model, optimizer, train_loader, save_step, model_output_path, train_step)
 			losses.append(loss)
 
 		# data
