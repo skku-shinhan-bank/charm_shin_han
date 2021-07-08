@@ -1,0 +1,8 @@
+git+https://git@github.com/SKTBrain/KoBERT.git@master
+mxnet
+gluonnlp
+pandas
+tqdm
+sentencepiece
+transformers
+torch
