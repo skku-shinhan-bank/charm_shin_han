@@ -29,13 +29,6 @@ class KoElectraClassifier(ElectraPreTrainedModel):
             output_attentions=None,
             output_hidden_states=None,
     ):
-      r"""
-      labels (:obj:`torch.LongTensor` of shape :obj:`(batch_size,)`, `optional`, defaults to :obj:`None`):
-          Labels for computing the sequence classification/regression loss.
-          Indices should be in :obj:`[0, ..., config.num_labels - 1]`.
-          If :obj:`config.num_labels == 1` a regression loss is computed (Mean-Square loss),
-          If :obj:`config.num_labels > 1` a classification loss is computed (Cross-Entropy).
-      """
       discriminator_hidden_states = self.electra(
         input_ids,
         attention_mask,
@@ -64,24 +57,24 @@ class KoElectraClassifier(ElectraPreTrainedModel):
 
       return outputs  # (loss), (logits), (hidden_states), (attentions)
 
-    def koelectra_input(tokenizer, str, device = None, max_seq_len = 512):
-      index_of_words = tokenizer.encode(str)
-      # token_type_ids = [0] * len(index_of_words)
-      attention_mask = [1] * len(index_of_words)
+    # def koelectra_input(tokenizer, str, device = None, max_seq_len = 512):
+    #   index_of_words = tokenizer.encode(str)
+    #   # token_type_ids = [0] * len(index_of_words)
+    #   attention_mask = [1] * len(index_of_words)
 
-      # Padding Length
-      padding_length = max_seq_len - len(index_of_words)
+    #   # Padding Length
+    #   padding_length = max_seq_len - len(index_of_words)
 
-      # Zero Padding
-      index_of_words += [0] * padding_length
-      # token_type_ids += [0] * padding_length
-      attention_mask += [0] * padding_length
+    #   # Zero Padding
+    #   index_of_words += [0] * padding_length
+    #   # token_type_ids += [0] * padding_length
+    #   attention_mask += [0] * padding_length
 
-      data = {
-        'input_ids': torch.tensor([]).to(device),
-        'attention_mask': torch.tensor([attention_mask]).to(device),
-      }
-      return data
+    #   data = {
+    #     'input_ids': torch.tensor([]).to(device),
+    #     'attention_mask': torch.tensor([attention_mask]).to(device),
+    #   }
+    #   return data
 
 
 class KoElectraClassifierHead(nn.Module):

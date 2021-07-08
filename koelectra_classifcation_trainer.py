@@ -24,7 +24,7 @@ class KoElectraClassficationTrainer :
 		pass
 
 	def train(self, data, label, config, device, model_output_path):
-		zipped_data = make_zip_data(data, label)
+		zipped_data = make_zipped_data(data, label)
 
 		n_epoch = config.num_epochs        # Num of Epoch
 		batch_size = config.batch_size      # 배치 사이즈
@@ -33,7 +33,7 @@ class KoElectraClassficationTrainer :
 
 		self.model.to(device)
 
-		dataset = KoElectraClassificationDataset(tokenizer=self.tokenizer, device=device, zippedData=zipped_data, num_labels=config.num_of_classes, max_seq_len=config.max_len)
+		dataset = KoElectraClassificationDataset(tokenizer=self.tokenizer, device=device, zipped_data=zipped_data, num_labels=config.num_of_classes, max_seq_len=config.max_len)
 		train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 		no_decay = ['bias', 'LayerNorm.weight']
@@ -89,15 +89,6 @@ class KoElectraClassficationTrainer :
 			pbar.update(train_step)
 			for i, data in enumerate(train_loader, train_start_index):
 				optimizer.zero_grad()
-
-				'''
-				inputs = {'input_ids': batch[0],
-				'attention_mask': batch[1],
-				'bias_labels': batch[3],
-				'hate_labels': batch[4]}
-				if self.args.model_type != 'distilkobert':
-				inputs['token_type_ids'] = batch[2]
-				'''
 				inputs = {'input_ids': data['input_ids'],
 					'attention_mask': data['attention_mask'],
 					'labels': data['labels']
@@ -129,11 +120,10 @@ class KoElectraClassficationTrainer :
 
 
 class KoElectraClassificationDataset(Dataset):
-	"""Wellness Text Classification Dataset"""
 	def __init__(self,
 			device = 'cpu',
 			tokenizer=None,
-			zippedData=None,
+			zipped_data=None,
 			num_labels=None,
 			max_seq_len=None # KoElectra max_length
 			):
@@ -143,7 +133,7 @@ class KoElectraClassificationDataset(Dataset):
 
 		mock_datas = []
 
-		for zd in zippedData:
+		for zd in zipped_data:
 			d = []
 
 			if len(zd[0]) > max_seq_len:
@@ -185,17 +175,14 @@ class KoElectraClassificationDataset(Dataset):
 		item = self.data[index]
 		return item
 
-def make_zip_data(data, label):		
-	zippedData = []
+def make_zipped_data(data, label):		
+	zipped_data = []
 
 	for i in range(len(data)):
 		row = []
 		row.append(data[i])
 		row.append(label[i])
-		zippedData.append(row)
+		zipped_data.append(row)
 
-		# print(zippedData)
-		# print(len(zippedData))
-
-		return zippedData
+		return zipped_data
 

@@ -44,7 +44,7 @@ class KoElectraClassficationEvaluator:
         model.to(device)
 
         # KoElectraClassificationDataset 데이터 로더
-        eval_dataset = KoElectraClassificationDataset(device=device, tokenizer=tokenizer, zippedData=test_datas, num_labels=config.num_of_classes, max_seq_len=config.max_len)
+        eval_dataset = KoElectraClassificationDataset(device=device, tokenizer=tokenizer, zipped_data=test_datas, num_labels=config.num_of_classes, max_seq_len=config.max_len)
         eval_dataloader = torch.utils.data.DataLoader(eval_dataset, batch_size=config.batch_size)
 
         loss = 0
