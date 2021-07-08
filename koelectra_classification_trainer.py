@@ -92,6 +92,8 @@ class KoelectraClassificationTrainer:
 		plt.xlabel('Epoch')
 		plt.ylabel('Loss')
 		plt.show()
+
+		self.evaluate(self, device=device, batch_size=config.batch_size, dataset_test=dataset_test, num_label=config.num_label, max_seq_len=config.max_seq_len, save_ckpt_path=model_output_path)
 	
 		
 	def train_model(self, epoch, model, optimizer, train_loader, save_step, save_ckpt_path, train_step = 0):
