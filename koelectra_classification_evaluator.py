@@ -12,7 +12,7 @@ from transformers import (
 
 
 class KoElectraClassficationEvaluator:
-    def __init__(self):
+    def __init__(self, config):
         pass
     
     def get_model_and_tokenizer(self, device, model_output_path):
