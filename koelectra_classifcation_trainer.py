@@ -104,7 +104,7 @@ class KoElectraClassficationTrainer :
 		checkpoint_path ="checkpoint"
 		if not os.path.isdir(checkpoint_path):
 			os.mkdir(checkpoint_path)
-		save_ckpt_path = f"{checkpoint_path}config.model_output_path"
+		save_ckpt_path = f"{checkpoint_path}/config.model_output_path"
 
 		no_decay = ['bias', 'LayerNorm.weight']
 		optimizer_grouped_parameters = [
