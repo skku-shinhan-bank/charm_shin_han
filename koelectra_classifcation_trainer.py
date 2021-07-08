@@ -39,13 +39,13 @@ class KoElectraClassficationTrainer :
 			return zippedData
 
 
-	def train(self, config, model, optimizer, train_loader, save_step, save_ckpt_path, train_step = 0):
+	def train(self, epoch, model, optimizer, train_loader, save_step, save_ckpt_path, train_step = 0):
 		losses = []
 		train_start_index = train_step+1 if train_step != 0 else 0
 		total_train_step = len(train_loader)
 		self.model.train()
 
-		with tqdm(total= total_train_step, desc=f"Train({config.num_epochs})") as pbar:
+		with tqdm(total= total_train_step, desc=f"Train({epoch})") as pbar:
 			pbar.update(train_step)
 			for i, data in enumerate(train_loader, train_start_index):
 				optimizer.zero_grad()
@@ -77,7 +77,7 @@ class KoElectraClassficationTrainer :
 
 				if i >= total_train_step or i % save_step == 0:
 					torch.save({
-						'epoch': config.num_epochs,  # 현재 학습 epoch
+						'epoch': epoch,  # 현재 학습 epoch
 						'model_state_dict': model.state_dict(),  # 모델 저장
 						'optimizer_state_dict': optimizer.state_dict(),  # 옵티마이저 저장
 						'loss': loss.item(),  # Loss 저장
@@ -132,7 +132,7 @@ class KoElectraClassficationTrainer :
 		offset = pre_epoch
 		for step in range(config.num_epochs):
 			epoch = step + offset
-			loss = self.train( epoch, self.model, optimizer, train_loader, save_step, save_ckpt_path, train_step)
+			loss = self.train( config.num_epochs, self.model, optimizer, train_loader, save_step, save_ckpt_path, train_step)
 			losses.append(loss)
 
 		# data
