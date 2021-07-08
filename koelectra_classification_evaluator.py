@@ -44,7 +44,7 @@ class KoElectraClassficationEvaluator:
 
     def evaluate(self, device, test_datas, config, model_output_path):
 
-        model, tokenizer = self.get_model_and_tokenizer(device, config, model_output_path)
+        model, tokenizer = self.get_model_and_tokenizer(device, model_output_path)
         model.to(device)
 
         # WellnessTextClassificationDataset 데이터 로더
