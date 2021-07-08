@@ -15,7 +15,7 @@ class KoElectraClassficationEvaluator:
     def __init__(self):
         pass
     
-    def get_model_and_tokenizer(self, device, model_output_path):
+    def get_model_and_tokenizer(self, device, model_output_path, config):
         # save_ckpt_path = CHECK_POINT[model_name]
         save_ckpt_path = model_output_path
 
@@ -44,7 +44,7 @@ class KoElectraClassficationEvaluator:
 
     def evaluate(self, device, test_datas, config, model_output_path):
 
-        model, tokenizer = self.get_model_and_tokenizer(device, model_output_path)
+        model, tokenizer = self.get_model_and_tokenizer(device, model_output_path, config)
         model.to(device)
 
         # WellnessTextClassificationDataset 데이터 로더
