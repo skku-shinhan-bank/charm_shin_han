@@ -11,7 +11,7 @@ from transformers import (
 
 
 class KoElectraClassficationEvaluator:
-    def __init__(self, model_path, config):
+    def __init__(self, device, model_path, config):
         save_ckpt_path = model_path
         model_name_or_path = "monologg/koelectra-small-v2-discriminator"
 
