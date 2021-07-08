@@ -180,8 +180,8 @@ class WellnessTextClassificationDataset(Dataset):
 		for zd in zippedData:
 			d = []
 
-			if len(zd[0]) > max_seq_len:
-				d.append(zd[0][:max_seq_len])
+			if len(zd[0]) > self.max_seq_len:
+				d.append(zd[0][:self.max_seq_len])
 			else:
 				d.append(zd[0])
 
