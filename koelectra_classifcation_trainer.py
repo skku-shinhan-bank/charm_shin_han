@@ -101,11 +101,10 @@ class KoElectraClassficationTrainer :
 		dataset = WellnessTextClassificationDataset(tokenizer=self.tokenizer, device=device, zippedData=zipped_data, num_label=config.num_of_classes, max_seq_len=config.max_len)
 		train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
-		#checkpoint_path ="checkpoint"
-		checkpoint_path = config.model_output_path
+		checkpoint_path ="checkpoint"
 		if not os.path.isdir(checkpoint_path):
 			os.mkdir(checkpoint_path)
-		save_ckpt_path = f"{checkpoint_path}"
+		save_ckpt_path = f"{checkpoint_path}config.model_output_path"
 
 		no_decay = ['bias', 'LayerNorm.weight']
 		optimizer_grouped_parameters = [
