@@ -67,6 +67,6 @@ class KoElectraClassificationEvaluate():
 				loss += outputs[0]
 				logit = outputs[1]
 				acc += (logit.argmax(1)==inputs['labels']).sum().item()
-				print('\n\n가나다라마바사', logit.argmax(1))
+				print('\n\n예측값', logit.argmax(1))
 
 		return loss / len(eval_dataset), acc / len(eval_dataset)
