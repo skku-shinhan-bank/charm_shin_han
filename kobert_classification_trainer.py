@@ -25,7 +25,7 @@ class KobertClassficationTrainer:
     train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
     return train_acc
 
-  def train(self, train_data, train_label,test_data, test_label, config, model_output_path, device):
+  def train(self, train_data, train_label, test_data, test_label, config, model_output_path, device):
     dataset_train = []
     dataset_test = []
 
