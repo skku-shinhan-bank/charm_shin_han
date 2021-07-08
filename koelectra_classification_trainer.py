@@ -24,18 +24,11 @@ class KoelectraClassificationTrainer:
 		model = koElectraForSequenceClassification.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-small-v2-discriminator", config = electra_config, num_labels = config.num_label)
 		tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-small-v2-discriminator")
 
-		MODEL_CLASSES ={
-			"koelectra": (ElectraConfig, koElectraForSequenceClassification, ElectraTokenizer),
-			}
-		CHECK_POINT ={
-		"koelectra": "../checkpoint/koelectra-wellnesee-text-classification.pth",
-		}
-
 		self.tokenizer = tokenizer
 		self.model = model
 		pass
 
-	def train(self, data, label, config):
+	def train(self, data, label, config, device, model_output_path):
 		zippedData = []
 
 		for i in range(len(data)):
@@ -50,21 +43,12 @@ class KoelectraClassificationTrainer:
 
 		dataset_train = zippedData[:config.num_of_train_data]
 		dataset_test = zippedData[config.num_of_train_data:]
-
-		ctx = "cuda" if torch.cuda.is_available() else "cpu"
-		device = torch.device(ctx)
 		learning_rate = 5e-5
 
 		self.model.to(device)
 
-		dataset = self.WellnessTextClassificationDataset(tokenizer=self.tokenizer, device=device, zippedData=dataset_train, num_label = config.num_label, max_seq_len = config.max_seq_len)
+		dataset = WellnessTextClassificationDataset(tokenizer=self.tokenizer, device=device, zippedData=dataset_train, num_label = config.num_label, max_seq_len = config.max_seq_len)
 		train_loader = torch.utils.data.DataLoader(dataset, batch_size=config.batch_size, shuffle=True)
-
-		checkpoint_path ="checkpoint"
-		# if not os.path.isdir(checkpoint_path):
-		# os.mkdir(checkpoint_path)
-		save_ckpt_path = f"{checkpoint_path}/koelectra-wellnesee-text-classification.pth"
-
 
 		no_decay = ['bias', 'LayerNorm.weight']
 		optimizer_grouped_parameters = [
@@ -75,8 +59,8 @@ class KoelectraClassificationTrainer:
 		optimizer = AdamW(optimizer_grouped_parameters, lr=learning_rate)
 
 		pre_epoch, pre_loss, train_step = 0, 0, 0
-		if os.path.isfile(save_ckpt_path):
-			checkpoint = torch.load(save_ckpt_path, map_location=device)
+		if os.path.isfile(model_output_path):
+			checkpoint = torch.load(model_output_path, map_location=device)
 			pre_epoch = checkpoint['epoch']
 			pre_loss = checkpoint['loss']
 			train_step =  checkpoint['train_step']
@@ -85,14 +69,14 @@ class KoelectraClassificationTrainer:
 			self.model.load_state_dict(checkpoint['model_state_dict'])
 			optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
-			print(f"load pretrain from: {save_ckpt_path}, epoch={pre_epoch}, loss={pre_loss}")
+			print(f"load pretrain from: {model_output_path}, epoch={pre_epoch}, loss={pre_loss}")
 		
 		losses = []
 
 		offset = pre_epoch
 		for step in range(config.n_epoch):
 			epoch = step + offset
-			loss = self.train_model( epoch, self.model, optimizer, train_loader, config.save_step, save_ckpt_path, train_step)
+			loss = self.train_model( epoch, self.model, optimizer, train_loader, config.save_step, model_output_path, train_step)
 			losses.append(loss)
 
 		# data
@@ -108,8 +92,6 @@ class KoelectraClassificationTrainer:
 		plt.xlabel('Epoch')
 		plt.ylabel('Loss')
 		plt.show()
-
-		self.evaluate_koelectra(dataset_test, config.batch_size, config.num_label, config.max_seq_len, config.save_ckpt_path)
 	
 		
 	def train_model(epoch, model, optimizer, train_loader, save_step, save_ckpt_path, train_step = 0):
