@@ -15,16 +15,16 @@ class KoElectraClassficationEvaluator:
     def __init__(self):
         pass
     
-    def get_model_and_tokenizer(self, device, config):
+    def get_model_and_tokenizer(self, device, model_output_path):
         # save_ckpt_path = CHECK_POINT[model_name]
-        save_ckpt_path = 'checkpoint/config.model_output_path'
+        save_ckpt_path = model_output_path
 
         # # if model_name== "koelectra":
-        # model_name_or_path = "monologg/koelectra-small-v2-discriminator"
+        model_name_or_path = "monologg/koelectra-small-v2-discriminator"
 
-        # tokenizer = ElectraTokenizer.from_pretrained(model_name_or_path)
-        # electra_config = ElectraConfig.from_pretrained(model_name_or_path)
-        # model = koElectraForSequenceClassifier.from_pretrained(pretrained_model_name_or_path=model_name_or_path, config=electra_config, num_labels=config.num_of_classes)
+        tokenizer = ElectraTokenizer.from_pretrained(model_name_or_path)
+        electra_config = ElectraConfig.from_pretrained(model_name_or_path)
+        model = koElectraForSequenceClassifier.from_pretrained(pretrained_model_name_or_path=model_name_or_path, config=electra_config, num_labels=config.num_of_classes)
 
         if os.path.isfile(save_ckpt_path):
             checkpoint = torch.load(save_ckpt_path, map_location=device)
