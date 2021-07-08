@@ -11,11 +11,8 @@ from transformers import (
 
 
 class KoElectraClassficationEvaluator:
-    def __init__(self):
-        pass
-    
-    def get_model_and_tokenizer(self, device, model_output_path, config):
-        save_ckpt_path = model_output_path
+    def __init__(self, model_path, config):
+        save_ckpt_path = model_path
         model_name_or_path = "monologg/koelectra-small-v2-discriminator"
 
         tokenizer = ElectraTokenizer.from_pretrained(model_name_or_path)
@@ -28,8 +25,11 @@ class KoElectraClassficationEvaluator:
             model.load_state_dict(checkpoint['model_state_dict'])
 
             print(f"\n\nload pretrain from\n\n: {save_ckpt_path}, epoch={pre_epoch}")
+        
+        self.model = model
+        self.tokenizer = tokenizer
 
-        return model, tokenizer
+        pass
 
     def get_model_input(self, data):
         return {'input_ids': data['input_ids'],
@@ -37,10 +37,9 @@ class KoElectraClassficationEvaluator:
                 'labels': data['labels']
                 }
 
-    def evaluate_model(self, test_datas, device, config, model_output_path):
+    def evaluate_model(self, test_datas, device, config, model_path):
 
-        model, tokenizer = self.get_model_and_tokenizer(device, model_output_path, config)
-        model.to(device)
+        self.model.to(device)
 
         # KoElectraClassificationDataset 데이터 로더
         eval_dataset = KoElectraClassificationDataset(device=device, tokenizer=tokenizer, zipped_data=test_datas, num_labels=config.num_of_classes, max_seq_len=config.max_len)
@@ -49,11 +48,11 @@ class KoElectraClassficationEvaluator:
         loss = 0
         acc = 0
 
-        model.eval()
+        self.model.eval()
         for data in tqdm(eval_dataloader, desc="Evaluating"):
             with torch.no_grad():
                 inputs = self.get_model_input(data)
-                outputs = model(**inputs)
+                outputs = self.model(**inputs)
                 loss += outputs[0]
                 logit = outputs[1]
                 acc += (logit.argmax(1)==inputs['labels']).sum().item()
