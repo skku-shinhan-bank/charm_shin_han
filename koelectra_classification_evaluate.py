@@ -53,7 +53,7 @@ class KoElectraClassificationEvaluate():
 		model, tokenizer = self.get_model_and_tokenizer(device=device, save_ckpt_path=save_ckpt_path, num_label=num_label)
 		model.to(device)
 
-		eval_dataset = WellnessTextClassificationDataset(device=device, tokenizer=tokenizer, zippedData=dataset_test, num_label = num_label, max_seq_len = max_seq_len)
+		eval_dataset = WellnessTextClassificationDataset(tokenizer=tokenizer, device=device, zippedData=dataset_test, max_seq_len = max_seq_len)
 		eval_dataloader = torch.utils.data.DataLoader(eval_dataset, batch_size=batch_size)
 
 		loss = 0
