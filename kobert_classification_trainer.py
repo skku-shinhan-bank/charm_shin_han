@@ -24,21 +24,31 @@ class KobertClassficationTrainer:
     train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
     return train_acc
 
-  def train(self, data, label, config, model_output_path, device):
-    zipped_data = []
+  def train(self, train_review, train_label,test_review, test_label, config, model_output_path, device):
+    zipped_train_data = []
+    zipped_test_data = []
 
-    for i in range(len(data)):
+    for i in range(len(train_review)):
         row = []
 
-        row.append(data[i])
-        row.append(label[i])
+        row.append(train_review[i])
+        row.append(train_label[i])
 
-        zipped_data.append(row)
+        zipped_train_data.append(row)
 
-    random.shuffle(zipped_data)
+    for i in range(len(test_review)):
+        row = []
 
-    dataset_train = zipped_data[:config.num_of_train_data]
-    dataset_test = zipped_data[config.num_of_train_data:]
+        row.append(test_review[i])
+        row.append(test_label[i])
+
+        zipped_test_data.append(row)
+
+    random.shuffle(zipped_train_data)
+    random.shuffle(zipped_test_data)
+
+    dataset_train = zipped_train_data
+    dataset_test = zipped_test_data
 
     tokenizer = get_tokenizer()
     tok = nlp.data.BERTSPTokenizer(tokenizer, self.vocab, lower=False)
