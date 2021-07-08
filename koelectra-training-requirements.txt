@@ -1,0 +1,5 @@
+transformers
+kobert_transformers
+torch
+matplotlib
+IPython
