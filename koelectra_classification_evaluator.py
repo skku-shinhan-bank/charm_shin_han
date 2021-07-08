@@ -42,7 +42,7 @@ class KoElectraClassficationEvaluator:
                 'labels': data['labels']
                 }
 
-    def evaluate(self, device, test_datas, config, model_output_path):
+    def evaluate_model(self, device, test_datas, config, model_output_path):
 
         model, tokenizer = self.get_model_and_tokenizer(device, model_output_path, config)
         model.to(device)
@@ -50,10 +50,6 @@ class KoElectraClassficationEvaluator:
         # WellnessTextClassificationDataset 데이터 로더
         eval_dataset = WellnessTextClassificationDataset(device=device, tokenizer=tokenizer, zippedData=test_datas, num_labels=config.num_of_classes, max_seq_len=config.max_len)
         eval_dataloader = torch.utils.data.DataLoader(eval_dataset, batch_size=config.batch_size)
-
-        # logger.info("***** Running evaluation on %s dataset *****")
-        # logger.info("  Num examples = %d", len(eval_dataset))
-        # logger.info("  Batch size = %d", batch_size)
 
         loss = 0
         acc = 0
@@ -66,19 +62,16 @@ class KoElectraClassficationEvaluator:
                 loss += outputs[0]
                 logit = outputs[1]
                 acc += (logit.argmax(1)==inputs['labels']).sum().item()
-                print('\n\n가나다라마바사', logit.argmax(1))
-                # predict = logit.argmax()
-                # num=predict.item()
-                # print("카테고리값 : ",num)
+                print('\n\n최댓값', logit.argmax(1))
 
         return loss / len(eval_dataset), acc / len(eval_dataset)
 
-    def evaluate_koelectra(self, test_datas, config, device, model_output_path):
+    def evaluate(self, test_datas, config, device, model_path):
         #n_epoch = config.num_epochs  # Num of Epoch
         # batch_size = config.batch_size  # 배치 사이즈
         # ctx = "cuda" if torch.cuda.is_available() else "cpu"
         # device = torch.device(ctx)
         # model_names=["kobert","koelectra"]
         # for model_name in model_names:
-        eval_loss, eval_acc = self.evaluate(device, test_datas, config, model_output_path)
+        eval_loss, eval_acc = self.evaluate_model(device, test_datas, config, model_path)
         print(f'\tLoss: {eval_loss:.4f}(valid)\t|\tAcc: {eval_acc * 100:.1f}%(valid)')
