@@ -59,8 +59,8 @@ class KoElectraClassficationTrainer :
 				inputs['token_type_ids'] = batch[2]
 				'''
 				inputs = {'input_ids': data['input_ids'],
-				'attention_mask': data['attention_mask'],
-				'labels': data['labels']
+					'attention_mask': data['attention_mask'],
+					'labels': data['labels']
 				}
 
 				outputs = model(**inputs)
