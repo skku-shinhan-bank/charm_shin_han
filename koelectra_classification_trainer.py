@@ -39,15 +39,11 @@ class KoelectraClassificationTrainer:
 
 			zippedData.append(row)
 
-			random.shuffle(zippedData)
-
-		dataset_train = zippedData[:config.num_of_train_data]
-		dataset_test = zippedData[config.num_of_train_data:]
-		learning_rate = 5e-5
+		learning_rate = config.learning_rate
 
 		self.model.to(device)
 
-		dataset = WellnessTextClassificationDataset(tokenizer=self.tokenizer, device=device, zippedData=dataset_train, num_label = config.num_label, max_seq_len = config.max_seq_len)
+		dataset = WellnessTextClassificationDataset(tokenizer=self.tokenizer, device=device, zippedData=zippedData, num_label = config.num_label, max_seq_len = config.max_seq_len)
 		train_loader = torch.utils.data.DataLoader(dataset, batch_size=config.batch_size, shuffle=True)
 
 		no_decay = ['bias', 'LayerNorm.weight']
@@ -92,10 +88,7 @@ class KoelectraClassificationTrainer:
 		plt.xlabel('Epoch')
 		plt.ylabel('Loss')
 		plt.show()
-
-		self.evaluate(self, device=device, batch_size=config.batch_size, dataset_test=dataset_test, num_label=config.num_label, max_seq_len=config.max_seq_len, save_ckpt_path=model_output_path)
 	
-		
 	def train_model(self, epoch, model, optimizer, train_loader, save_step, save_ckpt_path, train_step = 0):
 		losses = []
 		train_start_index = train_step+1 if train_step != 0 else 0
@@ -143,53 +136,6 @@ class KoelectraClassificationTrainer:
 					}, save_ckpt_path)
 
 		return np.mean(losses)
-
-	def get_model_and_tokenizer(self, device, save_ckpt_path):
-		if os.path.isfile(save_ckpt_path):
-			checkpoint = torch.load(save_ckpt_path, map_location=device)
-			pre_epoch = checkpoint['epoch']
-			self.model.load_state_dict(checkpoint['model_state_dict'])
-
-			print(f"\n\nload pretrain from\n\n: {save_ckpt_path}, epoch={pre_epoch}")
-
-		return self.model, self.tokenizer
-
-	def get_model_input(data):
-		return {'input_ids': data['input_ids'],
-					'attention_mask': data['attention_mask'],
-					'labels': data['labels']
-					}
-
-	def evaluate(self, device, batch_size, dataset_test, num_label, max_seq_len, save_ckpt_path):
-
-		model, tokenizer = self.get_model_and_tokenizer(device, save_ckpt_path)
-		model.to(device)
-
-		eval_dataset = self.WellnessTextClassificationDataset(device=device, tokenizer=tokenizer, zippedData=dataset_test, num_label = num_label, max_seq_len = max_seq_len)
-		eval_dataloader = torch.utils.data.DataLoader(eval_dataset, batch_size=batch_size)
-
-		loss = 0
-		acc = 0
-
-		model.eval()
-		for data in tqdm(eval_dataloader, desc="Evaluating"):
-			with torch.no_grad():
-				inputs = self.get_model_input(data)
-				outputs = model(**inputs)
-				loss += outputs[0]
-				logit = outputs[1]
-				acc += (logit.argmax(1)==inputs['labels']).sum().item()
-				print('\n\n가나다라마바사', logit.argmax(1))
-
-		return loss / len(eval_dataset), acc / len(eval_dataset)
-
-	def evaluate_koelectra(self, dataset_test, batch_size, num_label, max_seq_len, save_ckpt_path):
-		# n_epoch = 5  # Num of Epoch
-		# batch_size = 1  # 배치 사이즈
-		ctx = "cuda" if torch.cuda.is_available() else "cpu"
-		device = torch.device(ctx)
-		eval_loss, eval_acc = self.evaluate(device, batch_size, dataset_test, num_label, max_seq_len, save_ckpt_path)
-		print(f'\tLoss: {eval_loss:.4f}(valid)\t|\tAcc: {eval_acc * 100:.1f}%(valid)')
 
 
 class WellnessTextClassificationDataset(Dataset):
