@@ -7,7 +7,7 @@ from transformers import (
   ElectraModel
 )
 
-class koElectraForSequenceClassifier(ElectraPreTrainedModel):
+class koElectraForSequenceClassification(ElectraPreTrainedModel):
     def __init__(self, 
                 config,
                 num_labels):
