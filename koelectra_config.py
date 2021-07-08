@@ -6,7 +6,8 @@ class KoElectraConfig:
 	max_len,
 	batch_size,
 	num_epochs,
-	learning_rate
+	learning_rate,
+	model_output_path
 	):	
 			self.num_of_classes = num_of_classes
 			self.num_of_train_data = num_of_train_data
@@ -14,3 +15,4 @@ class KoElectraConfig:
 			self.batch_size = batch_size
 			self.num_epochs = num_epochs
 			self.learning_rate =  learning_rate
+			self.model_output_path = model_output_path
