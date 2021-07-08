@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from IPython.display import display
 from kobert_transformers import get_tokenizer
 from torch.utils.data import Dataset
-from .model.koelectra_classifier import koElectraForSequenceClassifier
+from .model.koelectra_classifier import KoElectraClassifier
 from transformers import (
 	ElectraConfig
 )
@@ -16,7 +16,7 @@ from transformers import (
 class KoElectraClassficationTrainer :
 	def __init__(self, config):
 		electra_config = ElectraConfig.from_pretrained("monologg/koelectra-small-v2-discriminator")
-		model = koElectraForSequenceClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-small-v2-discriminator", config = electra_config, num_labels = config.num_of_classes)
+		model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-small-v2-discriminator", config = electra_config, num_labels = config.num_of_classes)
 		tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-small-v2-discriminator")
 
 		self.model = model
@@ -33,7 +33,7 @@ class KoElectraClassficationTrainer :
 
 		self.model.to(device)
 
-		dataset = WellnessTextClassificationDataset(tokenizer=self.tokenizer, device=device, zippedData=zipped_data, num_labels=config.num_of_classes, max_seq_len=config.max_len)
+		dataset = KoElectraClassificationDataset(tokenizer=self.tokenizer, device=device, zippedData=zipped_data, num_labels=config.num_of_classes, max_seq_len=config.max_len)
 		train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 		no_decay = ['bias', 'LayerNorm.weight']
@@ -128,33 +128,18 @@ class KoElectraClassficationTrainer :
 		return np.mean(losses)
 
 
-	
-
-
-
-
-class WellnessTextClassificationDataset(Dataset):
+class KoElectraClassificationDataset(Dataset):
 	"""Wellness Text Classification Dataset"""
 	def __init__(self,
 			device = 'cpu',
 			tokenizer=None,
 			zippedData=None,
 			num_labels=None,
-			max_seq_len=None # KoBERT max_length
+			max_seq_len=None # KoElectra max_length
 			):
 		self.device = device
 		self.data =[]
 		self.tokenizer = tokenizer if tokenizer is not None else get_tokenizer()
-
-		# mock_datas = [
-		#   ['로그인이 안되네요', 0],
-		#   ['로그인이 안되네요', 0],
-		#   ['로그인이 안되네요', 0],
-		#   ['로그인이 안되네요', 0],
-		#   ['로그인이 안되네요', 0],
-		#   ['로그인이 안되네요', 0],
-		#   ['로그인이 안되네요', 0],
-		# ]
 
 		mock_datas = []
 
@@ -213,3 +198,4 @@ def make_zip_data(data, label):
 		# print(len(zippedData))
 
 		return zippedData
+

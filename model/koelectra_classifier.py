@@ -7,14 +7,14 @@ from transformers import (
   ElectraModel
 )
 
-class koElectraForSequenceClassifier(ElectraPreTrainedModel):
+class KoElectraClassifier(ElectraPreTrainedModel):
     def __init__(self, 
                 config,
                 num_labels):
       super().__init__(config)
       self.num_labels = num_labels
       self.electra = ElectraModel(config)
-      self.classifier = ElectraClassificationHead(config, num_labels)
+      self.classifier = KoElectraClassifierHead(config, num_labels)
 
       self.init_weights()
     def forward(
@@ -78,19 +78,13 @@ class koElectraForSequenceClassifier(ElectraPreTrainedModel):
       attention_mask += [0] * padding_length
 
       data = {
-        'input_ids': torch.tensor([
-                                   
-
-
-
-                                   
-        ]).to(device),
+        'input_ids': torch.tensor([]).to(device),
         'attention_mask': torch.tensor([attention_mask]).to(device),
       }
       return data
 
 
-class ElectraClassificationHead(nn.Module):
+class KoElectraClassifierHead(nn.Module):
 
   def __init__(self, config, num_labels):
     super().__init__()

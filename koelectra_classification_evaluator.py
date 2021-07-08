@@ -2,8 +2,8 @@ import torch
 import os
 from tqdm.notebook import tqdm
 from tqdm import tqdm
-from .model.koelectra_classifier import koElectraForSequenceClassifier
-from .koelectra_classifcation_trainer import WellnessTextClassificationDataset
+from .model.koelectra_classifier import KoElectraClassifier
+from .koelectra_classifcation_trainer import KoElectraClassificationDataset
 from .koelectra_classifcation_trainer import KoElectraClassficationTrainer
 from transformers import (
   ElectraTokenizer,  
@@ -16,20 +16,16 @@ class KoElectraClassficationEvaluator:
         pass
     
     def get_model_and_tokenizer(self, device, model_output_path, config):
-        # save_ckpt_path = CHECK_POINT[model_name]
         save_ckpt_path = model_output_path
-
-        # # if model_name== "koelectra":
         model_name_or_path = "monologg/koelectra-small-v2-discriminator"
 
         tokenizer = ElectraTokenizer.from_pretrained(model_name_or_path)
         electra_config = ElectraConfig.from_pretrained(model_name_or_path)
-        model = koElectraForSequenceClassifier.from_pretrained(pretrained_model_name_or_path=model_name_or_path, config=electra_config, num_labels=config.num_of_classes)
+        model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path=model_name_or_path, config=electra_config, num_labels=config.num_of_classes)
 
         if os.path.isfile(save_ckpt_path):
             checkpoint = torch.load(save_ckpt_path, map_location=device)
             pre_epoch = checkpoint['epoch']
-            # pre_loss = checkpoint['loss']
             model.load_state_dict(checkpoint['model_state_dict'])
 
             print(f"\n\nload pretrain from\n\n: {save_ckpt_path}, epoch={pre_epoch}")
@@ -47,8 +43,8 @@ class KoElectraClassficationEvaluator:
         model, tokenizer = self.get_model_and_tokenizer(device, model_output_path, config)
         model.to(device)
 
-        # WellnessTextClassificationDataset 데이터 로더
-        eval_dataset = WellnessTextClassificationDataset(device=device, tokenizer=tokenizer, zippedData=test_datas, num_labels=config.num_of_classes, max_seq_len=config.max_len)
+        # KoElectraClassificationDataset 데이터 로더
+        eval_dataset = KoElectraClassificationDataset(device=device, tokenizer=tokenizer, zippedData=test_datas, num_labels=config.num_of_classes, max_seq_len=config.max_len)
         eval_dataloader = torch.utils.data.DataLoader(eval_dataset, batch_size=config.batch_size)
 
         loss = 0
@@ -67,11 +63,6 @@ class KoElectraClassficationEvaluator:
         return loss / len(eval_dataset), acc / len(eval_dataset)
 
     def evaluate(self, test_datas, config, device, model_path):
-        #n_epoch = config.num_epochs  # Num of Epoch
-        # batch_size = config.batch_size  # 배치 사이즈
-        # ctx = "cuda" if torch.cuda.is_available() else "cpu"
-        # device = torch.device(ctx)
-        # model_names=["kobert","koelectra"]
-        # for model_name in model_names:
         eval_loss, eval_acc = self.evaluate_model(device, test_datas, config, model_path)
         print(f'\tLoss: {eval_loss:.4f}(valid)\t|\tAcc: {eval_acc * 100:.1f}%(valid)')
+
