@@ -25,7 +25,7 @@ class KoElectraClassficationEvaluator:
         electra_config = ElectraConfig.from_pretrained(model_name_or_path)
         model = koElectraForSequenceClassifier.from_pretrained(pretrained_model_name_or_path=model_name_or_path,
                                                                     config=electra_config,
-                                                                    num_labels=config.num_of_classes)
+                                                                    num_label=config.num_of_classes)
 
         if os.path.isfile(save_ckpt_path):
             checkpoint = torch.load(save_ckpt_path, map_location=device)

@@ -16,7 +16,7 @@ from transformers import (
 class KoElectraClassficationTrainer :
 	def __init__(self, config):
 		electra_config = ElectraConfig.from_pretrained("monologg/koelectra-small-v2-discriminator")
-		model = koElectraForSequenceClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-small-v2-discriminator", config = electra_config, num_labels = config.num_of_classes)
+		model = koElectraForSequenceClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-small-v2-discriminator", config = electra_config, num_label = config.num_of_classes)
 		tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-small-v2-discriminator")
 
 		self.model = model
