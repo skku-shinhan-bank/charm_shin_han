@@ -24,14 +24,14 @@ class KobertClassficationTrainer:
     train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
     return train_acc
 
-  def train(self, review_data, label_data, config, model_output_path, device):
+  def train(self, data, label, config, model_output_path, device):
     zipped_data = []
 
-    for i in range(len(review_data)):
+    for i in range(len(data)):
         row = []
 
-        row.append(review_data[i])
-        row.append(label_data[i])
+        row.append(data[i])
+        row.append(label[i])
 
         zipped_data.append(row)
 
