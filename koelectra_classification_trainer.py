@@ -143,16 +143,6 @@ class KoelectraClassificationTrainer:
 		return np.mean(losses)
 
 	def get_model_and_tokenizer(self, device, save_ckpt_path):
-		# save_ckpt_path = 'checkpoint/koelectra-wellnesee-text-classification.pth'
-
-		# model_name_or_path = "monologg/koelectra-small-v2-discriminator"
-
-		# tokenizer = ElectraTokenizer.from_pretrained(model_name_or_path)
-		# electra_config = ElectraConfig.from_pretrained(model_name_or_path)
-		# model = koElectraForSequenceClassification.from_pretrained(pretrained_model_name_or_path=model_name_or_path,
-		# 															config=electra_config,
-		# 															num_labels=config.num_labels)
-
 		if os.path.isfile(save_ckpt_path):
 			checkpoint = torch.load(save_ckpt_path, map_location=device)
 			pre_epoch = checkpoint['epoch']
@@ -212,15 +202,13 @@ class WellnessTextClassificationDataset(Dataset):
     self.device = device
     self.data =[]
     self.tokenizer = tokenizer if tokenizer is not None else get_tokenizer()
-	# self.num_label = num_label
-	# self.max_seq_len = max_seq_len
 
     mock_datas = []
 
     for zd in zippedData:
       d = []
 
-      if len(zd[0]) > self.max_seq_len:
+      if len(zd[0]) > max_seq_len:
         d.append(zd[0][:512])
       else:
         d.append(zd[0])
@@ -234,7 +222,7 @@ class WellnessTextClassificationDataset(Dataset):
       attention_mask = [1] * len(index_of_words)
 
       # Padding Length
-      padding_length = self.max_seq_len - len(index_of_words)
+      padding_length = max_seq_len - len(index_of_words)
 
       # Zero Padding
       index_of_words += [0] * padding_length
