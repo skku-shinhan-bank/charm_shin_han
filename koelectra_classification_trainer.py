@@ -42,7 +42,7 @@ class KoelectraClassificationTrainer:
 
 		self.model.to(device)
 
-		dataset = WellnessTextClassificationDataset(tokenizer=self.tokenizer, device=device, zippedData=zippedData, num_label = config.num_label, max_seq_len = config.max_seq_len)
+		dataset = WellnessTextClassificationDataset(tokenizer=self.tokenizer, device=device, zippedData=zippedData, max_seq_len = config.max_seq_len)
 		train_loader = torch.utils.data.DataLoader(dataset, batch_size=config.batch_size, shuffle=True)
 
 		no_decay = ['bias', 'LayerNorm.weight']
