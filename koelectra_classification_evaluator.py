@@ -11,7 +11,7 @@ from transformers import (
 
 
 class KoElectraClassficationEvaluator:
-    def __init__(self, config):
+    def __init__(self):
         pass
     
     def get_model_and_tokenizer(self, device, config):
@@ -45,7 +45,7 @@ class KoElectraClassficationEvaluator:
 
     def evaluate(self, device, test_datas, config):
 
-        model, tokenizer = self.get_model_and_tokenizer(device)
+        model, tokenizer = self.get_model_and_tokenizer(device, config)
         model.to(device)
 
         # WellnessTextClassificationDataset 데이터 로더
