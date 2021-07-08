@@ -39,7 +39,7 @@ class KoElectraClassficationTrainer :
 			return zippedData
 
 
-	def train_model(self, config, model, optimizer, train_loader, save_step, save_ckpt_path, train_step = 0):
+	def train(self, config, model, optimizer, train_loader, save_step, save_ckpt_path, train_step = 0):
 		losses = []
 		train_start_index = train_step+1 if train_step != 0 else 0
 		total_train_step = len(train_loader)
@@ -88,7 +88,7 @@ class KoElectraClassficationTrainer :
 		return np.mean(losses)
 
 
-	def train(self, data, label, config, device):
+	def train_model(self, data, label, config, device):
 		zipped_data = self.make_zip_data(data, label)
 
 		n_epoch = config.num_epochs        # Num of Epoch
