@@ -26,22 +26,19 @@ class KoElectraClassficationTrainer :
 	def train(self, data, label, config, device, model_output_path):
 		zipped_data = make_zipped_data(data, label)
 
-		n_epoch = config.num_epochs        # Num of Epoch
-		batch_size = config.batch_size      # 배치 사이즈
 		save_step = 100 # 학습 저장 주기
-		learning_rate = config.learning_rate
 
 		self.model.to(device)
 
 		dataset = KoElectraClassificationDataset(tokenizer=self.tokenizer, device=device, zipped_data=zipped_data, num_labels=config.num_of_classes, max_seq_len=config.max_len)
-		train_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
+		train_loader = torch.utils.data.DataLoader(dataset, batch_size=config.batch_size, shuffle=True)
 
 		no_decay = ['bias', 'LayerNorm.weight']
 		optimizer_grouped_parameters = [
 			{'params': [p for n, p in self.model.named_parameters() if not any(nd in n for nd in no_decay)], 'weight_decay': 0.01},
 			{'params': [p for n, p in self.model.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
 		]
-		optimizer = AdamW(optimizer_grouped_parameters, lr=learning_rate)
+		optimizer = AdamW(optimizer_grouped_parameters, lr=config.learning_rate)
 
 		pre_epoch, pre_loss, train_step = 0, 0, 0
 		if os.path.isfile(model_output_path):

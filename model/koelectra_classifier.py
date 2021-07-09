@@ -13,7 +13,7 @@ class KoElectraClassifier(ElectraPreTrainedModel):
                 num_labels):
       super().__init__(config)
       self.num_labels = num_labels
-      self.electra = ElectraModel(config)
+      self.model = ElectraModel(config)
       self.classifier = KoElectraClassifierHead(config, num_labels)
 
       self.init_weights()
@@ -48,11 +48,11 @@ class KoElectraClassifier(ElectraPreTrainedModel):
       if labels is not None:
         if self.num_labels == 1:
           #  We are doing regression
-          loss_fct = MSELoss()
-          loss = loss_fct(logits.view(-1), labels.view(-1))
+          loss_funct = MSELoss()
+          loss = loss_funct(logits.view(-1), labels.view(-1))
         else:
-          loss_fct = CrossEntropyLoss()
-          loss = loss_fct(logits.view(-1, self.num_labels), labels.view(-1))
+          loss_funct = CrossEntropyLoss()
+          loss = loss_funct(logits.view(-1, self.num_labels), labels.view(-1))
         outputs = (loss,) + outputs
 
       return outputs  # (loss), (logits), (hidden_states), (attentions)
