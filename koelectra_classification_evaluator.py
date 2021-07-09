@@ -1,7 +1,7 @@
 import torch
 from transformers import AutoTokenizer
 from .model.koelectra_classifier import KoElectraClassifier
-from .koelectra_classification_trainer import TextClassificationDataset
+from .koelectra_classification_trainer import KoElectraClassificationDataset
 from tqdm.notebook import tqdm
 import torch
 import os
@@ -45,7 +45,7 @@ class KoElectraClassificationEvaluator():
 		model, tokenizer = self.get_model_and_tokenizer(device=device, save_ckpt_path=save_ckpt_path, num_label=num_label)
 		model.to(device)
 
-		eval_dataset = TextClassificationDataset(tokenizer=tokenizer, device=device, zippedData=dataset_test, max_seq_len = max_seq_len)
+		eval_dataset = KoElectraClassificationDataset(tokenizer=tokenizer, device=device, zippedData=dataset_test, max_seq_len = max_seq_len)
 		eval_dataloader = torch.utils.data.DataLoader(eval_dataset, batch_size=batch_size)
 
 		loss = 0

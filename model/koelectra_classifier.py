@@ -13,7 +13,7 @@ class KoElectraClassifier(ElectraPreTrainedModel):
       super().__init__(config)
       self.num_labels = num_labels
       self.electra = ElectraModel(config)
-      self.model = KoElectra(config, num_labels)
+      self.model = KoElectraClassificationHead(config, num_labels)
 
       self.init_weights()
     def forward(
@@ -56,7 +56,7 @@ class KoElectraClassifier(ElectraPreTrainedModel):
 
       return outputs  # (loss), (logits), (hidden_states), (attentions)
 
-class KoElectra(nn.Module):
+class KoElectraClassificationHead(nn.Module):
 
   def __init__(self, config, num_labels):
     super().__init__()

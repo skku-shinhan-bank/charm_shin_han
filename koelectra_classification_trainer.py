@@ -17,7 +17,7 @@ from transformers import (
   ElectraConfig,
 )
 
-class KoelectraClassificationTrainer:
+class KoElectraClassificationTrainer:
 	def __init__(self, config):
 		electra_config = ElectraConfig.from_pretrained("monologg/koelectra-small-v2-discriminator")
 		model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-small-v2-discriminator", config = electra_config, num_labels = config.num_label)
@@ -42,7 +42,7 @@ class KoelectraClassificationTrainer:
 
 		self.model.to(device)
 
-		dataset = TextClassificationDataset(tokenizer=self.tokenizer, device=device, zipped_data=zipped_data, max_seq_len = config.max_seq_len)
+		dataset = KoElectraClassificationDataset(tokenizer=self.tokenizer, device=device, zipped_data=zipped_data, max_seq_len = config.max_seq_len)
 		train_loader = torch.utils.data.DataLoader(dataset, batch_size=config.batch_size, shuffle=True)
 
 		no_decay = ['bias', 'LayerNorm.weight']
@@ -71,7 +71,7 @@ class KoelectraClassificationTrainer:
 		offset = pre_epoch
 		for step in range(config.n_epoch):
 			epoch = step + offset
-			loss = self.train_model( epoch, self.model, optimizer, train_loader, config.save_step, model_output_path, train_step)
+			loss = self.train_one_epoch( epoch, self.model, optimizer, train_loader, config.save_step, model_output_path, train_step)
 			losses.append(loss)
 
 		# data
@@ -88,7 +88,7 @@ class KoelectraClassificationTrainer:
 		plt.ylabel('Loss')
 		plt.show()
 	
-	def train_model(self, epoch, model, optimizer, train_loader, save_step, save_ckpt_path, train_step = 0):
+	def train_one_epoch(self, epoch, model, optimizer, train_loader, save_step, save_ckpt_path, train_step = 0):
 		losses = []
 		train_start_index = train_step+1 if train_step != 0 else 0
 		total_train_step = len(train_loader)
@@ -129,7 +129,7 @@ class KoelectraClassificationTrainer:
 		return np.mean(losses)
 
 
-class TextClassificationDataset(Dataset):
+class KoElectraClassificationDataset(Dataset):
   def __init__(self,
                device = None,
                tokenizer = None,
