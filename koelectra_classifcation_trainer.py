@@ -160,7 +160,7 @@ class KoElectraClassificationDataset(Dataset):
 				'token_type_ids': torch.tensor(token_type_ids).to(self.device),
 				'attention_mask': torch.tensor(attention_mask).to(self.device),
 				'labels': torch.tensor(label).to(self.device)
-			}
+				}
 
 			self.data.append(data)
 
