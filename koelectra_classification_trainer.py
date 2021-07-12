@@ -122,15 +122,15 @@ class KoElectraClassificationTrainer:
 		return np.mean(losses)
 		
 def make_zipped_data(data, label):      
-   zipped_data = []
+	zipped_data = []
 
-   for i in range(len(data)):
-      row = []
-      row.append(data[i])
-      row.append(label[i])
-      zipped_data.append(row)
+	for i in range(len(data)):
+		row = []
+		row.append(data[i])
+		row.append(label[i])
+		zipped_data.append(row)
 
-    return zipped_data
+	return zipped_data
 
 class KoElectraClassificationDataset(Dataset):
   def __init__(self,
