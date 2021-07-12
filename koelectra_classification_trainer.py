@@ -81,7 +81,7 @@ class KoElectraClassificationTrainer:
 		plt.ylabel('Loss')
 		plt.show()
 	
-	def train_one_epoch(self, epoch, model, optimizer, train_loader, save_step, save_ckpt_path, train_step = 0):
+	def train_one_epoch(self, epoch, model, optimizer, train_loader, save_step, model_output_path, train_step = 0):
 		losses = []
 		train_start_index = train_step+1 if train_step != 0 else 0
 		total_train_step = len(train_loader)
@@ -117,7 +117,7 @@ class KoElectraClassificationTrainer:
 						'loss': loss.item(),  # Loss 저장
 						'train_step': i,  # 현재 진행한 학습
 						'total_train_step': len(train_loader)  # 현재 epoch에 학습 할 총 train step
-					}, save_ckpt_path)
+					}, model_output_path)
 
 		return np.mean(losses)
 		
