@@ -28,15 +28,8 @@ class KoElectraClassificationTrainer:
 		pass
 
 	def train(self, data, label, config, device, model_output_path):
-		zipped_data = []
 
-		for i in range(len(data)):
-			row = []
-
-			row.append(data[i])
-			row.append(label[i])
-
-			zipped_data.append(row)
+		zipped_data = make_zipped_data(data, label)
 
 		learning_rate = config.learning_rate
 
@@ -98,7 +91,7 @@ class KoElectraClassificationTrainer:
 			pbar.update(train_step)
 			for i, data in enumerate(train_loader, train_start_index):
 				optimizer.zero_grad()
-
+ 
 				inputs = {'input_ids': data['input_ids'],
 						'attention_mask': data['attention_mask'],
 						'labels': data['labels']
@@ -127,7 +120,17 @@ class KoElectraClassificationTrainer:
 					}, save_ckpt_path)
 
 		return np.mean(losses)
+		
+def make_zipped_data(data, label):      
+   zipped_data = []
 
+   for i in range(len(data)):
+      row = []
+      row.append(data[i])
+      row.append(label[i])
+      zipped_data.append(row)
+
+    return zipped_data
 
 class KoElectraClassificationDataset(Dataset):
   def __init__(self,
@@ -147,7 +150,7 @@ class KoElectraClassificationDataset(Dataset):
       d = []
 
       if len(zd[0]) > max_seq_len:
-        d.append(zd[0][:512])
+        d.append(zd[0][:max_seq_len])
       else:
         d.append(zd[0])
       
