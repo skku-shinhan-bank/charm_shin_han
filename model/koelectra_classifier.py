@@ -13,8 +13,8 @@ class KoElectraClassifier(ElectraPreTrainedModel):
                 num_labels):
       super().__init__(config)
       self.num_labels = num_labels
-      self.electra = ElectraModel(config)
-      self.model = KoElectraClassifierHead(config, num_labels)
+      self.model = ElectraModel(config)
+      self.classifier = KoElectraClassifierHead(config, num_labels)
 
       self.init_weights()
     def forward(
@@ -29,7 +29,7 @@ class KoElectraClassifier(ElectraPreTrainedModel):
             output_attentions=None,
             output_hidden_states=None,
     ):
-      discriminator_hidden_states = self.electra(
+      discriminator_hidden_states = self.model(
         input_ids,
         attention_mask,
         token_type_ids,
@@ -41,7 +41,7 @@ class KoElectraClassifier(ElectraPreTrainedModel):
       )
 
       sequence_output = discriminator_hidden_states[0]
-      logits = self.model(sequence_output)
+      logits = self.classifier(sequence_output)
 
       outputs = (logits,) + discriminator_hidden_states[1:]  # add hidden states and attention if they are here
 
