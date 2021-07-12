@@ -41,7 +41,7 @@ class KoElectraClassifier(ElectraPreTrainedModel):
       )
 
       sequence_output = discriminator_hidden_states[0]
-      logits = self.classifier(sequence_output)
+      logits = self.model(sequence_output)
 
       outputs = (logits,) + discriminator_hidden_states[1:]  # add hidden states and attention if they are here
 
