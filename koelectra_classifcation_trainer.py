@@ -86,9 +86,9 @@ class KoElectraClassficationTrainer :
 			for i, data in enumerate(train_loader, train_start_index):
 				optimizer.zero_grad()
 				inputs = {'input_ids': data['input_ids'],
-					'attention_mask': data['attention_mask'],
-					'labels': data['labels']
-					}
+						'attention_mask': data['attention_mask'],
+						'labels': data['labels']
+						}
 
 				outputs = model(**inputs)
 
@@ -105,7 +105,7 @@ class KoElectraClassficationTrainer :
 				if i >= total_train_step or i % save_step == 0:
 					torch.save({
 						'epoch': epoch,  # 현재 학습 epoch
-						'model_state_dict': model.state_dict(),  # 모델 저장
+						'model_state_dict': self.model.state_dict(),  # 모델 저장
 						'optimizer_state_dict': optimizer.state_dict(),  # 옵티마이저 저장
 						'loss': loss.item(),  # Loss 저장
 						'train_step': i,  # 현재 진행한 학습
