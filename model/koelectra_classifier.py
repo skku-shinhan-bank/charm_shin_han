@@ -14,7 +14,7 @@ class KoElectraClassifier(ElectraPreTrainedModel):
       super().__init__(config)
       self.num_labels = num_labels
       self.electra = ElectraModel(config)
-      self.classifier = KoElectraClassifierHead(config, num_labels)
+      self.model = KoElectraClassifierHead(config, num_labels)
 
       self.init_weights()
     def forward(
