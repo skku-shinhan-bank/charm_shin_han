@@ -74,10 +74,10 @@ class KobertClassficationTrainer:
         model.train()
         for batch_id, (token_ids, valid_length, segment_ids, label) in enumerate(tqdm_notebook(train_dataloader)):
             optimizer.zero_grad()
-            token_ids = token_ids.long()
-            segment_ids = segment_ids.long()
+            token_ids = token_ids.long().to(device)
+            segment_ids = segment_ids.long().to(device)
             valid_length= valid_length
-            label = label.long()
+            label = label.long().to(device)
             out = model(token_ids, valid_length, segment_ids)
             loss = loss_fn(out, label)
             loss.backward()
@@ -90,10 +90,10 @@ class KobertClassficationTrainer:
         print("epoch {} train acc {}".format(e+1, train_acc / (batch_id+1)))
         model.eval()
         for batch_id, (token_ids, valid_length, segment_ids, label) in enumerate(tqdm_notebook(test_dataloader)):
-            token_ids = token_ids.long()
-            segment_ids = segment_ids.long()
+            token_ids = token_ids.long().to(device)
+            segment_ids = segment_ids.long().to(device)
             valid_length= valid_length
-            label = label.long()
+            label = label.long().to(device)
             out = model(token_ids, valid_length, segment_ids)
             test_acc += self.calc_accuracy(out, label)
         print("epoch {} test acc {}".format(e+1, test_acc / (batch_id+1)))
