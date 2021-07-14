@@ -16,6 +16,7 @@ from kobert_transformers import get_tokenizer
 from transformers import (
   ElectraConfig,
 )
+import time
 
 class KoElectraClassificationTrainer:
 	def __init__(self):
@@ -51,6 +52,7 @@ class KoElectraClassificationTrainer:
 
 			losses = []
 			classification_model.train()
+			start_time = time.time()
 			for batch_index, data in enumerate(tqdm_notebook(train_loader)):
 				optimizer.zero_grad()
 				inputs = {
@@ -63,14 +65,14 @@ class KoElectraClassificationTrainer:
 				losses.append(loss.item())
 				loss.backward()
 				optimizer.step()
-			
+			end_time = time.time()
 			train_loss = np.mean(losses)
 			
 			train_loss, train_acc = self.test_model(classification_model, train_dataset, train_loader)
-			print("train acc {} / loss {}".format(train_acc, train_loss.data.cpu().numpy()))
+			print("train: acc {} / loss {} / time {}".format(train_acc, train_loss.data.cpu().numpy(), end_time - start_time))
 
 			test_loss, test_acc = self.test_model(classification_model, test_dataset, test_loader)
-			print("test acc {} / loss {}".format(test_acc, test_loss))
+			print("test: acc {} / loss {}".format(test_acc, test_loss))
 
 			print("\n")
 
