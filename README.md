@@ -1,5 +1,19 @@
 # charm-shin-han
 
+## install
+
+KoBERT Classification
+
+```
+pip install -r kobert-training-requirements.txt
+```
+
+KoElectra Classification
+
+```
+pip install -r koelectra-training-requirements.txt
+```
+
 ## usage
 
 ### Data Maker
