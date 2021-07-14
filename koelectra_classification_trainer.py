@@ -6,7 +6,6 @@ from torch.nn import functional as F
 from torch.utils.data import DataLoader, Dataset
 from transformers import AutoTokenizer, ElectraForSequenceClassification, AdamW
 from .model.koelectra_classifier import KoElectraClassifier
-from .koelectra_classification_evaluator import KoElectraClassificationEvaluator
 from tqdm.notebook import tqdm
 import torch
 import os
