@@ -47,6 +47,7 @@ class KoElectraClassificationTrainer:
 		optimizer = AdamW(optimizer_grouped_parameters, lr=learning_rate)
 
 		for epoch_index in range(config.n_epoch):
+			print("[epoch {}]".format(epoch_index + 1))
 			classification_model.train()
 			for batch_index, data in enumerate(tqdm_notebook(train_loader)):
 				optimizer.zero_grad()
@@ -59,11 +60,11 @@ class KoElectraClassificationTrainer:
 				loss = outputs[0]
 				loss.backward()
 				optimizer.step()
-			train_acc = self.test_model(classification_model, train_dataset, train_loader)
-			print("epoch {} / train acc {} / loss {}".format(epoch_index+1, train_acc / (batch_index + 1), loss.data.cpu().numpy()))
+			train_loss, train_acc = self.test_model(classification_model, train_dataset, train_loader)
+			print("train acc {} / loss {}".format(train_acc, train_loss))
 
-			test_acc = self.test_model(classification_model, test_dataset, test_loader)
-			print("epoch {} test acc {}".format(epoch_index + 1, test_acc / (batch_index+1)))
+			test_loss, test_acc = self.test_model(classification_model, test_dataset, test_loader)
+			print("test acc {} / loss {}".format(test_acc, test_loss))
 
 		torch.save({
 			'epoch': config.n_epoch,  # 현재 학습 epoch
@@ -92,7 +93,7 @@ class KoElectraClassificationTrainer:
 				logit = outputs[1]
 				acc += (logit.argmax(1)==inputs['labels']).sum().item()
 		
-		return acc / len(test_dataset)
+		return loss / len(test_dataset), acc / len(test_dataset)
 
 def make_zipped_data(data, label):      
 	zipped_data = []
