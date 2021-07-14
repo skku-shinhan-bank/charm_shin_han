@@ -48,5 +48,30 @@ trainer.train(train_data, train_label, test_data, test_label, config, 'output.pt
 ### KoElectra Classification Trainer
 
 ```python
+from charm_shin_han.koelectra_config import KoELECTRAConfig
+from charm_shin_han.koelectra_classification_trainer import KoElectraClassificationTrainer
+import torch
 
+train_data = [
+  'hello', 'hi', 'im', 'shinhan', 'app review'
+]
+train_label = [0, 1, 2, 3, 4]
+test_data = ['hi', 'hello']
+test_label = [0, 1]
+
+config = KoELECTRAConfig(
+    n_epoch = 5,       # Num of Epoch
+    batch_size = 32,      # 배치 사이즈
+    save_step = 3,   # 학습 저장 주기
+    num_label = 5,    #분류 개수
+    max_seq_len = 128,     #최대길이
+    learning_rate = 5e-5
+)
+ctx = "cuda" if torch.cuda.is_available() else "cpu"
+device = torch.device(ctx)
+
+trainer = KoElectraClassificationTrainer(
+    config=config
+)
+trainer.train(train_data=train_data, train_label=train_label, test_data=test_data, test_label=test_label, config=config, device=device, model_output_path='output.pth')
 ```
