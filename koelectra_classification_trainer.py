@@ -59,9 +59,8 @@ class KoElectraClassificationTrainer:
 				loss = outputs[0]
 				loss.backward()
 				optimizer.step()
-			
 			train_acc = self.test_model(classification_model, train_dataset, train_loader)
-			print("epoch {} train acc {}".format(epoch_index+1, train_acc / (batch_index + 1)))
+			print("epoch {} / train acc {} / loss {}".format(epoch_index+1, train_acc / (batch_index + 1), loss.data.cpu().numpy()))
 
 			test_acc = self.test_model(classification_model, test_dataset, test_loader)
 			print("epoch {} test acc {}".format(epoch_index + 1, test_acc / (batch_index+1)))
@@ -75,54 +74,6 @@ class KoElectraClassificationTrainer:
 			'total_train_step': len(train_loader)  # 현재 epoch에 학습 할 총 train step
 		}, model_output_path)
 	
-	def train_one_epoch(self, train_dataset, epoch, model, optimizer, train_loader, save_step, model_output_path, train_step = 0):
-		losses = []
-		train_start_index = train_step+1 if train_step != 0 else 0
-		total_train_step = len(train_loader)
-		model.train()
-
-		with tqdm(total= total_train_step, desc=f"Train({epoch})") as pbar:
-			pbar.update(train_step)
-			for i, data in enumerate(train_loader, train_start_index):
-				optimizer.zero_grad()
- 
-				inputs = {
-					'input_ids': data['input_ids'],
-					'attention_mask': data['attention_mask'],
-					'labels': data['labels']
-				}
-				outputs = model(**inputs)
-				loss = outputs[0]
-				losses.append(loss.item())
-				loss.backward()
-				optimizer.step()
-				pbar.update(1)
-				pbar.set_postfix_str(f"Train - Loss: {np.mean(losses):.3f}")
-			
-
-				if i == total_train_step :
-					torch.save({
-						'epoch': epoch,  # 현재 학습 epoch
-						'model_state_dict': model.state_dict(),  # 모델 저장
-						'optimizer_state_dict': optimizer.state_dict(),  # 옵티마이저 저장
-						'loss': loss.item(),  # Loss 저장
-						'train_step': i,  # 현재 진행한 학습
-						'total_train_step': len(train_loader)  # 현재 epoch에 학습 할 총 train step
-					}, model_output_path)
-			train_acc = self.test_model(model, train_dataset, train_loader)
-			print(f'\ttrain - Acc: {train_acc * 100:.1f}%(valid)')
-
-		return np.mean(losses)
-
-	def test_one_epoch(self, test_dataset, test_loader, model):
-		eval_acc = self.test_model(model, test_dataset, test_loader)
-		print(f'\ttest - Acc: {eval_acc * 100:.1f}%(valid)')
-
-	def get_model_input(self, data):
-		return {'input_ids': data['input_ids'],
-					'attention_mask': data['attention_mask'],
-					'labels': data['labels']
-				}
 	def test_model(self, model, test_dataset, test_loader):
 
 		loss = 0
