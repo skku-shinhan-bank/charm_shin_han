@@ -67,8 +67,7 @@ class KoElectraClassificationTrainer:
 		for step in range(config.n_epoch):
 			epoch = step + offset
 			loss = self.train_one_epoch(train_dataset, epoch, self.model, optimizer, train_loader, config.save_step, model_output_path, train_step)
-			eval_loss, eval_acc = self.test_model(self.model, test_dataset, test_loader)
-			print(f'\tLoss: {eval_loss:.4f}(valid)\t|\tAcc: {eval_acc * 100:.1f}%(valid)')
+			self.test_one_epoch(test_dataset, test_loader, self.model)
 			losses.append(loss)
 
 		# data
@@ -127,9 +126,9 @@ class KoElectraClassificationTrainer:
 
 		return np.mean(losses)
 
-#	def test_one_epoch(self, test_dataset, test_loader, model):
-#		eval_loss, eval_acc = self.test_model(model, test_dataset, test_loader)
-#		print(f'\tLoss: {eval_loss:.4f}(valid)\t|\tAcc: {eval_acc * 100:.1f}%(valid)')
+	def test_one_epoch(self, test_dataset, test_loader, model):
+		eval_loss, eval_acc = self.test_model(model, test_dataset, test_loader)
+		print(f'\tLoss: {eval_loss:.4f}(valid)\t|\tAcc: {eval_acc * 100:.1f}%(valid)')
 
 	def get_model_input(self, data):
 		return {'input_ids': data['input_ids'],
@@ -142,7 +141,7 @@ class KoElectraClassificationTrainer:
 		acc = 0
 
 		model.eval()
-		for data in tqdm(test_loader, desc="Evaluating"):
+		for data in test_loader:
 			with torch.no_grad():
 				inputs = self.get_model_input(data)
 				outputs = model(**inputs)
