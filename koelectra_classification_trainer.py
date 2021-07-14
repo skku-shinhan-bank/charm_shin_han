@@ -127,6 +127,11 @@ class KoElectraClassificationTrainer:
 		eval_loss, eval_acc = self.test_model(model, test_dataset, test_loader)
 		print(f'\tLoss: {eval_loss:.4f}(valid)\t|\tAcc: {eval_acc * 100:.1f}%(valid)')
 
+	def get_model_input(self, data):
+		return {'input_ids': data['input_ids'],
+					'attention_mask': data['attention_mask'],
+					'labels': data['labels']
+				}
 	def test_model(self, model, test_dataset, test_loader):
 
 		loss = 0
