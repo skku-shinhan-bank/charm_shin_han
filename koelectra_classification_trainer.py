@@ -6,6 +6,7 @@ from torch.nn import functional as F
 from torch.utils.data import DataLoader, Dataset
 from transformers import AutoTokenizer, ElectraForSequenceClassification, AdamW
 from .model.koelectra_classifier import KoElectraClassifier
+from .koelectra_classification_evaluator import KoElectraClassificationEvaluator
 from tqdm.notebook import tqdm
 import torch
 import os
@@ -27,16 +28,19 @@ class KoElectraClassificationTrainer:
 		self.model = model
 		pass
 
-	def train(self, data, label, config, device, model_output_path):
+	def train(self, train_data, train_label, test_data, test_label, config, device, model_output_path):
 
-		zipped_data = make_zipped_data(data, label)
-
+		train_zipped_data = make_zipped_data(train_data, train_label)
+		test_zipped_data = make_zipped_data(test_data, test_label)
 		learning_rate = config.learning_rate
 
 		self.model.to(device)
 
-		dataset = KoElectraClassificationDataset(tokenizer=self.tokenizer, device=device, zipped_data=zipped_data, max_seq_len = config.max_seq_len)
-		train_loader = torch.utils.data.DataLoader(dataset, batch_size=config.batch_size, shuffle=True)
+		train_dataset = KoElectraClassificationDataset(tokenizer=self.tokenizer, device=device, zipped_data=train_zipped_data, max_seq_len = config.max_seq_len)
+		test_dataset = KoElectraClassificationDataset(tokenizer=self.tokenizer, device=device, zipped_data=test_zipped_data, max_seq_len = config.max_seq_len)
+
+		train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True)
+		test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=config.batch_size, shuffle=True)
 
 		no_decay = ['bias', 'LayerNorm.weight']
 		optimizer_grouped_parameters = [
@@ -60,11 +64,11 @@ class KoElectraClassificationTrainer:
 			print(f"load pretrain from: {model_output_path}, epoch={pre_epoch}, loss={pre_loss}")
 		
 		losses = []
-
 		offset = pre_epoch
 		for step in range(config.n_epoch):
 			epoch = step + offset
 			loss = self.train_one_epoch( epoch, self.model, optimizer, train_loader, config.save_step, model_output_path, train_step)
+			self.test_one_epoch(test_dataset, test_loader, self.model)
 			losses.append(loss)
 
 		# data
@@ -105,7 +109,6 @@ class KoElectraClassificationTrainer:
 
 				loss.backward()
 				optimizer.step()
-
 				pbar.update(1)
 				pbar.set_postfix_str(f"Loss: {loss.item():.3f} ({np.mean(losses):.3f})")
 
@@ -120,7 +123,28 @@ class KoElectraClassificationTrainer:
 					}, model_output_path)
 
 		return np.mean(losses)
-		
+
+	def test_one_epoch(self, test_dataset, test_loader, model):
+		eval_loss, eval_acc = self.test_model(model, test_dataset, test_loader)
+		print(f'\tLoss: {eval_loss:.4f}(valid)\t|\tAcc: {eval_acc * 100:.1f}%(valid)')
+
+	def test_model(self, model, test_dataset, test_loader):
+
+		loss = 0
+		acc = 0
+
+		model.eval()
+		for data in tqdm(test_loader, desc="Evaluating"):
+			with torch.no_grad():
+				inputs = self.get_model_input(data)
+				outputs = model(**inputs)
+				loss += outputs[0]
+				logit = outputs[1]
+				acc += (logit.argmax(1)==inputs['labels']).sum().item()
+				print('\n\n예측값', logit.argmax(1))
+
+		return loss / len(test_dataset), acc / len(test_dataset)
+
 def make_zipped_data(data, label):      
 	zipped_data = []
 
