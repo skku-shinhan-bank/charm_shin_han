@@ -112,15 +112,15 @@ class KoElectraClassificationTrainer:
 				pbar.set_postfix_str(f"Train - Loss: {np.mean(losses):.3f}")
 			
 
-				# if i >= total_train_step or i % save_step == 0:
-				# 	torch.save({
-				# 		'epoch': epoch,  # 현재 학습 epoch
-				# 		'model_state_dict': model.state_dict(),  # 모델 저장
-				# 		'optimizer_state_dict': optimizer.state_dict(),  # 옵티마이저 저장
-				# 		'loss': loss.item(),  # Loss 저장
-				# 		'train_step': i,  # 현재 진행한 학습
-				# 		'total_train_step': len(train_loader)  # 현재 epoch에 학습 할 총 train step
-				# 	}, model_output_path)
+				if i == total_train_step :
+					torch.save({
+						'epoch': epoch,  # 현재 학습 epoch
+						'model_state_dict': model.state_dict(),  # 모델 저장
+						'optimizer_state_dict': optimizer.state_dict(),  # 옵티마이저 저장
+						'loss': loss.item(),  # Loss 저장
+						'train_step': i,  # 현재 진행한 학습
+						'total_train_step': len(train_loader)  # 현재 epoch에 학습 할 총 train step
+					}, model_output_path)
 			train_acc = self.test_model(model, train_dataset, train_loader)
 			print(f'\ttrain - Acc: {train_acc * 100:.1f}%(valid)')
 
