@@ -48,6 +48,8 @@ class KoElectraClassificationTrainer:
 
 		for epoch_index in range(config.n_epoch):
 			print("[epoch {}]".format(epoch_index + 1))
+
+			losses = []
 			classification_model.train()
 			for batch_index, data in enumerate(tqdm_notebook(train_loader)):
 				optimizer.zero_grad()
@@ -58,13 +60,19 @@ class KoElectraClassificationTrainer:
 				}
 				outputs = classification_model(**inputs)
 				loss = outputs[0]
+				losses.append(loss.item())
 				loss.backward()
 				optimizer.step()
+			
+			train_loss = np.mean(losses)
+			
 			train_loss, train_acc = self.test_model(classification_model, train_dataset, train_loader)
-			print("train acc {} / loss {}".format(train_acc, train_loss))
+			print("train acc {} / loss {}".format(train_acc, train_loss.data.cpu().numpy()))
 
 			test_loss, test_acc = self.test_model(classification_model, test_dataset, test_loader)
 			print("test acc {} / loss {}".format(test_acc, test_loss))
+
+			print("\n")
 
 		torch.save({
 			'epoch': config.n_epoch,  # 현재 학습 epoch
