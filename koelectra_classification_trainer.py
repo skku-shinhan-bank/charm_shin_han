@@ -32,8 +32,8 @@ class KoElectraClassificationTrainer:
 
 		classification_model.to(device)
 
-		train_dataset = KoElectraClassificationDataset(tokenizer=self.tokenizer, device=device, zipped_data=train_zipped_data, max_seq_len = config.max_seq_len)
-		test_dataset = KoElectraClassificationDataset(tokenizer=self.tokenizer, device=device, zipped_data=test_zipped_data, max_seq_len = config.max_seq_len)
+		train_dataset = KoElectraClassificationDataset(tokenizer=tokenizer, device=device, zipped_data=train_zipped_data, max_seq_len = config.max_seq_len)
+		test_dataset = KoElectraClassificationDataset(tokenizer=tokenizer, device=device, zipped_data=test_zipped_data, max_seq_len = config.max_seq_len)
 
 		train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=config.batch_size, shuffle=True)
 		test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=config.batch_size, shuffle=True)
