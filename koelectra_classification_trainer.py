@@ -147,8 +147,8 @@ class KoElectraClassificationTrainer:
 				outputs = model(**inputs)
 				loss += outputs[0]
 				logit = outputs[1]
-				acc += (logit.argmax(1)==inputs['labels']).sum().item()
-
+				
+		acc += (logit.argmax(1)==inputs['labels']).sum().item()
 		return loss / len(test_dataset), acc / len(test_dataset)
 
 def make_zipped_data(data, label):      
