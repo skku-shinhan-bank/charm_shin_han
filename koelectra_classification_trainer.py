@@ -109,7 +109,7 @@ class KoElectraClassificationTrainer:
 				loss.backward()
 				optimizer.step()
 				pbar.update(1)
-				pbar.set_postfix_str(f"Train - Loss: {loss.item():.3f} ({np.mean(losses):.3f})")
+				pbar.set_postfix_str(f"Train - Loss: {np.mean(losses):.3f}")
 			
 
 				if i >= total_train_step or i % save_step == 0:
@@ -121,14 +121,14 @@ class KoElectraClassificationTrainer:
 						'train_step': i,  # 현재 진행한 학습
 						'total_train_step': len(train_loader)  # 현재 epoch에 학습 할 총 train step
 					}, model_output_path)
-			train_loss, train_acc = self.test_model(model, train_dataset, train_loader)
-			print(f'\ttrain : Loss: {train_loss:.4f}(valid)\t|\tAcc: {train_acc * 100:.1f}%(valid)')
+			train_acc = self.test_model(model, train_dataset, train_loader)
+			print(f'\ttrain - Acc: {train_acc * 100:.1f}%(valid)')
 
 		return np.mean(losses)
 
 	def test_one_epoch(self, test_dataset, test_loader, model):
-		eval_loss, eval_acc = self.test_model(model, test_dataset, test_loader)
-		print(f'\ttest - Loss: {eval_loss:.4f}(valid)\t|\tAcc: {eval_acc * 100:.1f}%(valid)')
+		eval_acc = self.test_model(model, test_dataset, test_loader)
+		print(f'\ttest - Acc: {eval_acc * 100:.1f}%(valid)')
 
 	def get_model_input(self, data):
 		return {'input_ids': data['input_ids'],
@@ -149,7 +149,7 @@ class KoElectraClassificationTrainer:
 				logit = outputs[1]
 				acc += (logit.argmax(1)==inputs['labels']).sum().item()
 		
-		return loss / len(test_dataset), acc / len(test_dataset)
+		return acc / len(test_dataset)
 
 def make_zipped_data(data, label):      
 	zipped_data = []
