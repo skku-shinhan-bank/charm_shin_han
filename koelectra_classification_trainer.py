@@ -66,7 +66,7 @@ class KoElectraClassificationTrainer:
 		offset = pre_epoch
 		for step in range(config.n_epoch):
 			epoch = step + offset
-			loss = self.train_one_epoch( epoch, self.model, optimizer, train_loader, config.save_step, model_output_path, train_step)
+			loss = self.train_one_epoch(train_dataset, epoch, self.model, optimizer, train_loader, config.save_step, model_output_path, train_step)
 			self.test_one_epoch(test_dataset, test_loader, self.model)
 			losses.append(loss)
 
@@ -84,7 +84,7 @@ class KoElectraClassificationTrainer:
 		plt.ylabel('Loss')
 		plt.show()
 	
-	def train_one_epoch(self, epoch, model, optimizer, train_loader, save_step, model_output_path, train_step = 0):
+	def train_one_epoch(self, train_dataset, epoch, model, optimizer, train_loader, save_step, model_output_path, train_step = 0):
 		losses = []
 		train_start_index = train_step+1 if train_step != 0 else 0
 		total_train_step = len(train_loader)
@@ -110,6 +110,8 @@ class KoElectraClassificationTrainer:
 				optimizer.step()
 				pbar.update(1)
 				pbar.set_postfix_str(f"Loss: {loss.item():.3f} ({np.mean(losses):.3f})")
+				train_loss, train_acc = self.test_model(model, train_dataset, train_loader)
+				print(f'\tLoss: {train_loss:.4f}(valid)\t|\tAcc: {train_acc * 100:.1f}%(valid)')
 
 				if i >= total_train_step or i % save_step == 0:
 					torch.save({
@@ -145,7 +147,6 @@ class KoElectraClassificationTrainer:
 				loss += outputs[0]
 				logit = outputs[1]
 				acc += (logit.argmax(1)==inputs['labels']).sum().item()
-				print('\n\n예측값', logit.argmax(1))
 
 		return loss / len(test_dataset), acc / len(test_dataset)
 
