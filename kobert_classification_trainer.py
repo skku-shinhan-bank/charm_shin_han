@@ -13,19 +13,13 @@ from torch.utils.data import Dataset
 
 class KobertClassficationTrainer:
   def __init__(self):
-    model, vocab = get_pytorch_kobert_model()
+    return
+
+  def train(self, train_data, train_label, test_data, test_label, config, model_output_path, device):
+    bert_model, vocab = get_pytorch_kobert_model()
     tok = get_tokenizer()
     tokenizer = nlp.data.BERTSPTokenizer(tok, vocab, lower=False)
 
-    self.model = model
-    self.tokenizer = tokenizer
-
-  def calc_accuracy(self,X,Y):
-    max_vals, max_indices = torch.max(X, 1)
-    train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
-    return train_acc
-
-  def train(self, train_data, train_label, test_data, test_label, config, model_output_path, device):
     dataset_train = []
     dataset_test = []
 
@@ -48,18 +42,18 @@ class KobertClassficationTrainer:
     random.shuffle(dataset_train)
     random.shuffle(dataset_test)
 
-    data_train = KoBERTDataset(dataset_train, 0, 1, self.tokenizer, config.max_len, True, False)
-    data_test = KoBERTDataset(dataset_test, 0, 1, self.tokenizer, config.max_len, True, False)
+    data_train = KoBERTDataset(dataset_train, 0, 1, tokenizer, config.max_len, True, False)
+    data_test = KoBERTDataset(dataset_test, 0, 1, tokenizer, config.max_len, True, False)
 
     train_dataloader = torch.utils.data.DataLoader(data_train, batch_size=config.batch_size, num_workers=5)
     test_dataloader = torch.utils.data.DataLoader(data_test, batch_size=config.batch_size, num_workers=5)
     
-    model = KoBERTClassifier(self.model,  dr_rate=0.5, num_classes=config.num_of_classes).to(device)
+    classification_model = KoBERTClassifier(bert_model,  dr_rate=0.5, num_classes=config.num_of_classes).to(device)
 
     no_decay = ['bias', 'LayerNorm.weight']
     optimizer_grouped_parameters = [
-        {'params': [p for n, p in model.named_parameters() if not any(nd in n for nd in no_decay)], 'weight_decay': 0.01},
-        {'params': [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
+        {'params': [p for n, p in classification_model.named_parameters() if not any(nd in n for nd in no_decay)], 'weight_decay': 0.01},
+        {'params': [p for n, p in classification_model.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
     ]
 
     optimizer = AdamW(optimizer_grouped_parameters, lr=config.learning_rate)
@@ -71,34 +65,34 @@ class KobertClassficationTrainer:
     for e in range(config.num_epochs):
         train_acc = 0.0
         test_acc = 0.0
-        model.train()
+        classification_model.train()
         for batch_id, (token_ids, valid_length, segment_ids, label) in enumerate(tqdm_notebook(train_dataloader)):
             optimizer.zero_grad()
             token_ids = token_ids.long()
             segment_ids = segment_ids.long()
             valid_length= valid_length
             label = label.long()
-            out = model(token_ids, valid_length, segment_ids)
+            out = classification_model(token_ids, valid_length, segment_ids)
             loss = loss_fn(out, label)
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), config.max_grad_norm)
+            torch.nn.utils.clip_grad_norm_(classification_model.parameters(), config.max_grad_norm)
             optimizer.step()
             scheduler.step()  # Update learning rate schedule
-            train_acc += self.calc_accuracy(out, label)
+            train_acc += calc_accuracy(out, label)
             if batch_id % config.log_interval == 0:
                 print("epoch {} batch id {} loss {} train acc {}".format(e+1, batch_id+1, loss.data.cpu().numpy(), train_acc / (batch_id+1)))
         print("epoch {} train acc {}".format(e+1, train_acc / (batch_id+1)))
-        model.eval()
+        classification_model.eval()
         for batch_id, (token_ids, valid_length, segment_ids, label) in enumerate(tqdm_notebook(test_dataloader)):
             token_ids = token_ids.long()
             segment_ids = segment_ids.long()
             valid_length= valid_length
             label = label.long()
-            out = model(token_ids, valid_length, segment_ids)
-            test_acc += self.calc_accuracy(out, label)
+            out = classification_model(token_ids, valid_length, segment_ids)
+            test_acc += calc_accuracy(out, label)
         print("epoch {} test acc {}".format(e+1, test_acc / (batch_id+1)))
 
-    torch.save(model.state_dict(), model_output_path)
+    torch.save(classification_model.state_dict(), model_output_path)
 
 class KoBERTDataset(Dataset):
   def __init__(self, dataset, sent_idx, label_idx, bert_tokenizer, max_len,
@@ -114,3 +108,9 @@ class KoBERTDataset(Dataset):
 
   def __len__(self):
     return (len(self.labels))
+
+
+def calc_accuracy(X,Y):
+  max_vals, max_indices = torch.max(X, 1)
+  train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
+  return train_acc

@@ -11,29 +11,26 @@ import torch
 import os
 import matplotlib.pyplot as plt
 from IPython.display import display
-from tqdm import tqdm
+from tqdm import tqdm, tqdm_notebook
 from kobert_transformers import get_tokenizer
 from transformers import (
   ElectraConfig,
 )
 
 class KoElectraClassificationTrainer:
-	def __init__(self, config):
-		electra_config = ElectraConfig.from_pretrained("monologg/koelectra-small-v2-discriminator")
-		model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-small-v2-discriminator", config = electra_config, num_labels = config.num_label)
-		tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-small-v2-discriminator")
-
-		self.tokenizer = tokenizer
-		self.model = model
+	def __init__(self):
 		pass
 
 	def train(self, train_data, train_label, test_data, test_label, config, device, model_output_path):
+		electra_config = ElectraConfig.from_pretrained("monologg/koelectra-small-v2-discriminator")
+		classification_model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-small-v2-discriminator", config = electra_config, num_labels = config.num_label)
+		tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-small-v2-discriminator")
 
 		train_zipped_data = make_zipped_data(train_data, train_label)
 		test_zipped_data = make_zipped_data(test_data, test_label)
 		learning_rate = config.learning_rate
 
-		self.model.to(device)
+		classification_model.to(device)
 
 		train_dataset = KoElectraClassificationDataset(tokenizer=self.tokenizer, device=device, zipped_data=train_zipped_data, max_seq_len = config.max_seq_len)
 		test_dataset = KoElectraClassificationDataset(tokenizer=self.tokenizer, device=device, zipped_data=test_zipped_data, max_seq_len = config.max_seq_len)
@@ -43,46 +40,40 @@ class KoElectraClassificationTrainer:
 
 		no_decay = ['bias', 'LayerNorm.weight']
 		optimizer_grouped_parameters = [
-			{'params': [p for n, p in self.model.named_parameters() if not any(nd in n for nd in no_decay)],
+			{'params': [p for n, p in classification_model.named_parameters() if not any(nd in n for nd in no_decay)],
 			'weight_decay': 0.01},
-			{'params': [p for n, p in self.model.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
+			{'params': [p for n, p in classification_model.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
 		]
 		optimizer = AdamW(optimizer_grouped_parameters, lr=learning_rate)
 
-		pre_epoch, pre_loss, train_step = 0, 0, 0
-		# if os.path.isfile(model_output_path):
-		# 	checkpoint = torch.load(model_output_path, map_location=device)
-		# 	pre_epoch = checkpoint['epoch']
-		# 	pre_loss = checkpoint['loss']
-		# 	train_step =  checkpoint['train_step']
-		# 	total_train_step =  checkpoint['total_train_step']
+		for epoch_index in range(config.n_epoch):
+			classification_model.train()
+			for batch_index, data in enumerate(tqdm_notebook(train_loader)):
+				optimizer.zero_grad()
+				inputs = {
+					'input_ids': data['input_ids'],
+					'attention_mask': data['attention_mask'],
+					'labels': data['labels']
+				}
+				outputs = classification_model(**inputs)
+				loss = outputs[0]
+				loss.backward()
+				optimizer.step()
+			
+			train_acc = self.test_model(classification_model, train_dataset, train_loader)
+			print("epoch {} train acc {}".format(epoch_index+1, train_acc / (batch_index + 1)))
 
-		# 	self.model.load_state_dict(checkpoint['model_state_dict'])
-		# 	optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+			test_acc = self.test_model(classification_model, test_dataset, test_loader)
+			print("epoch {} test acc {}".format(epoch_index + 1, test_acc / (batch_index+1)))
 
-		# 	print(f"load pretrain from: {model_output_path}, epoch={pre_epoch}, loss={pre_loss}")
-		
-		losses = []
-		offset = pre_epoch
-		for step in range(config.n_epoch):
-			epoch = step + offset
-			loss = self.train_one_epoch(train_dataset, epoch, self.model, optimizer, train_loader, config.save_step, model_output_path, train_step)
-			self.test_one_epoch(test_dataset, test_loader, self.model)
-			losses.append(loss)
-
-		# data
-		data = {
-			"loss": losses
-		}
-		df = pd.DataFrame(data)
-		display(df)
-
-		plt.figure(figsize=[12, 4])
-		plt.plot(losses, label="loss")
-		plt.legend()
-		plt.xlabel('Epoch')
-		plt.ylabel('Loss')
-		plt.show()
+		torch.save({
+			'epoch': config.n_epoch,  # 현재 학습 epoch
+			'model_state_dict': classification_model.state_dict(),  # 모델 저장
+			'optimizer_state_dict': optimizer.state_dict(),  # 옵티마이저 저장
+			'loss': loss.item(),  # Loss 저장
+			'train_step': config.n_epoch * config.batch_size,  # 현재 진행한 학습
+			'total_train_step': len(train_loader)  # 현재 epoch에 학습 할 총 train step
+		}, model_output_path)
 	
 	def train_one_epoch(self, train_dataset, epoch, model, optimizer, train_loader, save_step, model_output_path, train_step = 0):
 		losses = []
@@ -95,17 +86,14 @@ class KoElectraClassificationTrainer:
 			for i, data in enumerate(train_loader, train_start_index):
 				optimizer.zero_grad()
  
-				inputs = {'input_ids': data['input_ids'],
-						'attention_mask': data['attention_mask'],
-						'labels': data['labels']
-						}
-
+				inputs = {
+					'input_ids': data['input_ids'],
+					'attention_mask': data['attention_mask'],
+					'labels': data['labels']
+				}
 				outputs = model(**inputs)
-
 				loss = outputs[0]
-
 				losses.append(loss.item())
-
 				loss.backward()
 				optimizer.step()
 				pbar.update(1)
@@ -143,7 +131,11 @@ class KoElectraClassificationTrainer:
 		model.eval()
 		for data in test_loader:
 			with torch.no_grad():
-				inputs = self.get_model_input(data)
+				inputs = {
+					'input_ids': data['input_ids'],
+					'attention_mask': data['attention_mask'],
+					'labels': data['labels']
+				}
 				outputs = model(**inputs)
 				loss += outputs[0]
 				logit = outputs[1]
@@ -216,3 +208,8 @@ class KoElectraClassificationDataset(Dataset):
   def __getitem__(self,index):
     item = self.data[index]
     return item
+
+def calc_accuracy(X,Y):
+  max_vals, max_indices = torch.max(X, 1)
+  train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
+  return train_acc
