@@ -69,7 +69,7 @@ class KoElectraClassificationTrainer:
 			train_loss = np.mean(losses)
 			
 			trai_temp_loss, train_acc = self.test_model(classification_model, train_dataset, train_loader)
-			print("train: acc {} / loss {} / time {}".format(train_acc, train_loss.data.cpu().numpy(), end_time - start_time))
+			print("train: acc {} / loss {} / time {}".format(train_acc, train_loss, end_time - start_time))
 
 			test_loss, test_acc = self.test_model(classification_model, test_dataset, test_loader)
 			print("test: acc {} / loss {}".format(test_acc, test_loss))
