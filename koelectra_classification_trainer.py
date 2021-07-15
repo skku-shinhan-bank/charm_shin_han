@@ -50,6 +50,7 @@ class KoElectraClassificationTrainer:
 		for epoch_index in range(config.n_epoch):
 			print("[epoch {}]\n".format(epoch_index + 1))
 
+			losses = []
 			classification_model.train()
 			start_time = time.time()
 			for batch_index, data in enumerate(tqdm_notebook(train_loader)):
@@ -61,11 +62,13 @@ class KoElectraClassificationTrainer:
 				}
 				outputs = classification_model(**inputs)
 				loss = outputs[0]
+				losses.append(loss.item())
 				loss.backward()
 				optimizer.step()
 			end_time = time.time()
+			train_loss = np.mean(losses)
 			
-			train_loss, train_acc = self.test_model(classification_model, train_dataset, train_loader)
+			train_temp_loss, train_acc = self.test_model(classification_model, train_dataset, train_loader)
 			print("train: acc {} / loss {} / time {}".format(train_acc, train_loss, end_time - start_time))
 
 			test_loss, test_acc = self.test_model(classification_model, test_dataset, test_loader)
