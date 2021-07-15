@@ -48,7 +48,7 @@ class KoElectraClassificationTrainer:
 		optimizer = AdamW(optimizer_grouped_parameters, lr=learning_rate)
 
 		for epoch_index in range(config.n_epoch):
-			print("[epoch {}]------------------------------------------------------------------------".format(epoch_index + 1))
+			print("[epoch {}]\n".format(epoch_index + 1))
 
 			losses = []
 			classification_model.train()
