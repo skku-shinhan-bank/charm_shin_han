@@ -53,8 +53,14 @@ class KobertClassficationTrainer:
 
     no_decay = ['bias', 'LayerNorm.weight']
     optimizer_grouped_parameters = [
-        {'params': [p for n, p in classification_model.named_parameters() if not any(nd in n for nd in no_decay)], 'weight_decay': 0.01},
-        {'params': [p for n, p in classification_model.named_parameters() if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}
+      {
+        'params': [p for n, p in classification_model.named_parameters() if not any(nd in n for nd in no_decay)],
+        'weight_decay': 0.01,
+      },
+      {
+        'params': [p for n, p in classification_model.named_parameters() if any(nd in n for nd in no_decay)],
+        'weight_decay': 0.0,
+      }
     ]
 
     optimizer = AdamW(optimizer_grouped_parameters, lr=config.learning_rate)
@@ -85,7 +91,7 @@ class KobertClassficationTrainer:
             if batch_id % config.log_interval == 0:
                 print("batch id {} / loss {} / train acc {}".format(batch_id+1, loss.data.cpu().numpy(), train_acc / (batch_id+1)))
         print("train acc {} / train time {}".format(train_acc / (batch_id+1), time.time() - start_time))
-        
+
         classification_model.eval()
         for batch_id, (token_ids, valid_length, segment_ids, label) in enumerate(test_dataloader):
             token_ids = token_ids.long().to(device)
