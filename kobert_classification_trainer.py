@@ -10,6 +10,7 @@ from torch import nn
 from tqdm import tqdm, tqdm_notebook
 import numpy as np
 from torch.utils.data import Dataset
+import time
 
 class KobertClassficationTrainer:
   def __init__(self):
@@ -62,9 +63,11 @@ class KobertClassficationTrainer:
     warmup_step = int(t_total * config.warmup_ratio)
     scheduler = get_cosine_schedule_with_warmup(optimizer, num_warmup_steps=warmup_step, num_training_steps=t_total)
 
-    for e in range(config.num_epochs):
+    for epoch_index in range(config.num_epochs):
+        print("[epoch {}]\n".format(epoch_index + 1))
         train_acc = 0.0
         test_acc = 0.0
+        start_time = time.time()
         classification_model.train()
         for batch_id, (token_ids, valid_length, segment_ids, label) in enumerate(tqdm_notebook(train_dataloader)):
             optimizer.zero_grad()
@@ -80,8 +83,8 @@ class KobertClassficationTrainer:
             scheduler.step()  # Update learning rate schedule
             train_acc += calc_accuracy(out, label)
             if batch_id % config.log_interval == 0:
-                print("epoch {} batch id {} loss {} train acc {}".format(e+1, batch_id+1, loss.data.cpu().numpy(), train_acc / (batch_id+1)))
-        print("epoch {} train acc {}".format(e+1, train_acc / (batch_id+1)))
+                print("batch id {} / loss {} / train acc {}".format(batch_id+1, loss.data.cpu().numpy(), train_acc / (batch_id+1)))
+        print("train acc {} / train time {}".format(train_acc / (batch_id+1), time.time() - start_time))
         classification_model.eval()
         for batch_id, (token_ids, valid_length, segment_ids, label) in enumerate(tqdm_notebook(test_dataloader)):
             token_ids = token_ids.long().to(device)
@@ -90,7 +93,8 @@ class KobertClassficationTrainer:
             label = label.long().to(device)
             out = classification_model(token_ids, valid_length, segment_ids)
             test_acc += calc_accuracy(out, label)
-        print("epoch {} test acc {}".format(e+1, test_acc / (batch_id+1)))
+        print("test acc {}".format(test_acc / (batch_id+1)))
+        print('\n')
 
     torch.save(classification_model.state_dict(), model_output_path)
 
