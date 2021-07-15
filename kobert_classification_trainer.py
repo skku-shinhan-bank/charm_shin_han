@@ -85,8 +85,9 @@ class KobertClassficationTrainer:
             if batch_id % config.log_interval == 0:
                 print("batch id {} / loss {} / train acc {}".format(batch_id+1, loss.data.cpu().numpy(), train_acc / (batch_id+1)))
         print("train acc {} / train time {}".format(train_acc / (batch_id+1), time.time() - start_time))
+        
         classification_model.eval()
-        for batch_id, (token_ids, valid_length, segment_ids, label) in enumerate(tqdm_notebook(test_dataloader)):
+        for batch_id, (token_ids, valid_length, segment_ids, label) in enumerate(test_dataloader):
             token_ids = token_ids.long().to(device)
             segment_ids = segment_ids.long().to(device)
             valid_length= valid_length
