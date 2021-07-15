@@ -103,26 +103,6 @@ class KoElectraClassificationTrainer:
 			'train_step': config.n_epoch * config.batch_size,  # 현재 진행한 학습
 			'total_train_step': len(train_loader)  # 현재 epoch에 학습 할 총 train step
 		}, model_output_path)
-	
-	def test_model(self, model, test_dataset, test_loader):
-
-		loss = 0
-		acc = 0
-
-		model.eval()
-		for data in test_loader:
-			with torch.no_grad():
-				inputs = {
-					'input_ids': data['input_ids'],
-					'attention_mask': data['attention_mask'],
-					'labels': data['labels']
-				}
-				outputs = model(**inputs)
-				loss += outputs[0]
-				logit = outputs[1]
-				acc += (logit.argmax(1)==inputs['labels']).sum().item()
-		
-		return loss / len(test_dataset), acc / len(test_dataset)
 
 def make_zipped_data(data, label):      
 	zipped_data = []
