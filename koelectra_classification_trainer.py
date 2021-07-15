@@ -89,7 +89,7 @@ class KoElectraClassificationTrainer:
 						'labels': data['labels']
 					}
 					outputs = classification_model(**inputs)
-					loss += outputs[0]
+					loss = outputs[0]
 					logit = outputs[1]
 					test_losses.append(loss.item())
 					test_acc += (logit.argmax(1)==inputs['labels']).sum().item()
@@ -161,11 +161,11 @@ class KoElectraClassificationDataset(Dataset):
       # Label
       label = int(sliced_data[1])
       data = {
-              'input_ids': torch.tensor(index_of_words).to(self.device),
-              'token_type_ids': torch.tensor(token_type_ids).to(self.device),
-              'attention_mask': torch.tensor(attention_mask).to(self.device),
-              'labels': torch.tensor(label).to(self.device)
-             }
+				'input_ids': torch.tensor(index_of_words).to(self.device),
+				'token_type_ids': torch.tensor(token_type_ids).to(self.device),
+				'attention_mask': torch.tensor(attention_mask).to(self.device),
+				'labels': torch.tensor(label).to(self.device)
+			}
 
       self.data.append(data)
 
