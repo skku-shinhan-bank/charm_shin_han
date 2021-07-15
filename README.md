@@ -84,7 +84,6 @@ config = KoELECTRAConfig(
 ctx = "cuda" if torch.cuda.is_available() else "cpu"
 device = torch.device(ctx)
 
-trainer = KoElectraClassificationTrainer(
-)
+trainer = KoElectraClassificationTrainer()
 trainer.train(train_data=train_data, train_label=train_label, test_data=test_data, test_label=test_label, config=config, device=device, model_output_path='output.pth')
 ```
