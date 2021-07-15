@@ -50,7 +50,8 @@ class KoElectraClassificationTrainer:
 		for epoch_index in range(config.n_epoch):
 			print("[epoch {}]\n".format(epoch_index + 1))
 
-			losses = []
+			train_losses = []
+			train_acc = 0
 			classification_model.train()
 			start_time = time.time()
 			for batch_index, data in enumerate(tqdm_notebook(train_loader)):
@@ -62,16 +63,34 @@ class KoElectraClassificationTrainer:
 				}
 				outputs = classification_model(**inputs)
 				loss = outputs[0]
-				losses.append(loss.item())
+				logit = outputs[1]
+				train_losses.append(loss.item())
 				loss.backward()
 				optimizer.step()
+				train_acc += (logit.argmax(1)==inputs['labels']).sum().item()
 			end_time = time.time()
-			train_loss = np.mean(losses)
-			
-			train_temp_loss, train_acc = self.test_model(classification_model, train_dataset, train_loader)
+			train_loss = np.mean(train_losses)
+			train_acc = train_acc / len(train_dataset)
 			print("train: acc {} / loss {} / time {}".format(train_acc, train_loss, end_time - start_time))
 
-			test_loss, test_acc = self.test_model(classification_model, test_dataset, test_loader)
+			test_losses = []
+			test_acc = 0
+			classification_model.eval()
+			for data in test_loader:
+				with torch.no_grad():
+					inputs = {
+						'input_ids': data['input_ids'],
+						'attention_mask': data['attention_mask'],
+						'labels': data['labels']
+					}
+					outputs = classification_model(**inputs)
+					loss += outputs[0]
+					logit = outputs[1]
+					test_losses.append(loss.item())
+					test_acc += (logit.argmax(1)==inputs['labels']).sum().item()
+			
+			test_loss = np.mean(test_losses)
+			test_acc = train_acc / len(test_dataset)
 			print("test: acc {} / loss {}".format(test_acc, test_loss))
 
 			print("\n")
