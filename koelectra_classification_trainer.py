@@ -81,7 +81,7 @@ class KoElectraClassificationTrainer:
 			test_losses = []
 			test_acc = 0
 			classification_model.eval()
-			for data in test_loader:
+			for batch_index, data in enumerate(test_loader):
 				with torch.no_grad():
 					inputs = {
 						'input_ids': data['input_ids'],
