@@ -79,7 +79,7 @@ class KoElectraClassificationTrainer:
 			train_acc = train_acc / len(train_dataset)
 			print("train: acc {} / loss {} / time {}".format(train_acc, train_loss, end_time - start_time))
 
-			cm = ConfusionMatrix()
+			cm = ConfusionMatrix(config.num_label)
 			test_losses = []
 			test_acc = 0
 			classification_model.eval()
