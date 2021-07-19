@@ -134,19 +134,12 @@ class KoElectraClassificationDataset(Dataset):
 
     sliced_datas = []
 
-    for zd in zipped_data:
-      d = []
-
-      if len(zd[0]) > max_seq_len:
-        d.append(zd[0][:max_seq_len])
-      else:
-        d.append(zd[0])
-      
-      d.append(zd[1])
-      sliced_datas.append(d)
-
     for sliced_data in sliced_datas:
       index_of_words = self.tokenizer.encode(sliced_data[0])
+
+      if len(index_of_words) > max_seq_len:
+        index_of_words = index_of_words[:max_seq_len]			
+
       token_type_ids = [0] * len(index_of_words)
       attention_mask = [1] * len(index_of_words)
 
@@ -179,3 +172,4 @@ def calc_accuracy(X,Y):
   max_vals, max_indices = torch.max(X, 1)
   train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
   return train_acc
+	
