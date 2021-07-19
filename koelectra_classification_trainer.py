@@ -102,7 +102,7 @@ class KoElectraClassificationTrainer:
 			test_loss = np.mean(test_losses)
 			test_acc = test_acc / len(test_dataset)
 			print("test: acc {} / loss {}".format(test_acc, test_loss))
-			print(pd.DataFrame(cm.get()))
+			print("<confusion matrix>\n", pd.DataFrame(cm.get()))
 			print("\n")
 
 		torch.save({
