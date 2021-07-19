@@ -60,6 +60,7 @@ class KoElectraClassificationTrainer:
 			train_acc = 0
 			classification_model.train()
 			start_time = time.time()
+			print('(train)')
 			for batch_index, data in enumerate(tqdm_notebook(train_loader)):
 				optimizer.zero_grad()
 				inputs = {
@@ -77,12 +78,13 @@ class KoElectraClassificationTrainer:
 			end_time = time.time()
 			train_loss = np.mean(train_losses)
 			train_acc = train_acc / len(train_dataset)
-			print("train: acc {} / loss {} / time {}".format(train_acc, train_loss, end_time - start_time))
+			print("acc {} / loss {} / time {}".format(train_acc, train_loss, end_time - start_time))
 
 			cm = ConfusionMatrix(config.num_label)
 			test_losses = []
 			test_acc = 0
 			classification_model.eval()
+			print('(test)')
 			for batch_index, data in enumerate(test_loader):
 				with torch.no_grad():
 					inputs = {
@@ -101,7 +103,7 @@ class KoElectraClassificationTrainer:
 			
 			test_loss = np.mean(test_losses)
 			test_acc = test_acc / len(test_dataset)
-			print("test: acc {} / loss {}".format(test_acc, test_loss))
+			print("acc {} / loss {}".format(test_acc, test_loss))
 			print("<confusion matrix>\n", pd.DataFrame(cm.get()))
 			print("\n")
 

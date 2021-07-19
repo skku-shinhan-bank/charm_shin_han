@@ -23,6 +23,9 @@ class KobertClassficationTrainer:
     tok = get_tokenizer()
     tokenizer = nlp.data.BERTSPTokenizer(tok, vocab, lower=False)
 
+    classification_model = KoBERTClassifier(bert_model,  dr_rate=0.5, num_classes=config.num_of_classes)
+    classification_model.to(device)
+
     dataset_train = []
     dataset_test = []
 
@@ -42,16 +45,11 @@ class KobertClassficationTrainer:
 
         dataset_test.append(row)
 
-    random.shuffle(dataset_train)
-    random.shuffle(dataset_test)
-
     data_train = KoBERTDataset(dataset_train, 0, 1, tokenizer, config.max_len, True, False)
     data_test = KoBERTDataset(dataset_test, 0, 1, tokenizer, config.max_len, True, False)
 
-    train_dataloader = torch.utils.data.DataLoader(data_train, batch_size=config.batch_size, num_workers=5)
-    test_dataloader = torch.utils.data.DataLoader(data_test, batch_size=config.batch_size, num_workers=5)
-    
-    classification_model = KoBERTClassifier(bert_model,  dr_rate=0.5, num_classes=config.num_of_classes).to(device)
+    train_dataloader = torch.utils.data.DataLoader(data_train, batch_size=config.batch_size, shuffle=True)
+    test_dataloader = torch.utils.data.DataLoader(data_test, batch_size=config.batch_size, shuffle=True)
 
     no_decay = ['bias', 'LayerNorm.weight']
     optimizer_grouped_parameters = [
@@ -78,6 +76,7 @@ class KobertClassficationTrainer:
       train_losses = []
       start_time = time.time()
       classification_model.train()
+      print('(train)')
       for batch_id, (token_ids, valid_length, segment_ids, label) in enumerate(tqdm_notebook(train_dataloader)):
         optimizer.zero_grad()
         token_ids = token_ids.long().to(device)
@@ -95,10 +94,11 @@ class KobertClassficationTrainer:
         # if batch_id % config.log_interval == 0:
         #   print("batch id {} / loss {} / train acc {}".format(batch_id+1, loss.data.cpu().numpy(), train_acc / (batch_id+1)))
       train_loss = np.mean(train_losses)
-      print("train acc {} / loss {} / train time {}".format(train_acc / (batch_id+1), train_loss,time.time() - start_time))
+      print("acc {} / loss {} / train time {}".format(train_acc / (batch_id+1), train_loss,time.time() - start_time))
 
       cm = ConfusionMatrix(config.num_of_classes)
       classification_model.eval()
+      print('(test)')
       for batch_id, (token_ids, valid_length, segment_ids, label) in enumerate(test_dataloader):
         token_ids = token_ids.long().to(device)
         segment_ids = segment_ids.long().to(device)
@@ -110,7 +110,7 @@ class KobertClassficationTrainer:
         for index, real_class_id in enumerate(label):
           max_vals, max_indices = torch.max(out, 1)
           cm.add(real_class_id, max_indices[index].item())
-      print("test acc {}".format(test_acc / (batch_id+1)))
+      print("acc {}".format(test_acc / (batch_id+1)))
       print("<confusion matrix>\n", pd.DataFrame(cm.get()))
       print('\n')
 
