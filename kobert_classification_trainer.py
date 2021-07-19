@@ -12,6 +12,7 @@ import numpy as np
 from torch.utils.data import Dataset
 import time
 from .confusion_matrix import ConfusionMatrix
+import pandas as pd
 
 class KobertClassficationTrainer:
   def __init__(self):
@@ -105,8 +106,9 @@ class KobertClassficationTrainer:
 
         for index, real_class_id in enumerate(label):
           max_vals, max_indices = torch.max(out, 1)
-          print('hoho', index, real_class_id.item(), max_indices)
+          cm.add(real_class_id, max_indices[index].item())
       print("test acc {}".format(test_acc / (batch_id+1)))
+      print("<confusion matrix>\n", pd.DataFrame(cm.get()))
       print('\n')
 
     torch.save(classification_model.state_dict(), model_output_path)
