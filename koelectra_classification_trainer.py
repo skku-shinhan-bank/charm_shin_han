@@ -17,6 +17,7 @@ from transformers import (
 	ElectraConfig,
 )
 import time
+from .confusion_matrix import ConfusionMatrix
 
 class KoElectraClassificationTrainer:
 	def __init__(self):
@@ -78,6 +79,7 @@ class KoElectraClassificationTrainer:
 			train_acc = train_acc / len(train_dataset)
 			print("train: acc {} / loss {} / time {}".format(train_acc, train_loss, end_time - start_time))
 
+			cm = ConfusionMatrix()
 			test_losses = []
 			test_acc = 0
 			classification_model.eval()
@@ -95,11 +97,13 @@ class KoElectraClassificationTrainer:
 					test_acc += (logit.argmax(1)==inputs['labels']).sum().item()
 					
 					for index, real_class_id in enumerate(inputs['labels']):
-						print(index, real_class_id, logit.argmax(1)[index])
+						print(index, real_class_id.item(), logit.argmax(1)[index].item())
+						cm.add(real_class_id.item(), logit.argmax(1)[index].item())
 			
 			test_loss = np.mean(test_losses)
 			test_acc = test_acc / len(test_dataset)
 			print("test: acc {} / loss {}".format(test_acc, test_loss))
+			cm.get()
 			print("\n")
 
 		torch.save({
