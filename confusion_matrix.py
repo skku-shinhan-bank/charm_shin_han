@@ -10,3 +10,6 @@ class ConfusionMatrix:
   def show(self):
     for row in self.matrix:
       print(row)
+  def get(self):
+    return self.matrix
+    

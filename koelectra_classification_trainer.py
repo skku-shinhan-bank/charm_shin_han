@@ -97,13 +97,12 @@ class KoElectraClassificationTrainer:
 					test_acc += (logit.argmax(1)==inputs['labels']).sum().item()
 					
 					for index, real_class_id in enumerate(inputs['labels']):
-						print('ohno', index, real_class_id.item(), logit.argmax(1)[index].item())
 						cm.add(real_class_id.item(), logit.argmax(1)[index].item())
 			
 			test_loss = np.mean(test_losses)
 			test_acc = test_acc / len(test_dataset)
 			print("test: acc {} / loss {}".format(test_acc, test_loss))
-			cm.show()
+			print(pd.DataFrame(cm.get()))
 			print("\n")
 
 		torch.save({
