@@ -90,7 +90,7 @@ class KobertClassficationTrainer:
         scheduler.step()  # Update learning rate schedule
         train_acc += calc_accuracy(out, label)
         if batch_id % config.log_interval == 0:
-            print("batch id {} / loss {} / train acc {}".format(batch_id+1, loss.data.cpu().numpy(), train_acc / (batch_id+1)))
+          print("batch id {} / loss {} / train acc {}".format(batch_id+1, loss.data.cpu().numpy(), train_acc / (batch_id+1)))
       print("train acc {} / train time {}".format(train_acc / (batch_id+1), time.time() - start_time))
 
       cm = ConfusionMatrix(config.num_of_classes)
@@ -104,7 +104,8 @@ class KobertClassficationTrainer:
         test_acc += calc_accuracy(out, label)
 
         for index, real_class_id in enumerate(label):
-          print('hoho', index, real_class_id.item(), out)
+          max_vals, max_indices = torch.max(out, 1)
+          print('hoho', index, real_class_id.item(), max_indices)
       print("test acc {}".format(test_acc / (batch_id+1)))
       print('\n')
 
