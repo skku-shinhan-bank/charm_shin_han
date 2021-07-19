@@ -104,7 +104,7 @@ class KobertClassficationTrainer:
             test_acc += calc_accuracy(out, label)
 
             for index, real_class_id in enumerate(label):
-              print('hoho', index, real_class_id.item(), out[1].argmax(1)[index].item())
+              print('hoho', index, real_class_id.item(), out[1][index].item())
         print("test acc {}".format(test_acc / (batch_id+1)))
         print('\n')
 
