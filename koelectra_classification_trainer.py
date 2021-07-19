@@ -136,7 +136,6 @@ class KoElectraClassificationDataset(Dataset):
 			index_of_words = self.tokenizer.encode(zd[0])
 
 			if len(index_of_words) > max_seq_len:
-				print('hihi', index_of_words[:max_seq_len], len(index_of_words[:max_seq_len]))
 				index_of_words = index_of_words[:max_seq_len]
 
 			token_type_ids = [0] * len(index_of_words)
@@ -149,8 +148,6 @@ class KoElectraClassificationDataset(Dataset):
 			index_of_words += [0] * padding_length
 			token_type_ids += [0] * padding_length
 			attention_mask += [0] * padding_length
-
-			print('hello', len(index_of_words), len(token_type_ids), len(attention_mask))
 
 			# Label
 			label = int(zd[1])
