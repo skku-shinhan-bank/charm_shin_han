@@ -28,6 +28,7 @@ train_shinhan_data, train_shinhan_label, test_shinhan_data, test_shinhan_label =
 
 hana_data, hana_label = DataMaker.make_issue_class_data_from_crawled("/content/drive/MyDrive/신한은행/training-data/Labeled_Data/hana_app_review.xlsx")
 woori_data, woori_label = DataMaker.make_issue_class_data_from_crawled("/content/drive/MyDrive/신한은행/training-data/Labeled_Data/woori_app_review.xlsx")
+shinhan_data, shinhan_label = DataMaker.make_issue_class_data_from_crawled("/content/drive/MyDrive/신한은행/training-data/Labeled_Data/shinhan_app_review_2.xlsx")
 ```
 
 ### KoBERT Classification Trainer
