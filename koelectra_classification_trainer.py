@@ -94,6 +94,8 @@ class KoElectraClassificationTrainer:
 					test_losses.append(loss.item())
 					test_acc += (logit.argmax(1)==inputs['labels']).sum().item()
 					print('hihi', logit.argmax(1), inputs['labels'])
+					print('hello', logit.argmax(1)==inputs['labels'])
+					print('hh', (logit.argmax(1)==inputs['labels']).sum().item())
 			
 			test_loss = np.mean(test_losses)
 			test_acc = test_acc / len(test_dataset)
