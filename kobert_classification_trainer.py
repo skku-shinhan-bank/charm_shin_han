@@ -75,6 +75,7 @@ class KobertClassficationTrainer:
       print("[epoch {}]\n".format(epoch_index + 1))
       train_acc = 0.0
       test_acc = 0.0
+      train_losses = []
       start_time = time.time()
       classification_model.train()
       for batch_id, (token_ids, valid_length, segment_ids, label) in enumerate(tqdm_notebook(train_dataloader)):
@@ -85,14 +86,16 @@ class KobertClassficationTrainer:
         label = label.long().to(device)
         out = classification_model(token_ids, valid_length, segment_ids)
         loss = loss_fn(out, label)
+        train_losses.append(loss.item())
         loss.backward()
         torch.nn.utils.clip_grad_norm_(classification_model.parameters(), config.max_grad_norm)
         optimizer.step()
         scheduler.step()  # Update learning rate schedule
         train_acc += calc_accuracy(out, label)
-        if batch_id % config.log_interval == 0:
-          print("batch id {} / loss {} / train acc {}".format(batch_id+1, loss.data.cpu().numpy(), train_acc / (batch_id+1)))
-      print("train acc {} / train time {}".format(train_acc / (batch_id+1), time.time() - start_time))
+        # if batch_id % config.log_interval == 0:
+        #   print("batch id {} / loss {} / train acc {}".format(batch_id+1, loss.data.cpu().numpy(), train_acc / (batch_id+1)))
+      train_loss = np.mean(train_losses)
+      print("train acc {} / loss {} / train time {}".format(train_acc / (batch_id+1), train_loss,time.time() - start_time))
 
       cm = ConfusionMatrix(config.num_of_classes)
       classification_model.eval()
