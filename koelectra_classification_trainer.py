@@ -132,10 +132,8 @@ class KoElectraClassificationDataset(Dataset):
 		self.data =[]
 		self.tokenizer = tokenizer if tokenizer is not None else get_tokenizer()
 
-		sliced_datas = []
-
-		for sliced_data in sliced_datas:
-			index_of_words = self.tokenizer.encode(sliced_data[0])
+		for zd in zipped_data:
+			index_of_words = self.tokenizer.encode(zd[0])
 
 			if len(index_of_words) > max_seq_len:
 				print('hihi', index_of_words[:max_seq_len], len(index_of_words[:max_seq_len]))
@@ -155,7 +153,7 @@ class KoElectraClassificationDataset(Dataset):
 			print('hello', len(index_of_words), len(token_type_ids), len(attention_mask))
 
 			# Label
-			label = int(sliced_data[1])
+			label = int(zd[1])
 			data = {
 				'input_ids': torch.tensor(index_of_words).to(self.device),
 				'token_type_ids': torch.tensor(token_type_ids).to(self.device),
