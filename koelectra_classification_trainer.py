@@ -152,7 +152,7 @@ class KoElectraClassificationDataset(Dataset):
 			token_type_ids += [0] * padding_length
 			attention_mask += [0] * padding_length
 
-			print('hello', len(index_of_words), print(len(token_type_ids) print(len(attention_mask))))
+			print('hello', len(index_of_words), len(token_type_ids), len(attention_mask))
 
 			# Label
 			label = int(sliced_data[1])
