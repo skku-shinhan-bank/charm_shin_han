@@ -11,6 +11,7 @@ from tqdm import tqdm, tqdm_notebook
 import numpy as np
 from torch.utils.data import Dataset
 import time
+from .confusion_matrix import ConfusionMatrix
 
 class KobertClassficationTrainer:
   def __init__(self):
@@ -92,6 +93,7 @@ class KobertClassficationTrainer:
                 print("batch id {} / loss {} / train acc {}".format(batch_id+1, loss.data.cpu().numpy(), train_acc / (batch_id+1)))
         print("train acc {} / train time {}".format(train_acc / (batch_id+1), time.time() - start_time))
 
+        cm = ConfusionMatrix(config.num_of_classes)
         classification_model.eval()
         for batch_id, (token_ids, valid_length, segment_ids, label) in enumerate(test_dataloader):
             token_ids = token_ids.long().to(device)
@@ -100,6 +102,9 @@ class KobertClassficationTrainer:
             label = label.long().to(device)
             out = classification_model(token_ids, valid_length, segment_ids)
             test_acc += calc_accuracy(out, label)
+
+            for index, real_class_id in enumerate(label):
+              print('hoho', index, real_class_id.item(), out[1].argmax(1)[index].item())
         print("test acc {}".format(test_acc / (batch_id+1)))
         print('\n')
 
