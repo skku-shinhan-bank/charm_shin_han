@@ -78,7 +78,7 @@ class KoElectraClassificationTrainer:
 			end_time = time.time()
 			train_loss = np.mean(train_losses)
 			train_acc = train_acc / len(train_dataset)
-			print("acc {} / loss {} / time {}".format(train_acc, train_loss, end_time - start_time))
+			print("acc {} / loss {} / time {}\n".format(train_acc, train_loss, end_time - start_time))
 
 			cm = ConfusionMatrix(config.num_label)
 			test_losses = []

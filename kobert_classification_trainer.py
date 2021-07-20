@@ -94,7 +94,7 @@ class KobertClassficationTrainer:
         # if batch_id % config.log_interval == 0:
         #   print("batch id {} / loss {} / train acc {}".format(batch_id+1, loss.data.cpu().numpy(), train_acc / (batch_id+1)))
       train_loss = np.mean(train_losses)
-      print("acc {} / loss {} / train time {}".format(train_acc / (batch_id+1), train_loss,time.time() - start_time))
+      print("acc {} / loss {} / train time {}\n".format(train_acc / (batch_id+1), train_loss,time.time() - start_time))
 
       cm = ConfusionMatrix(config.num_of_classes)
       classification_model.eval()
