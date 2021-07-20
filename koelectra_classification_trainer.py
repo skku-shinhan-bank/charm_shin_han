@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import torch
-import random
 from torch.nn import functional as F
 from torch.utils.data import DataLoader, Dataset
 from transformers import AutoTokenizer, ElectraForSequenceClassification, AdamW
@@ -9,10 +8,8 @@ from .model.koelectra_classifier import KoElectraClassifier
 from tqdm.notebook import tqdm
 import torch
 import os
-import matplotlib.pyplot as plt
 from IPython.display import display
 from tqdm import tqdm, tqdm_notebook
-from kobert_transformers import get_tokenizer
 from transformers import (
 	ElectraConfig,
 )
@@ -30,7 +27,6 @@ class KoElectraClassificationTrainer:
 
 		train_zipped_data = make_zipped_data(train_data, train_label)
 		test_zipped_data = make_zipped_data(test_data, test_label)
-		learning_rate = config.learning_rate
 
 		classification_model.to(device)
 
@@ -51,7 +47,7 @@ class KoElectraClassificationTrainer:
 				'weight_decay': 0.0
 			},
 		]
-		optimizer = AdamW(optimizer_grouped_parameters, lr=learning_rate)
+		optimizer = AdamW(optimizer_grouped_parameters, lr=config.learning_rate)
 
 		for epoch_index in range(config.n_epoch):
 			print("[epoch {}]\n".format(epoch_index + 1))
@@ -137,7 +133,7 @@ class KoElectraClassificationDataset(Dataset):
 
 		self.device = device
 		self.data =[]
-		self.tokenizer = tokenizer if tokenizer is not None else get_tokenizer()
+		self.tokenizer = tokenizer
 
 		for zd in zipped_data:
 			index_of_words = self.tokenizer.encode(zd[0])
