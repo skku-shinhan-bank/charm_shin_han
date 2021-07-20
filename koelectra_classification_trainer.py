@@ -24,9 +24,9 @@ class KoElectraClassificationTrainer:
 		pass
 
 	def train(self, train_data, train_label, test_data, test_label, config, device, model_output_path):
-		electra_config = ElectraConfig.from_pretrained("monologg/koelectra-small-v2-discriminator")
-		classification_model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-small-v2-discriminator", config = electra_config, num_labels = config.num_label)
-		tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-small-v2-discriminator")
+		electra_config = ElectraConfig.from_pretrained("monologg/koelectra-base-v3-discriminator")
+		classification_model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-base-v3-discriminator", config = electra_config, num_labels = config.num_label)
+		tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
 
 		train_zipped_data = make_zipped_data(train_data, train_label)
 		test_zipped_data = make_zipped_data(test_data, test_label)
