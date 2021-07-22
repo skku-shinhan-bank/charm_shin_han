@@ -26,4 +26,7 @@ class WordpieceVocab :
             limit_alphabet=self.limit_alphabet
         )
 
-        tokenizer.save_model("./daa/vocab/wordpiece")
+        checkpoint_path ="checkpoint"
+        if not os.path.isdir(checkpoint_path):
+            os.mkdir(checkpoint_path)
+        tokenizer.save_model("./checkpoint")
