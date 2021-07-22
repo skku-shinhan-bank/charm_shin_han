@@ -8,7 +8,10 @@ class WordpieceVocab :
         self.vocab_size = vocab_size
         self.limit_alphabet = limit_alphabet
 
-        self.tokenizer = BertWordPieceTokenizer(
+        pass
+
+    def vocab(self):
+        tokenizer = BertWordPieceTokenizer(
             vocab_file=None,
             clean_text=True,
             handle_chinese_chars=True,
@@ -16,16 +19,14 @@ class WordpieceVocab :
             lowercase=False,
             wordpieces_prefix="##"
         )
-        pass
 
-    def vocab(self):
-        self.tokenizer.train(
+        tokenizer.train(
             files=[self.corpus_file],
             limit_alphabet=self.limit_alphabet,
             vocab_size=self.vocab_size
         )
 
-        self.tokenizer.save("./", "ch-{}-wpm-{}".format(self.limit_alphabet, self.vocab_size))    
+        tokenizer.save("./", "ch-{}-wpm-{}".format(self.limit_alphabet, self.vocab_size))    
     
 
 
