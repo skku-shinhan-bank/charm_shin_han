@@ -3,18 +3,12 @@ import argparse
 from tokenizers import BertWordPieceTokenizer
 
 class WordpieceVocab :
-    def __init__(self):
-        pass
-    def vocab(self):
-        parser = argparse.ArgumentParser()
+    def __init__(self, corpus_file, vocab_size, limit_alphabet):
+        self.corpus_file = corpus_file
+        self.vocab_size = vocab_size
+        self.limit_alphabet = limit_alphabet
 
-        parser.add_argument("--corpus_file", type=str)
-        parser.add_argument("--vocab_size", type=int, default=32000)
-        parser.add_argument("--limit_alphabet", type=int, default=6000)
-
-        args = parser.parse_args()
-
-        tokenizer = BertWordPieceTokenizer(
+        self.tokenizer = BertWordPieceTokenizer(
             vocab_file=None,
             clean_text=True,
             handle_chinese_chars=True,
@@ -22,14 +16,16 @@ class WordpieceVocab :
             lowercase=False,
             wordpieces_prefix="##"
         )
+        pass
 
-        tokenizer.train(
-            files=[args.corpus_file],
-            limit_alphabet=args.limit_alphabet,
-            vocab_size=args.vocab_size
+    def vocab(self):
+        self.tokenizer.train(
+            files=[self.corpus_file],
+            limit_alphabet=self.limit_alphabet,
+            vocab_size=self.vocab_size
         )
 
-        tokenizer.save("./", "ch-{}-wpm-{}".format(args.limit_alphabet, args.vocab_size))    
+        self.tokenizer.save("./", "ch-{}-wpm-{}".format(self.limit_alphabet, self.vocab_size))    
     
 
 
