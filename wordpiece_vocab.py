@@ -26,5 +26,5 @@ class WordpieceVocab :
             vocab_size=self.vocab_size
         )
 
-        tokenizer.save("vocab.txt")    
-        return tokenizer
+        tokenizer.save("./", "ch-{}-wpm-{}".format(args.limit_alphabet, args.vocab_size))
+        
