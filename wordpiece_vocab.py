@@ -22,8 +22,8 @@ class WordpieceVocab :
 
         tokenizer.train(
             files=[self.corpus_file],
-            vocab_size=self.vocab_size
-            limit_alphabet=self.limit_alphabet,
+            vocab_size=self.vocab_size,
+            limit_alphabet=self.limit_alphabet
         )
 
         tokenizer.save_model("./daa/vocab/wordpiece")
