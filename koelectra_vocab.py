@@ -2,10 +2,15 @@ import argparse
 from tokenizers import BertWordPieceTokenizer
 
 class KoElectra_vocab:
-    def __init__(self):
+    def __init__():
         pass
 
-    def Wordpeiece(corpus_file, limit_alphabet, vocab_size):
+    def Wordpeiece(self, corpus_file, limit_alphabet, vocab_size):
+        
+        self.corpus_file = corpus_file, 
+        self.limit_alphabet = limit_alphabet, 
+        self.vocab_size = vocab_size,
+        
         # parser = argparse.ArgumentParser()
 
         # parser.add_argument(corpus_file)
@@ -24,9 +29,9 @@ class KoElectra_vocab:
         )
 
         tokenizer.train(
-            files=corpus_file,
-            limit_alphabet=limit_alphabet,
-            vocab_size=vocab_size
+            files=[self.corpus_file],
+            limit_alphabet=self.limit_alphabet,
+            vocab_size=self.vocab_size
         )
 
-        tokenizer.save("./ch-{}-wpm-{}-pretty".format(limit_alphabet, vocab_size),True)
+        tokenizer.save("./ch-{}-wpm-{}-pretty".format(self.limit_alphabet, self.vocab_size),True)
