@@ -15,6 +15,7 @@ from transformers import (
 )
 import time
 from .confusion_matrix import ConfusionMatrix
+from .wordpiece_vocab import WordpieceVocab
 
 class KoElectraClassificationTrainer:
 	def __init__(self):
