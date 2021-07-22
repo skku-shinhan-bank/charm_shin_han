@@ -27,4 +27,4 @@ class WordpieceVocab :
         )
 
         tokenizer.save("./", "ch-{}-wpm-{}".format(self.limit_alphabet, self.vocab_size))    
-    
+        return tokenizer
