@@ -11,7 +11,7 @@ class WordpieceVocab :
 
     def vocab(self):
         tokenizer = BertWordPieceTokenizer(
-            vocab_file=None,
+            vocab=None,
             clean_text=True,
             handle_chinese_chars=True,
             strip_accents=False, # Must be False if cased model
@@ -22,9 +22,8 @@ class WordpieceVocab :
 
         tokenizer.train(
             files=[self.corpus_file],
-            limit_alphabet=self.limit_alphabet,
             vocab_size=self.vocab_size
+            limit_alphabet=self.limit_alphabet,
         )
 
-        tokenizer.save("./", "ch-{}-wpm-{}".format(args.limit_alphabet, args.vocab_size))
-        
+        tokenizer.save_model("./daa/vocab/wordpiece")
