@@ -1,6 +1,5 @@
 import os
 from tokenizers import BertWordPieceTokenizer
-from transformers import AutoTokenizer
 
 class WordpieceVocab :
     def __init__(self, corpus_file, vocab_size, limit_alphabet):
@@ -11,16 +10,15 @@ class WordpieceVocab :
         pass
 
     def vocab(self):
-		tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
-        # tokenizer = BertWordPieceTokenizer(
-        #     vocab=None,
-        #     clean_text=True,
-        #     handle_chinese_chars=True,
-        #     strip_accents=False, # Must be False if cased model
-        #     lowercase=False,
-        #     wordpieces_prefix="##"
-        # )
-        # tokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
+        tokenizer = BertWordPieceTokenizer(
+            vocab=None,
+            clean_text=True,
+            handle_chinese_chars=True,
+            strip_accents=False, # Must be False if cased model
+            lowercase=False,
+            wordpieces_prefix="##"
+        )
+        tokenizer = BertWordPieceTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
 
         tokenizer.train(
             files=[self.corpus_file],
