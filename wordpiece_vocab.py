@@ -18,7 +18,7 @@ class WordpieceVocab :
             lowercase=False,
             wordpieces_prefix="##"
         )
-        tokenizer = BertWordPieceTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
+        # tokenizer = BertWordPieceTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
 
         tokenizer.train(
             files=[self.corpus_file],
