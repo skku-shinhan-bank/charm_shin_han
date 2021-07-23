@@ -6,11 +6,11 @@ class KoElectra_vocab:
     def __init__(self):
         pass
 
-    def Wordpeiece(self, corpus_file, limit_alphabet, vocab_size):
+    def Wordpeiece(corpus_file, limit_alphabet, vocab_size):
         
-        corpus_file = corpus_file, 
-        limit_alphabet = limit_alphabet, 
-        vocab_size = vocab_size,
+        # corpus_file = corpus_file, 
+        # limit_alphabet = limit_alphabet, 
+        # vocab_size = vocab_size,
         
         # parser = argparse.ArgumentParser()
         # parser.add_argument(corpus_file)
@@ -36,5 +36,5 @@ class KoElectra_vocab:
         checkpoint_path ="vocab"
         if not os.path.isdir(checkpoint_path):
             os.mkdir(checkpoint_path)
-        tokenizer.save("{checkpoint_path}/vocab.txt")
+        tokenizer.save_model("{checkpoint_path}/vocab.txt")
         # tokenizer.save("./ch-{}-wpm-{}-pretty".format(limit_alphabet, vocab_size),True)
