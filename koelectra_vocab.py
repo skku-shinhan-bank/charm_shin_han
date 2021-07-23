@@ -33,8 +33,8 @@ class KoElectra_vocab:
             vocab_size=vocab_size
         )
 
-        checkpoint_path ="vocab"
-        if not os.path.isdir(checkpoint_path):
-            os.mkdir(checkpoint_path)
-        tokenizer.save_model("{checkpoint_path}/vocab.txt")
+        # checkpoint_path ="vocab"
+        # if not os.path.isdir(checkpoint_path):
+        #     os.mkdir(checkpoint_path)
+        tokenizer.save_model("./vocab")
         # tokenizer.save("./ch-{}-wpm-{}-pretty".format(limit_alphabet, vocab_size),True)
