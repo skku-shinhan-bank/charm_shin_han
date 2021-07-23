@@ -27,7 +27,7 @@ class KoElectraClassificationTrainer:
 		tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
 
 		origin_tokens = []
-		f = open("/checkpoint/vocab.txt", 'r')
+		f = open("/content/checkpoint/vocab.txt", 'r')
 		while True :
 			line = f.readline()
 			if not line :
