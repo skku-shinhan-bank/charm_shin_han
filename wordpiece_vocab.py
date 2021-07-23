@@ -2,14 +2,10 @@ import os
 from tokenizers import BertWordPieceTokenizer
 
 class WordpieceVocab :
-    def __init__(self, corpus_file, vocab_size, limit_alphabet):
-        self.corpus_file = corpus_file
-        self.vocab_size = vocab_size
-        self.limit_alphabet = limit_alphabet
-
+    def __init__(self):
         pass
 
-    def vocab(self):
+    def make_vocab(self, corpus_file, vocab_size, limit_alphabet):
         tokenizer = BertWordPieceTokenizer(
             vocab=None,
             clean_text=True,
@@ -21,9 +17,9 @@ class WordpieceVocab :
         # tokenizer = BertWordPieceTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
 
         tokenizer.train(
-            files=[self.corpus_file],
-            vocab_size=self.vocab_size,
-            limit_alphabet=self.limit_alphabet
+            files=[corpus_file],
+            vocab_size=vocab_size,
+            limit_alphabet=limit_alphabet
         )
 
         checkpoint_path ="checkpoint"
