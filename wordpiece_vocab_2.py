@@ -35,16 +35,12 @@ class WordpieceVocabTest :
 
         data = open(file_path, 'r').read().split('\n')
 
-        # mecab for window는 아래 코드 사용
-        mecab_tokenizer = Mecab()
-
+        mecab_tokenizer = Mecab.morphs()
         for_generation = False # or normal
 
         if for_generation:
-            # 1: '어릴때' -> '어릴, ##때' for generation model
             total_morph=[]
             for sentence in data:
-                # 문장단위 mecab 적용
                 morph_sentence= []
                 count = 0
                 for token_mecab in mecab_tokenizer(sentence):
@@ -55,20 +51,13 @@ class WordpieceVocabTest :
                     else:
                         morph_sentence.append(token_mecab_save)
                         count += 1
-                # 문장단위 저장
                 total_morph.append(morph_sentence)
-
         else:
-            # 2: '어릴때' -> '어릴, 때'   for normal case
             total_morph=[]
             for sentence in data:
-                # 문장단위 mecab 적용
                 morph_sentence= mecab_tokenizer(sentence)
-                # 문장단위 저장
                 total_morph.append(morph_sentence)
                                 
-        # mecab 적용한 데이터 저장
-        # ex) 1 line: '어릴 때 보 고 지금 다시 봐도 재밌 어요 ㅋㅋ'
         with open('after_mecab.txt', 'w', encoding='utf-8') as f:
             for line in total_morph:
                 f.write(' '.join(line)+'\n')
