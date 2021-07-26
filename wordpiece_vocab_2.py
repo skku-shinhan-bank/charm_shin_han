@@ -6,8 +6,9 @@ class WordpieceVocabTest :
     def __init__(self):
         pass
 
-    def make_vocab(self, corpus_file, vocab_size, limit_alphabet):
-        
+    def make_vocab(self, file_path, vocab_size, limit_alphabet):
+        self.generate_mecab_vocab(file_path)
+
         tokenizer = BertWordPieceTokenizer(
             vocab=None,
             clean_text=True,
@@ -18,7 +19,7 @@ class WordpieceVocabTest :
         )
 
         tokenizer.train(
-            files=[corpus_file],
+            files=['after_mecab.txt'],
             vocab_size=vocab_size,
             limit_alphabet=limit_alphabet,
             min_frequency = 5,
