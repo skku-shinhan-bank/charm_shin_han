@@ -35,7 +35,7 @@ class WordpieceVocabTest :
 
         data = open(file_path, 'r').read().split('\n')
 
-        mecab_tokenizer = Mecab.morphs()
+        mecab_tokenizer = Mecab()
         for_generation = False # or normal
 
         if for_generation:
@@ -43,7 +43,7 @@ class WordpieceVocabTest :
             for sentence in data:
                 morph_sentence= []
                 count = 0
-                for token_mecab in mecab_tokenizer(sentence):
+                for token_mecab in mecab_tokenizer.morphs(sentence):
                     token_mecab_save = token_mecab
                     if count > 0:
                         token_mecab_save = "##" + token_mecab_save  # 앞에 ##를 부친다
@@ -55,7 +55,7 @@ class WordpieceVocabTest :
         else:
             total_morph=[]
             for sentence in data:
-                morph_sentence= mecab_tokenizer(sentence)
+                morph_sentence= mecab_tokenizer.morphs(sentence)
                 total_morph.append(morph_sentence)
                                 
         with open('after_mecab.txt', 'w', encoding='utf-8') as f:
