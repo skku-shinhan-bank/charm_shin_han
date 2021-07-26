@@ -1,11 +1,6 @@
 import os
 from tokenizers import BertWordPieceTokenizer
 from transformers import AutoTokenizer
-from .model.koelectra_classifier import KoElectraClassifier
-from transformers import (
-	ElectraConfig,
-)
-
 
 class WordpieceVocabTest :
     def __init__(self):
@@ -25,7 +20,9 @@ class WordpieceVocabTest :
         tokenizer.train(
             files=[corpus_file],
             vocab_size=vocab_size,
-            limit_alphabet=limit_alphabet
+            limit_alphabet=limit_alphabet,
+            min_frequency = 5,
+            show_progress=True
         )
 
         checkpoint_path ="checkpoint"
@@ -33,37 +30,21 @@ class WordpieceVocabTest :
             os.mkdir(checkpoint_path)
         tokenizer.save_model("./checkpoint")
 
-		# electra_config = ElectraConfig.from_pretrained("monologg/koelectra-base-v3-discriminator")
-		# classification_model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-base-v3-discriminator", config = electra_config, num_labels = config.num_label)
-		# new_tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
+        user_defined_symbols = ['[BOS]','[EOS]','[UNK0]','[UNK1]','[UNK2]','[UNK3]','[UNK4]','[UNK5]','[UNK6]','[UNK7]','[UNK8]','[UNK9]']
+        unused_token_num = 200
+        unused_list = ['[unused{}]'.format(n) for n in range(unused_token_num)]
+        user_defined_symbols = user_defined_symbols + unused_list
 
-        origin_tokens = []
-        f = open("/content/checkpoint/vocab.txt", 'r')
-        while True :
-            line = f.readline()
-            if not line :
-                break
-        origin_tokens.append(line)
-        f.close()
-        new_tokens = []
+        new_tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
+        origin_tokens = open('/content/checkpoint/vocab.txt', 'r').read().split('\n')
         new_tokens=origin_tokens[5:]
-        print(new_tokens)
-		# new_tokenizer.add_tokens(new_tokens)
-		# classification_model.resize_token_embeddings(len(tokenizer))
+        new_tokenizer.add_tokens(new_tokens)
 
-    # def retrain_tokenizer(self, config):
+        new_tokenizer.get_vocab()
+        new_tokenizer.all_special_tokens()
+        special_tokens_dict = {'additional_special_tokens': user_defined_symbols}
+        new_tokenizer.add_special_tokens(special_tokens_dict)
 
-	# 	electra_config = ElectraConfig.from_pretrained("monologg/koelectra-base-v3-discriminator")
-	# 	classification_model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-base-v3-discriminator", config = electra_config, num_labels = config.num_label)
-    #     new_tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
-    #     origin_tokens = []
-    #     f = open("/checkpoint/vocab.txt", 'r')
-    #     while True :
-    #         line = f.readline()
-    #         if not line :
-    #             break
-    #         origin_tokens.append(line)
-    #     f.close()
-    #     new_tokens=origin_tokens[5:]
-    #     new_tokenizer.add_tokens(new_tokens)
-
+        if not os.path.isdir(checkpoint_special):
+            os.mkdir(checkpoint_special)
+        new_tokenizer.save_model("./checkpoint_special")
