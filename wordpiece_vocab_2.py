@@ -24,34 +24,52 @@ class WordpieceVocabTest :
             min_frequency = 5,
             show_progress=True
         )
-
+        
         checkpoint_path ="checkpoint"
         if not os.path.isdir(checkpoint_path):
             os.mkdir(checkpoint_path)
         tokenizer.save_model("./checkpoint")
 
-        # user_defined_symbols = ['[BOS]','[EOS]','[UNK0]','[UNK1]','[UNK2]','[UNK3]','[UNK4]','[UNK5]','[UNK6]','[UNK7]','[UNK8]','[UNK9]']
-        # unused_token_num = 200
-        # unused_list = ['[unused{}]'.format(n) for n in range(unused_token_num)]
-        # user_defined_symbols = user_defined_symbols + unused_list
+    def generate_mecab_vocab(self, file_path):
 
-        # new_tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
-        # origin_tokens = open('/content/checkpoint/vocab.txt', 'r').read().split('\n')
-        # new_tokens=origin_tokens[5:]
-        # new_tokenizer.add_tokens(new_tokens)
+        data = open(file_path, 'r').read().split('\n')
 
-        # print(new_tokenizer.get_vocab())
-        # print(new_tokenizer.all_special_tokens())
-        # special_tokens_dict = {'additional_special_tokens': user_defined_symbols}
-        # new_tokenizer.add_special_tokens(special_tokens_dict)
+        # mecab for window는 아래 코드 사용
+        from konlpy.tag import Mecab  # install mecab for window: https://hong-yp-ml-records.tistory.com/91
+        mecab_tokenizer = Mecab(dicpath=r"C:\mecab\mecab-ko-dic").morphs
+        print('mecab check :', mecab_tokenizer('어릴때보고 지금다시봐도 재밌어요ㅋㅋ'))
 
-        # if not os.path.isdir("checkpoint_special"):
-        #     os.mkdir("checkpoint_special")
-        # new_tokenizer.save_model("./checkpoint_special")
+        for_generation = False # or normal
 
-        # special_tokens_dict = {'additional_special_tokens': user_defined_symbols}
-        # tokenizer.add_special_tokens(special_tokens_dict)
+        if for_generation:
+            # 1: '어릴때' -> '어릴, ##때' for generation model
+            total_morph=[]
+            for sentence in data:
+                # 문장단위 mecab 적용
+                morph_sentence= []
+                count = 0
+                for token_mecab in mecab_tokenizer(sentence):
+                    token_mecab_save = token_mecab
+                    if count > 0:
+                        token_mecab_save = "##" + token_mecab_save  # 앞에 ##를 부친다
+                        morph_sentence.append(token_mecab_save)
+                    else:
+                        morph_sentence.append(token_mecab_save)
+                        count += 1
+                # 문장단위 저장
+                total_morph.append(morph_sentence)
 
-        # if not os.path.isdir("checkpoint_special"):
-        #     os.mkdir("checkpoint_special")
-        # tokenizer.save_model("./checkpoint_special")
+        else:
+            # 2: '어릴때' -> '어릴, 때'   for normal case
+            total_morph=[]
+            for sentence in data:
+                # 문장단위 mecab 적용
+                morph_sentence= mecab_tokenizer(sentence)
+                # 문장단위 저장
+                total_morph.append(morph_sentence)
+                                
+        # mecab 적용한 데이터 저장
+        # ex) 1 line: '어릴 때 보 고 지금 다시 봐도 재밌 어요 ㅋㅋ'
+        with open('after_mecab.txt', 'w', encoding='utf-8') as f:
+            for line in total_morph:
+                f.write(' '.join(line)+'\n')

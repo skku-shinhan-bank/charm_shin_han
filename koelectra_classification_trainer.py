@@ -34,8 +34,6 @@ class KoElectraClassificationTrainer:
 					origin_tokens.append(line[:512])
 				else :
 					origin_tokens.append(line)
-
-		# origin_tokens = open('/content/checkpoint/vocab.txt', 'r').read().split('\n')
 		new_tokens=origin_tokens[5:]
 		tokenizer.add_tokens(new_tokens)
 

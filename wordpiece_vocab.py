@@ -18,7 +18,8 @@ class WordpieceVocab :
         tokenizer.train(
             files=[corpus_file],
             vocab_size=vocab_size,
-            limit_alphabet=limit_alphabet
+            limit_alphabet=limit_alphabet,
+            min_frequency = 5
         )
 
         checkpoint_path ="checkpoint"
