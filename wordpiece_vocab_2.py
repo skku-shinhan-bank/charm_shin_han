@@ -7,7 +7,7 @@ from transformers import (
 )
 
 
-class WordpieceVocab :
+class WordpieceVocabTest :
     def __init__(self):
         pass
 
