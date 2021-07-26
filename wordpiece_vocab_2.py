@@ -40,8 +40,8 @@ class WordpieceVocabTest :
         new_tokens=origin_tokens[5:]
         new_tokenizer.add_tokens(new_tokens)
 
-        new_tokenizer.get_vocab()
-        new_tokenizer.all_special_tokens()
+        print(new_tokenizer.get_vocab())
+        print(new_tokenizer.all_special_tokens())
         special_tokens_dict = {'additional_special_tokens': user_defined_symbols}
         new_tokenizer.add_special_tokens(special_tokens_dict)
 
