@@ -36,8 +36,7 @@ class WordpieceVocabTest :
         data = open(file_path, 'r').read().split('\n')
 
         # mecab for window는 아래 코드 사용
-        mecab_tokenizer = Mecab(dicpath=r"C:\mecab\mecab-ko-dic").morphs
-        print('mecab check :', mecab_tokenizer('어릴때보고 지금다시봐도 재밌어요ㅋㅋ'))
+        mecab_tokenizer = Mecab()
 
         for_generation = False # or normal
 
