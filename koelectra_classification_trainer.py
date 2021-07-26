@@ -27,7 +27,15 @@ class KoElectraClassificationTrainer:
 		tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
 
 		#adding tokens
-		origin_tokens = open('/content/checkpoint/vocab.txt', 'r').read().split('\n')
+		with open('/content/checkpoint/vocab.txt', 'r') as f:
+			origin_tokens = []
+			for line in f:
+				if len(line) > 512 :
+					origin_tokens.append(line[:512])
+				else :
+					origin_tokens.append(line)
+
+		# origin_tokens = open('/content/checkpoint/vocab.txt', 'r').read().split('\n')
 		new_tokens=origin_tokens[5:]
 		tokenizer.add_tokens(new_tokens)
 

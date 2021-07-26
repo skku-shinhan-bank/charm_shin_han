@@ -22,7 +22,8 @@ class WordpieceVocabTest :
             vocab_size=vocab_size,
             limit_alphabet=limit_alphabet,
             min_frequency = 5,
-            show_progress=True
+            show_progress=True,
+            max_length = 512
         )
 
         checkpoint_path ="checkpoint"
@@ -30,10 +31,10 @@ class WordpieceVocabTest :
             os.mkdir(checkpoint_path)
         tokenizer.save_model("./checkpoint")
 
-        user_defined_symbols = ['[BOS]','[EOS]','[UNK0]','[UNK1]','[UNK2]','[UNK3]','[UNK4]','[UNK5]','[UNK6]','[UNK7]','[UNK8]','[UNK9]']
-        unused_token_num = 200
-        unused_list = ['[unused{}]'.format(n) for n in range(unused_token_num)]
-        user_defined_symbols = user_defined_symbols + unused_list
+        # user_defined_symbols = ['[BOS]','[EOS]','[UNK0]','[UNK1]','[UNK2]','[UNK3]','[UNK4]','[UNK5]','[UNK6]','[UNK7]','[UNK8]','[UNK9]']
+        # unused_token_num = 200
+        # unused_list = ['[unused{}]'.format(n) for n in range(unused_token_num)]
+        # user_defined_symbols = user_defined_symbols + unused_list
 
         # new_tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
         # origin_tokens = open('/content/checkpoint/vocab.txt', 'r').read().split('\n')
@@ -49,9 +50,9 @@ class WordpieceVocabTest :
         #     os.mkdir("checkpoint_special")
         # new_tokenizer.save_model("./checkpoint_special")
 
-        special_tokens_dict = {'additional_special_tokens': user_defined_symbols}
-        tokenizer.add_special_tokens(special_tokens_dict)
+        # special_tokens_dict = {'additional_special_tokens': user_defined_symbols}
+        # tokenizer.add_special_tokens(special_tokens_dict)
 
-        if not os.path.isdir("checkpoint_special"):
-            os.mkdir("checkpoint_special")
-        tokenizer.save_model("./checkpoint_special")
+        # if not os.path.isdir("checkpoint_special"):
+        #     os.mkdir("checkpoint_special")
+        # tokenizer.save_model("./checkpoint_special")
