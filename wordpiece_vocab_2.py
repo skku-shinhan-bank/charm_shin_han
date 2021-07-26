@@ -45,6 +45,6 @@ class WordpieceVocabTest :
         special_tokens_dict = {'additional_special_tokens': user_defined_symbols}
         new_tokenizer.add_special_tokens(special_tokens_dict)
 
-        if not os.path.isdir(checkpoint_special):
-            os.mkdir(checkpoint_special)
+        if not os.path.isdir("checkpoint_special"):
+            os.mkdir("checkpoint_special")
         new_tokenizer.save_model("./checkpoint_special")
