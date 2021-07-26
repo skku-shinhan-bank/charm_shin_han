@@ -45,6 +45,7 @@ class WordpieceVocabTest :
                 break
         origin_tokens.append(line)
         f.close()
+        new_tokens = []
         new_tokens=origin_tokens[5:]
         print(new_tokens)
 		# new_tokenizer.add_tokens(new_tokens)
