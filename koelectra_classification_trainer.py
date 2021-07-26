@@ -30,6 +30,7 @@ class KoElectraClassificationTrainer:
 		origin_tokens = open('/content/checkpoint/vocab.txt', 'r').read().split('\n')
 		new_tokens = [l.strip() for l in origin_tokens[5:]]
 		tokenizer.add_tokens(new_tokens)
+		classification_model.resize_token_embeddings(len(tokenizer))
 
 		#adding special tokens
 		user_defined_symbols = ['[BOS]','[EOS]','[UNK0]','[UNK1]','[UNK2]','[UNK3]','[UNK4]','[UNK5]','[UNK6]','[UNK7]','[UNK8]','[UNK9]']
@@ -38,8 +39,6 @@ class KoElectraClassificationTrainer:
 		user_defined_symbols = user_defined_symbols + unused_list
 		special_tokens_dict = {'additional_special_tokens': user_defined_symbols}
 		tokenizer.add_special_tokens(special_tokens_dict)
-
-		#resizing token embeddings
 		classification_model.resize_token_embeddings(len(tokenizer))
 
 		train_zipped_data = make_zipped_data(train_data, train_label)
