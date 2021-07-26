@@ -37,15 +37,15 @@ class WordpieceVocabTest :
 		# classification_model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-base-v3-discriminator", config = electra_config, num_labels = config.num_label)
 		# new_tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
 
-		origin_tokens = []
-		f = open("/content/checkpoint/vocab.txt", 'r')
-		while True :
-			line = f.readline()
-			if not line :
-				break
-			origin_tokens.append(line)
-		f.close()
-		new_tokens=origin_tokens[5:]
+        origin_tokens = []
+        f = open("/content/checkpoint/vocab.txt", 'r')
+        while True :
+            line = f.readline()
+            if not line :
+                break
+        origin_tokens.append(line)
+        f.close()
+        new_tokens=origin_tokens[5:]
         print(new_tokens)
 		# new_tokenizer.add_tokens(new_tokens)
 		# classification_model.resize_token_embeddings(len(tokenizer))
