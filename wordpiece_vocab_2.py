@@ -22,8 +22,7 @@ class WordpieceVocabTest :
             vocab_size=vocab_size,
             limit_alphabet=limit_alphabet,
             min_frequency = 5,
-            show_progress=True,
-            max_length = 512
+            show_progress=True
         )
 
         checkpoint_path ="checkpoint"
