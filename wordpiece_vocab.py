@@ -1,6 +1,8 @@
 import os
 from tokenizers import BertWordPieceTokenizer
 
+#Mecab 미사용
+
 class WordpieceVocab :
     def __init__(self):
         pass

@@ -2,6 +2,8 @@ import os
 from tokenizers import BertWordPieceTokenizer
 from konlpy.tag import Mecab
 
+#Mecab 사용
+
 class WordpieceVocabTest :
     def __init__(self):
         pass
