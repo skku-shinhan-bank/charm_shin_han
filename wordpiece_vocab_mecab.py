@@ -4,7 +4,7 @@ from konlpy.tag import Mecab
 
 #Mecab 사용
 
-class WordpieceVocabTest :
+class WordpieceVocabMecab :
     def __init__(self):
         pass
 
