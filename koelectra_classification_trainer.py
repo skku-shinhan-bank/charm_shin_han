@@ -33,13 +33,13 @@ class KoElectraClassificationTrainer:
 		classification_model.resize_token_embeddings(len(tokenizer))
 
 		#adding special tokens
-		user_defined_symbols = ['[BOS]','[EOS]','[UNK0]','[UNK1]','[UNK2]','[UNK3]','[UNK4]','[UNK5]','[UNK6]','[UNK7]','[UNK8]','[UNK9]']
+		# user_defined_symbols = ['[BOS]','[EOS]','[UNK0]','[UNK1]','[UNK2]','[UNK3]','[UNK4]','[UNK5]','[UNK6]','[UNK7]','[UNK8]','[UNK9]']
 		# unused_token_num = 200
 		# unused_list = ['[unused{}]'.format(n) for n in range(unused_token_num)]
 		# user_defined_symbols = user_defined_symbols + unused_list
-		special_tokens_dict = {'additional_special_tokens': user_defined_symbols}
-		tokenizer.add_special_tokens(special_tokens_dict)
-		classification_model.resize_token_embeddings(len(tokenizer))
+		# special_tokens_dict = {'additional_special_tokens': user_defined_symbols}
+		# tokenizer.add_special_tokens(special_tokens_dict)
+		# classification_model.resize_token_embeddings(len(tokenizer))
 
 		train_zipped_data = make_zipped_data(train_data, train_label)
 		test_zipped_data = make_zipped_data(test_data, test_label)
