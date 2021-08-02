@@ -4,6 +4,7 @@ import torch
 from torch.nn import functional as F
 from torch.utils.data import DataLoader, Dataset
 from transformers import AutoTokenizer, ElectraForSequenceClassification, AdamW
+from transformers import ElectraModel, ElectraTokenizer
 from .model.koelectra_classifier import KoElectraClassifier
 from tqdm.notebook import tqdm
 import torch
@@ -23,8 +24,8 @@ class KoElectraClassificationTrainer:
 
 	def train(self, train_data, train_label, test_data, test_label, config, device, model_output_path):
 		electra_config = ElectraConfig.from_pretrained("monologg/koelectra-base-v3-discriminator")
-		classification_model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-base-v3-discriminator", config = electra_config, num_labels = config.num_label)
-		tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
+		classification_model = ElectraModel.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-base-v3-discriminator", config = electra_config, num_labels = config.num_label)
+		tokenizer = ElectraTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
 
 		#adding tokens
 		origin_tokens = open('/content/checkpoint/vocab.txt', 'r').read().split('\n')
