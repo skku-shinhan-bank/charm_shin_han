@@ -53,6 +53,12 @@ class KoElectraClassificationTrainer:
 		]
 		optimizer = AdamW(optimizer_grouped_parameters, lr=learning_rate)
 
+		# data history for experiments
+    	history_loss = []
+    	history_train_acc = []
+  	 	history_test_acc = []
+   		history_train_time = []
+
 		for epoch_index in range(config.n_epoch):
 			print("[epoch {}]\n".format(epoch_index + 1))
 
@@ -78,6 +84,9 @@ class KoElectraClassificationTrainer:
 			train_loss = np.mean(train_losses)
 			train_acc = train_acc / len(train_dataset)
 			print("train: acc {} / loss {} / time {}".format(train_acc, train_loss, end_time - start_time))
+			history_loss.append(train_loss)
+			history_train_acc.append(train_acc)
+			history_train_time.append(end_time - start_time)
 
 			cm = ConfusionMatrix(config.num_label)
 			test_losses = []
@@ -105,6 +114,7 @@ class KoElectraClassificationTrainer:
 			print("test: acc {} / loss {}".format(test_acc, test_loss))
 			cm.show()
 			print("\n")
+			history_test_acc.append(test_acc)
 
 		torch.save({
 			'epoch': config.n_epoch,  # 현재 학습 epoch
@@ -114,6 +124,24 @@ class KoElectraClassificationTrainer:
 			'train_step': config.n_epoch * config.batch_size,  # 현재 진행한 학습
 			'total_train_step': len(train_loader)  # 현재 epoch에 학습 할 총 train step
 		}, model_output_path)
+
+		# Print the result
+		print("RESULT - copy and paste this to the report")
+		for epoch_index in range(config.num_epochs):
+		print('epoch ', epoch_index, end='\t')
+		print('')
+		for i in history_loss:
+		print(i, end='\t')
+		print('')
+		for i in history_train_acc:
+		print(i, end='\t')
+		print('')
+		for i in history_test_acc:
+		print(i, end='\t')
+		print('')
+		for i in history_train_time:
+		print(i, end='\t')
+		print('')
 
 def make_zipped_data(data, label):      
 	zipped_data = []

@@ -96,7 +96,7 @@ class KobertClassficationTrainer:
             train_acc += calc_accuracy(out, label)
             if batch_id % config.log_interval == 0:
                 print("batch id {} / loss {} / train acc {}".format(batch_id+1, loss.data.cpu().numpy(), train_acc / (batch_id+1)))
-            train_time = time.time() - start_time
+        train_time = time.time() - start_time
         print("train acc {} / train time {}".format(train_acc / (batch_id+1), train_time))
         history_loss.append(loss.data.cpu().numpy())
         history_train_acc.append(train_acc / (batch_id + 1))
