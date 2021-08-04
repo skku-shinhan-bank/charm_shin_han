@@ -16,7 +16,6 @@ from transformers import (
 )
 import time
 from .confusion_matrix import ConfusionMatrix
-from .wordpiece_vocab import WordpieceVocab
 
 class KoElectraClassificationTrainer:
 	def __init__(self):
@@ -32,6 +31,8 @@ class KoElectraClassificationTrainer:
 		new_tokens = [l.strip() for l in origin_tokens[5:]]
 		tokenizer.add_tokens(new_tokens)
 		classification_model.resize_token_embeddings(len(tokenizer))
+		classification_model.embeddings.word_embeddings.weight[-1, :] = torch.zeros([768])
+
 
 		#adding special tokens
 		# user_defined_symbols = ['[BOS]','[EOS]','[UNK0]','[UNK1]','[UNK2]','[UNK3]','[UNK4]','[UNK5]','[UNK6]','[UNK7]','[UNK8]','[UNK9]']
