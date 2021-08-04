@@ -69,6 +69,12 @@ class KobertClassficationTrainer:
     warmup_step = int(t_total * config.warmup_ratio)
     scheduler = get_cosine_schedule_with_warmup(optimizer, num_warmup_steps=warmup_step, num_training_steps=t_total)
 
+    # data history for experiments
+    history_loss = []
+    history_train_acc = []
+    history_test_acc = []
+    history_train_time = []
+
     for epoch_index in range(config.num_epochs):
       print("[epoch {}]\n".format(epoch_index + 1))
       train_acc = 0.0
@@ -94,7 +100,11 @@ class KobertClassficationTrainer:
         # if batch_id % config.log_interval == 0:
         #   print("batch id {} / loss {} / train acc {}".format(batch_id+1, loss.data.cpu().numpy(), train_acc / (batch_id+1)))
       train_loss = np.mean(train_losses)
-      print("acc {} / loss {} / train time {}\n".format(train_acc / (batch_id+1), train_loss,time.time() - start_time))
+      train_time = time.time() - start_time
+      print("acc {} / loss {} / train time {}\n".format(train_acc / (batch_id+1), train_loss, train_time))
+      history_loss.append(train_loss)
+			history_train_acc.append(train_acc / (batch_id + 1))
+			history_train_time.append(train_time)
 
       cm = ConfusionMatrix(config.num_of_classes)
       classification_model.eval()
@@ -113,8 +123,27 @@ class KobertClassficationTrainer:
       print("acc {}".format(test_acc / (batch_id+1)))
       print("<confusion matrix>\n", pd.DataFrame(cm.get()))
       print('\n')
+      history_test_acc.append(test_acc / (batch_id + 1))
+      
 
     torch.save(classification_model.state_dict(), model_output_path)
+    # Print the result
+		print("RESULT - copy and paste this to the report")
+		for epoch_index in range(config.num_epochs):
+      print('epoch ', epoch_index, end='\t')
+      print('')
+		for i in history_loss:
+      print(i, end='\t')
+      print('')
+		for i in history_train_acc:
+      print(i, end='\t')
+      print('')
+		for i in history_test_acc:
+      print(i, end='\t')
+      print('')
+		for i in history_train_time:
+      print(i, end='\t')
+      print('')
 
 class KoBERTDataset(Dataset):
   def __init__(self, dataset, sent_idx, label_idx, bert_tokenizer, max_len,
