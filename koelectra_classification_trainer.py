@@ -31,7 +31,7 @@ class KoElectraClassificationTrainer:
 		new_tokens = [l.strip() for l in origin_tokens[5:]]
 		tokenizer.add_tokens(new_tokens)
 		classification_model.resize_token_embeddings(len(tokenizer))
-		classification_model.embeddings.word_embeddings.weight[-1, :] = torch.zeros([768])
+		# classification_model.embeddings.word_embeddings.weight[-1, :] = torch.zeros([768])
 
 
 		#adding special tokens
