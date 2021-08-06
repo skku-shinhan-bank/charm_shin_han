@@ -50,10 +50,10 @@ class KoElectraClassificationTrainer:
 		optimizer = AdamW(optimizer_grouped_parameters, lr=config.learning_rate)
 
 		# data history for experiments
-    	history_loss = []
-    	history_train_acc = []
-    	history_test_acc = []
-    	history_train_time = []
+		history_loss = []
+		history_train_acc = []
+		history_test_acc = []
+		history_train_time = []
 
 		for epoch_index in range(config.n_epoch):
 			print("[epoch {}]\n".format(epoch_index + 1))
