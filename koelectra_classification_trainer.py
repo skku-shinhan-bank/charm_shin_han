@@ -123,7 +123,7 @@ class KoElectraClassificationTrainer:
 		}, model_output_path)
 		# Print the result
 		print("RESULT - copy and paste this to the report")
-		for epoch_index in range(config.num_epochs):
+		for epoch_index in range(config.n_epochs):
 			print('epoch ', epoch_index, end='\t')
 			print('')
 		for i in history_loss:
