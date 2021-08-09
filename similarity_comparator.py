@@ -133,7 +133,7 @@ class IssuePredictor:
     # unseen_test = [[review,0]]
     unseen_test = []
     row = []
-    row.append(review[i])
+    row.append(review)
     row.append(0)
     unseen_test.append(row)
 
