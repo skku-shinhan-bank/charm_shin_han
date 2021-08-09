@@ -55,8 +55,8 @@ class SimilarityComparator:
 
     print(cosine_scores[0][1].item())
 
-  def compare_generate_review(self, data, label, comment, model_path):
-    test_label = IssuePredictor(model_path).predict(self.string)
+  def compare_generate_review(self, config, data, label, comment, model_path):
+    test_label = IssuePredictor(model_path).predict(config, self.string)
     data.insert(0, self.string)
     label.insert(0, test_label)
 
