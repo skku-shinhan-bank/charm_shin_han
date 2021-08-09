@@ -16,7 +16,7 @@ def pad_seq(seq, leng):
 def cos_sim(A, B):
     return dot(A, B)/(norm(A)*norm(B))
 
-class GenerationBySimilarity:
+class SimilarityBasedGeneratior:
     def __init__(self):
         return
 
