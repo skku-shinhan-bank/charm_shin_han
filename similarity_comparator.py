@@ -130,12 +130,12 @@ class IssuePredictor:
     max_len = config.max_seq_len
     batch_size = config.batch_size
 
-    # unseen_test = [[review,0]]
-    unseen_test = []
-    row = []
-    row.append(review)
-    row.append(0)
-    unseen_test.append(row)
+    unseen_test = [[review,0]]
+    # unseen_test = []
+    # row = []
+    # row.append(review)
+    # row.append(0)
+    # unseen_test.append(row)
 
     self.stringset = KoElectraClassificationDataset(tokenizer=self.tokenizer, device=self.device, zipped_data = unseen_test, max_seq_len = max_len)
     test_loader = torch.utils.data.DataLoader(self.stringset, batch_size=batch_size, shuffle=False)
