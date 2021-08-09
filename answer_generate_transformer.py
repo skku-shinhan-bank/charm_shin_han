@@ -183,7 +183,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
 
     # 인코더를 num_layers개 쌓기
     for i in range(num_layers):
-        outputs = encoder_layer(dff=dff, d_model=d_model, num_heads=num_heads,
+        outputs = MultiHeadAttention.encoder_layer(dff=dff, d_model=d_model, num_heads=num_heads,
             dropout=dropout, name="encoder_layer_{}".format(i),
         )([outputs, padding_mask])
 
@@ -264,7 +264,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
 
     # 디코더를 num_layers개 쌓기
     for i in range(num_layers):
-        outputs = decoder_layer(dff=dff, d_model=d_model, num_heads=num_heads,
+        outputs = MultiHeadAttention.decoder_layer(dff=dff, d_model=d_model, num_heads=num_heads,
             dropout=dropout, name='decoder_layer_{}'.format(i),
         )(inputs=[outputs, enc_outputs, look_ahead_mask, padding_mask])
 
