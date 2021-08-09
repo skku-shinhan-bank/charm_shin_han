@@ -10,7 +10,8 @@ from .model.koelectra_classifier import KoElectraClassifier
 from .koelectra_classification_trainer import KoElectraClassificationDataset
 
 class SimilarityComparator:
-  def __init__(self, str1, str2):
+  def __init__(self, str1, str2, str3):
+    self.string = str3
     dataset = []
     dataset.append(str1)
     dataset.append(str2)
@@ -54,9 +55,9 @@ class SimilarityComparator:
 
     print(cosine_scores[0][1].item())
 
-  def compare_generate_review(self, test_data, data, label, comment, model_path):
-    test_label = IssuePredictor(model_path).predict(test_data)
-    data.insert(0, test_data)
+  def compare_generate_review(self, data, label, comment, model_path):
+    test_label = IssuePredictor(model_path).predict(self.string)
+    data.insert(0, self.string)
     label.insert(0, test_label)
 
     #Tokenize sentences
@@ -136,8 +137,8 @@ class IssuePredictor:
     row.append(0)
     unseen_test.append(row)
 
-    test_dataset = KoElectraClassificationDataset(tokenizer=self.tokenizer, device=self.device, zipped_data = unseen_test, max_seq_len = max_len)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+    self.stringset = KoElectraClassificationDataset(tokenizer=self.tokenizer, device=self.device, zipped_data = unseen_test, max_seq_len = max_len)
+    test_loader = torch.utils.data.DataLoader(self.stringset, batch_size=batch_size, shuffle=False)
 
     total_issue_info = 0
     for batch_index, data in enumerate(test_loader):
