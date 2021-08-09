@@ -35,7 +35,7 @@ class DataMaker:
 			elif test_issue_id == 23:
 				label.append(6)
 			else:
-				break;
+				break
 			data.append(test_review)
 
 		train_data = []

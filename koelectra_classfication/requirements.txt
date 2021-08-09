@@ -1,0 +1,6 @@
+transformers
+torch
+kobert_transformers
+matplotlib
+IPython
+pandas
