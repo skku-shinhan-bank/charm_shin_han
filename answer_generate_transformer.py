@@ -116,7 +116,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
 
     # 3. 스케일드 닷 프로덕트 어텐션. 앞서 구현한 함수 사용.
     # (batch_size, num_heads, query의 문장 길이, d_model/num_heads)
-    scaled_attention, _ = scaled_dot_product_attention(query, key, value, mask)
+    scaled_attention, _ = PositionalEncoding.scaled_dot_product_attention(query, key, value, mask)
     # (batch_size, query의 문장 길이, num_heads, d_model/num_heads)
     scaled_attention = tf.transpose(scaled_attention, perm=[0, 2, 1, 3])
 
