@@ -7,7 +7,7 @@ from transformers import (
 )
 from transformers import AutoTokenizer, ElectraForSequenceClassification, AdamW
 from .model.koelectra_classifier import KoElectraClassifier
-from koelectra_classification_trainer import KoElectraClassificationDataset
+from .koelectra_classification_trainer import KoElectraClassificationDataset
 
 class SimilarityComparator:
   def __init__(self, str1, str2):
