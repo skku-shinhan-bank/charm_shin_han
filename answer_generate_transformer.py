@@ -313,6 +313,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
     return tf.keras.Model(inputs=[inputs, dec_inputs], outputs=outputs, name=name)
 
   def loss_function(y_true, y_pred):
+    MAX_LENGTH = 40
     y_true = tf.reshape(y_true, shape=(-1, MAX_LENGTH - 1))
 
     loss = tf.keras.losses.SparseCategoricalCrossentropy(
