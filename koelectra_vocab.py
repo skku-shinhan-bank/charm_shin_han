@@ -8,16 +8,6 @@ class KoElectra_vocab:
 
     def Wordpeiece(corpus_file, limit_alphabet, vocab_size):
         
-        # corpus_file = corpus_file, 
-        # limit_alphabet = limit_alphabet, 
-        # vocab_size = vocab_size,
-        
-        # parser = argparse.ArgumentParser()
-        # parser.add_argument(corpus_file)
-        # parser.add_argument("--vocab_size", type=int, default=22000) # 만들 Vocab의 숫자 
-        # parser.add_argument("--limit_alphabet", type=int, default=6000)
-        # args = parser.parse_args()
-
         tokenizer = BertWordPieceTokenizer(
             vocab=None,
             clean_text=True,
@@ -37,4 +27,3 @@ class KoElectra_vocab:
         if not os.path.isdir(checkpoint_path):
             os.mkdir(checkpoint_path)
         tokenizer.save_model("./vocab")
-        # tokenizer.save("./ch-{}-wpm-{}-pretty".format(limit_alphabet, vocab_size),True)
