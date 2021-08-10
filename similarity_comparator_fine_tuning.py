@@ -201,7 +201,7 @@ class KoElectraSimilarityDataset(Dataset):
     self.tokenizer = tokenizer
 
     for zd in zipped_data:
-      encoding = self.tokenizer(zd[0], zd[1], max_len=max_seq_len, padding="max_length", truncation=True)
+      encoding = self.tokenizer(zd[0], zd[1], padding="max_length", truncation=True)
       if len(encoding['input_ids']) > max_seq_len:
         encoding['input_ids'] = encoding['input_ids'][:max_seq_len]
       # Padding Length
