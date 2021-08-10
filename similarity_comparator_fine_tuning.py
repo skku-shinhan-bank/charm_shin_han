@@ -151,38 +151,86 @@ def make_zipped_pair_data(data1, data2, label):
 
 	return zipped_data
 
+# class KoElectraSimilarityDataset(Dataset):
+#   def __init__(self,
+#               device = None,
+#               tokenizer = None,
+#               zipped_data = None,
+#               max_seq_len = None, # KoBERT max_length
+#               ):
+
+#     self.device = device
+#     self.data =[]
+#     self.tokenizer = tokenizer
+
+#     for zd in zipped_data:
+#       encoding = self.tokenizer(zd[0], zd[1], padding="max_length", truncation=True)
+#       # Label
+#       label = int(zd[2])
+#       data = {
+#         'input_ids': torch.tensor(encoding['input_ids']).to(self.device),
+#         'token_type_ids': torch.tensor(encoding['token_type_ids']).to(self.device),
+#         'attention_mask': torch.tensor(encoding['attention_mask']).to(self.device),
+#         'labels': torch.tensor(label).to(self.device)
+#       }
+
+#       self.data.append(data)
+
+#   def __len__(self):
+#     return len(self.data)
+#   def __getitem__(self,index):
+#     item = self.data[index]
+#     return item
+
+# def calc_accuracy(X,Y):
+# 	max_vals, max_indices = torch.max(X, 1)
+# 	train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
+# 	return train_acc
+
 class KoElectraSimilarityDataset(Dataset):
   def __init__(self,
               device = None,
               tokenizer = None,
               zipped_data = None,
               max_seq_len = None, # KoBERT max_length
-              ):
+              ):  
 
     self.device = device
     self.data =[]
     self.tokenizer = tokenizer
 
     for zd in zipped_data:
-      encoding = self.tokenizer(zd[0], zd[1], padding="max_length", truncation=True)
+      index_of_words = self.tokenizer.encode(zd[0]+zd[1])
+
+      if len(index_of_words) > max_seq_len:
+        index_of_words = index_of_words[:max_seq_len]
+
+      token_type_ids = [0] * len(index_of_words)
+      attention_mask = [1] * len(index_of_words)
+
+      # Padding Length
+      padding_length = max_seq_len - len(index_of_words)
+
+      # Zero Padding
+      index_of_words += [0] * padding_length
+      token_type_ids += [0] * padding_length
+      attention_mask += [0] * padding_length
+
       # Label
       label = int(zd[2])
       data = {
-        'input_ids': torch.tensor(encoding['input_ids']).to(self.device),
-        'token_type_ids': torch.tensor(encoding['token_type_ids']).to(self.device),
-        'attention_mask': torch.tensor(encoding['attention_mask']).to(self.device),
+        'input_ids': torch.tensor(index_of_words).to(self.device),
+        'token_type_ids': torch.tensor(token_type_ids).to(self.device),
+        'attention_mask': torch.tensor(attention_mask).to(self.device),
         'labels': torch.tensor(label).to(self.device)
       }
 
       self.data.append(data)
+      print(torch.tensor(index_of_words).to(self.device))
 
   def __len__(self):
     return len(self.data)
   def __getitem__(self,index):
     item = self.data[index]
     return item
-
-def calc_accuracy(X,Y):
-	max_vals, max_indices = torch.max(X, 1)
-	train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
-	return train_acc
+	
