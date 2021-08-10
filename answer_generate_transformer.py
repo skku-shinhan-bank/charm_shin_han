@@ -331,71 +331,9 @@ class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
     self.d_model = tf.cast(self.d_model, tf.float32)
     self.warmup_steps = warmup_steps
 
+
   def __call__(self, step):
     arg1 = tf.math.rsqrt(step)
     arg2 = step * (self.warmup_steps**-1.5)
 
     return tf.math.rsqrt(self.d_model) * tf.math.minimum(arg1, arg2)
-# 토큰화 / 정수 인코딩 / 시작 토큰과 종료 토큰 추가 / 패딩
-  def tokenize_and_filter(inputs, outputs):
-    MAX_LENGTH = 40
-    tokenized_inputs, tokenized_outputs = [], []
-
-    for (sentence1, sentence2) in zip(inputs, outputs):
-        # encode(토큰화 + 정수 인코딩), 시작 토큰과 종료 토큰 추가
-        sentence1 = START_TOKEN + tokenizer.encode(sentence1) + END_TOKEN
-        sentence2 = START_TOKEN + tokenizer.encode(sentence2) + END_TOKEN
-
-        tokenized_inputs.append(sentence1)
-        tokenized_outputs.append(sentence2)
-
-    # 패딩
-    tokenized_inputs = tf.keras.preprocessing.sequence.pad_sequences(
-        tokenized_inputs, maxlen=MAX_LENGTH, padding='post')
-    tokenized_outputs = tf.keras.preprocessing.sequence.pad_sequences(
-        tokenized_outputs, maxlen=MAX_LENGTH, padding='post')
-
-    return tokenized_inputs, tokenized_outputs
-
-  def accuracy(y_true, y_pred):
-    # 레이블의 크기는 (batch_size, MAX_LENGTH - 1)
-    y_true = tf.reshape(y_true, shape=(-1, MAX_LENGTH - 1))
-    return tf.keras.metrics.sparse_categorical_accuracy(y_true, y_pred)
-
-  def evaluate(sentence):
-    sentence = preprocess_sentence(sentence)
-
-    sentence = tf.expand_dims(
-        START_TOKEN + tokenizer.encode(sentence) + END_TOKEN, axis=0)
-
-    output = tf.expand_dims(START_TOKEN, 0)
-
-    # 디코더의 예측 시작
-    for i in range(MAX_LENGTH):
-        predictions = model(inputs=[sentence, output], training=False)
-
-        # 현재(마지막) 시점의 예측 단어를 받아온다.
-        predictions = predictions[:, -1:, :]
-        predicted_id = tf.cast(tf.argmax(predictions, axis=-1), tf.int32)
-
-        # 만약 마지막 시점의 예측 단어가 종료 토큰이라면 예측을 중단
-        if tf.equal(predicted_id, END_TOKEN[0]):
-            break
-
-        # 마지막 시점의 예측 단어를 출력에 연결한다.
-        # 이는 for문을 통해서 디코더의 입력으로 사용될 예정이다.
-        output = tf.concat([output, predicted_id], axis=-1)
-
-    return tf.squeeze(output, axis=0)
-
-  def predict(sentence):
-    prediction = evaluate(sentence)
-
-    predicted_sentence = tokenizer.decode(
-        [i for i in prediction if i < tokenizer.vocab_size])
-
-    return predicted_sentence
-  def preprocess_sentence(sentence):
-    sentence = re.sub(r"([?.!,])", r" \1 ", sentence)
-    sentence = sentence.strip()
-    return sentence
