@@ -137,8 +137,8 @@ class IssuePredictor:
     # row.append(0)
     # unseen_test.append(row)
 
-    self.stringset = KoElectraClassificationDataset(tokenizer=self.tokenizer, device=self.device, zipped_data = unseen_test, max_seq_len = max_len)
-    test_loader = torch.utils.data.DataLoader(self.stringset, batch_size=batch_size, shuffle=False)
+    test_dataset = KoElectraClassificationDataset(tokenizer=self.tokenizer, device=self.device, zipped_data = unseen_test, max_seq_len = max_len)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
     total_issue_info = 0
     for batch_index, data in enumerate(test_loader):
