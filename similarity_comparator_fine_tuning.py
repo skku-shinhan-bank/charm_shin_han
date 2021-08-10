@@ -187,6 +187,7 @@ def calc_accuracy(X,Y):
 	train_acc = (max_indices == Y).sum().data.cpu().numpy()/max_indices.size()[0]
 	return train_acc
 
+
 class KoElectraSimilarityDataset(Dataset):
   def __init__(self,
               device = None,
