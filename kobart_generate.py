@@ -269,6 +269,10 @@ class KoBartGenerator:
     #     parser = Base.add_model_specific_args(parser)   #num_workers
     #     # parser = ArgsBase.add_model_specific_args(parser)  #train_file, text_file, tokenizer_path, batch_size, max_seq_len
     #     # parser = ChatDataModule.add_model_specific_args(parser)  #batch_size, lr, warmup_ratio, model_path
+
+        self.train_file=train_file
+        self.test_file=test_file
+
         parser = argparse.ArgumentParser(add_help=False)
         #parents=[parent_parser], 
 
