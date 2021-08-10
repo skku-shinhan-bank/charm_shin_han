@@ -265,7 +265,7 @@ class KoBARTConditionalGeneration(Base):
 
 class KoBartGenerator:
     # if __name__ == '__main__':
-    def generate(train_file, test_file, config):
+    def generate(self, train_file, test_file, config):
     #     parser = Base.add_model_specific_args(parser)   #num_workers
     #     # parser = ArgsBase.add_model_specific_args(parser)  #train_file, text_file, tokenizer_path, batch_size, max_seq_len
     #     # parser = ChatDataModule.add_model_specific_args(parser)  #batch_size, lr, warmup_ratio, model_path
@@ -274,11 +274,11 @@ class KoBartGenerator:
 
         parser.add_argument('--train_file',
                             type=str,
-                            default=train_file,
+                            default=self.train_file,
                             help='train file')
         parser.add_argument('--test_file',
                             type=str,
-                            default='test_file',
+                            default=self.test_file,
                             help='test file')
         parser.add_argument('--batch-size',
                             type=int,
