@@ -9,13 +9,13 @@ class KoBARTConfig:
         model_path,
         default_root_dir,
     ):
-        batch_size = batch_size
-        max_seq_len = max_seq_len
-        lr = lr
-        warmup_ratio = warmup_ratio
-        num_worker = num_worker     #5
-        tokenizer_path = tokenizer_path
-        model_path = model_path
-        default_root_dir = default_root_dir
+        self.batch_size = batch_size
+        self.max_seq_len = max_seq_len
+        self.lr = lr
+        self.warmup_ratio = warmup_ratio
+        self.num_worker = num_worker     #5
+        self.tokenizer_path = tokenizer_path
+        self.model_path = model_path
+        self.default_root_dir = default_root_dir
 
     
