@@ -20,13 +20,13 @@ class KoElectraSimilarityTrainer:
 	def __init__(self):
 		pass
 
-	def train(self, train_data, train_label, test_data, test_label, config, device, model_output_path):
+	def train(self, train_data_1, train_data_2, train_label, test_data_1, test_data_2, test_label, config, device, model_output_path):
 		electra_config = ElectraConfig.from_pretrained("monologg/koelectra-base-v3-discriminator")
 		classification_model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = "monologg/koelectra-base-v3-discriminator", config = electra_config, num_labels = 2)
 		tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
 
-		train_zipped_data = make_zipped_pair_data(train_data, train_label)
-		test_zipped_data = make_zipped_pair_data(test_data, test_label)
+		train_zipped_data = make_zipped_pair_data(train_data_1, train_data_2, train_label)
+		test_zipped_data = make_zipped_pair_data(test_data_1, test_data_2, test_label)
 
 		classification_model.to(device)
 
