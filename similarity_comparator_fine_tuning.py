@@ -16,7 +16,7 @@ from transformers import (
 import time
 from .confusion_matrix import ConfusionMatrix
 
-class KoElectraClassificationTrainer:
+class KoElectraSimilarityTrainer:
 	def __init__(self):
 		pass
 
