@@ -380,7 +380,7 @@ class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
 
         # 만약 마지막 시점의 예측 단어가 종료 토큰이라면 예측을 중단
         if tf.equal(predicted_id, END_TOKEN[0]):
-        break
+            break
 
         # 마지막 시점의 예측 단어를 출력에 연결한다.
         # 이는 for문을 통해서 디코더의 입력으로 사용될 예정이다.
