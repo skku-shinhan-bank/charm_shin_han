@@ -116,9 +116,7 @@ class IssuePredictor:
     model.eval()
 
     print('3. Get Tokenizer')
-    # tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
-    tokenizer = SimilarityComparator.tokenizer
-
+    tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
     self.tokenizer = tokenizer
     self.device = device
     self.model = model
