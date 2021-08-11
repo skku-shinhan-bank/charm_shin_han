@@ -264,8 +264,8 @@ class KoBARTConditionalGeneration(Base):   #답변생성
         return a.replace('<s>', '').replace('</s>', '')
 
 
-# class KoBartGenerator:
-if __name__ == '__main__':
+class KoBartGenerator:
+# if __name__ == '__main__':
     def generate(self, train_file, test_file, config):
     #     parser = Base.add_model_specific_args(parser)   #num_workers
     #     # parser = ArgsBase.add_model_specific_args(parser)  #train_file, text_file, tokenizer_path, batch_size, max_seq_len
