@@ -10,13 +10,7 @@ from .model.koelectra_classifier import KoElectraClassifier
 from .koelectra_classification_trainer import KoElectraClassificationDataset
 
 class SimilarityComparator:
-  def __init__(self, str1, str2, str3):
-    self.string = str3
-    dataset = []
-    dataset.append(str1)
-    dataset.append(str2)
-    self.dataset = dataset
-
+  def __init__(self):
     tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
     model = AutoModel.from_pretrained("monologg/koelectra-base-v3-discriminator").to("cuda")
 
@@ -32,9 +26,13 @@ class SimilarityComparator:
     sum_mask = torch.clamp(input_mask_expanded.sum(1), min=1e-9)
     return sum_embeddings / sum_mask
 
-  def compare_between_two(self):
+  def compare_between_two(self, str1, str2):
+    dataset = []
+    dataset.append(str1)
+    dataset.append(str2)
+
     #Tokenize sentences
-    encoded_input = self.tokenizer(self.dataset, padding=True, truncation=True, max_length=32, return_tensors='pt')
+    encoded_input = self.tokenizer(dataset, padding=True, truncation=True, max_length=32, return_tensors='pt')
 
     gc.collect()
     torch.cuda.empty_cache()
@@ -55,8 +53,8 @@ class SimilarityComparator:
 
     print(cosine_scores[0][1].item())
 
-  def compare_generate_review(self, config, data, label, comment, model_path):
-    test_label = IssuePredictor(model_path).predict(config, self.string)
+  def compare_generate_review(self, string, config, data, label, comment, model_path):
+    test_label = IssuePredictor(model_path).predict(config, string)
     data.insert(0, self.string)
     label.insert(0, test_label)
 
@@ -119,7 +117,8 @@ class IssuePredictor:
     model.eval()
 
     print('3. Get Tokenizer')
-    tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
+    # tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
+    tokenizer = SimilarityComparator.tokenizer
 
     self.tokenizer = tokenizer
     self.device = device
