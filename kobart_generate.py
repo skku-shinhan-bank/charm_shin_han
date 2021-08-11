@@ -223,7 +223,7 @@ class Base(pl.LightningModule):
         return [optimizer], [lr_scheduler]
 
 
-class KoBARTConditionalGeneration(Base):
+class KoBARTConditionalGeneration(Base):   #답변생성
     def __init__(self, hparams, **kwargs):
         super(KoBARTConditionalGeneration, self).__init__(hparams, **kwargs)
         self.model = BartForConditionalGeneration.from_pretrained(self.hparams.model_path)
@@ -263,8 +263,9 @@ class KoBARTConditionalGeneration(Base):
         a = self.tokenizer.batch_decode(res_ids.tolist())[0]
         return a.replace('<s>', '').replace('</s>', '')
 
-class KoBartGenerator:
-    # if __name__ == '__main__':
+
+# class KoBartGenerator:
+if __name__ == '__main__':
     def generate(self, train_file, test_file, config):
     #     parser = Base.add_model_specific_args(parser)   #num_workers
     #     # parser = ArgsBase.add_model_specific_args(parser)  #train_file, text_file, tokenizer_path, batch_size, max_seq_len
@@ -273,50 +274,50 @@ class KoBartGenerator:
         self.train_file=train_file
         self.test_file=test_file
 
-        # parser = argparse.ArgumentParser(add_help=False)
-        # #parents=[parent_parser], 
+        parser = argparse.ArgumentParser(add_help=False)
+        #parents=[parent_parser], 
 
-        # parser.add_argument('--train_file',
-        #                     type=str,
-        #                     default=self.train_file,
-        #                     help='train file')
-        # parser.add_argument('--test_file',
-        #                     type=str,
-        #                     default=self.test_file,
-        #                     help='test file')
-        # parser.add_argument('--batch-size',
-        #                     type=int,
-        #                     default=config.batch_size,
-        #                     help='batch size for training (default: 96)')
-        # parser.add_argument('--max_seq_len',
-        #                     type=int,
-        #                     default=config.max_seq_len,
-        #                     help='max_seq_len')
-        # parser.add_argument('--lr',
-        #                     type=int,
-        #                     default=config.lr,
-        #                     help='learing_rate')
-        # parser.add_argument('--warmup_ratio',
-        #                     type=int,
-        #                     default=config.warmup_ratio,
-        #                     help='warmup_ratio')
-        # parser.add_argument('--num_workers',
-        #                     type=int,
-        #                     default=config.num_workers,
-        #                     help='num_workers')
+        parser.add_argument('--train_file',
+                            type=str,
+                            default=self.train_file, 
+                            help='train file')
+        parser.add_argument('--test_file',
+                            type=str,
+                            default=self.test_file,
+                            help='test file')
+        parser.add_argument('--batch-size',
+                            type=int,
+                            default=config.batch_size,
+                            help='batch size for training (default: 96)')
+        parser.add_argument('--max_seq_len',
+                            type=int,
+                            default=config.max_seq_len,
+                            help='max_seq_len')
+        parser.add_argument('--lr',
+                            type=int,
+                            default=config.lr,
+                            help='learing_rate')
+        parser.add_argument('--warmup_ratio',
+                            type=int,
+                            default=config.warmup_ratio,
+                            help='warmup_ratio')
+        parser.add_argument('--num_workers',
+                            type=int,
+                            default=config.num_workers,
+                            help='num_workers')
         
 
-        # parser = pl.Trainer.add_argparse_args(parser)
-        # args = parser.parse_args()
-        # logging.info(args)
+        parser = pl.Trainer.add_argparse_args(parser)
+        args = parser.parse_args()
+        logging.info(args)
 
-        model = KoBARTConditionalGeneration(config)
+        model = KoBARTConditionalGeneration(args)
 
         dm = ChatDataModule(train_file,
                             test_file,
-                            os.path.join(config.tokenizer_path, 'model.json'),
-                            max_seq_len=config.max_seq_len,
-                            num_workers=config.num_workers)
+                            os.path.join(args.tokenizer_path, 'model.json'),
+                            max_seq_len=args.max_seq_len,
+                            num_workers=args.num_workers)
         # checkpoint_callback = pl.callbacks.ModelCheckpoint(monitor='val_loss',
         #                                                 dirpath=args.default_root_dir,
         #                                                 filename='model_chp/{epoch:02d}-{val_loss:.3f}',
@@ -325,9 +326,9 @@ class KoBartGenerator:
         #                                                 mode='min',
         #                                                 save_top_k=-1,
         #                                                 prefix='kobart_chitchat')
-        tb_logger = pl_loggers.TensorBoardLogger(os.path.join(config.default_root_dir, 'tb_logs'))
+        tb_logger = pl_loggers.TensorBoardLogger(os.path.join(args.default_root_dir, 'tb_logs'))
         # lr_logger = pl.callbacks.LearningRateMonitor()
-        trainer = pl.Trainer.from_argparse_args(config, logger=tb_logger)
+        trainer = pl.Trainer.from_argparse_args(args, logger=tb_logger)
                                                 # callbacks=[checkpoint_callback, lr_logger])
         trainer.fit(model, dm)
     # if args.chat:
