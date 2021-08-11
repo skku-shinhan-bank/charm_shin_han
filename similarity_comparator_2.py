@@ -14,7 +14,7 @@ from .koelectra_config import KoELECTRAConfig
 class SimilarityComparator:
   def __init__(self, comparator_model_path):
     electra_config = ElectraConfig.from_pretrained("monologg/koelectra-base-v3-discriminator")
-    model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = comparator_model_path, config = electra_config, num_labels = 2)
+    model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = comparator_model_path, config = electra_config, num_labels = 2).to("cuda")
     tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
 
     no_decay = ['bias', 'LayerNorm.weight']
@@ -59,7 +59,6 @@ class SimilarityComparator:
     gc.collect()
     torch.cuda.empty_cache()
 
-    self.model.to("cuda")
     self.model.eval()
     with torch.no_grad():
       model_output = self.model(input_ids=encoded_input["input_ids"].to("cuda"))
