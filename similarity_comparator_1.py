@@ -13,7 +13,6 @@ class SimilarityComparator:
   def __init__(self):
     tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
     model = AutoModel.from_pretrained("monologg/koelectra-base-v3-discriminator").to("cuda")
-
     self.tokenizer = tokenizer
     self.model = model
     pass
@@ -49,7 +48,7 @@ class SimilarityComparator:
     temp.argsort(descending=True)
 
     for i in temp.argsort(descending=True)[1:2]:
-      print(f"{self.dataset[org]} <> {self.dataset[i]} \nScore: {cosine_scores[org][i]:.4f}")
+      print(f"{dataset[org]} <> {dataset[i]} \nScore: {cosine_scores[org][i]:.4f}")
 
     print(cosine_scores[0][1].item())
 
