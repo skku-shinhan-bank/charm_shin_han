@@ -10,14 +10,7 @@ from .model.koelectra_classifier import KoElectraClassifier
 from .koelectra_classification_trainer import KoElectraClassificationDataset
 
 class SimilarityComparator:
-  def __init__(self, comparator_model_path, classification_mdoel_path, str1):
-    self.string = str1
-
-    tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
-    model = AutoModel.from_pretrained(comparator_model_path).to("cuda")
-
-    self.tokenizer = tokenizer
-    self.model = model
+  def __init__(self):
     pass
 
   def mean_pooling(self, model_output, attention_mask):
@@ -28,19 +21,21 @@ class SimilarityComparator:
     sum_mask = torch.clamp(input_mask_expanded.sum(1), min=1e-9)
     return sum_embeddings / sum_mask
 
-  def compare_generate_review(self, config, data, label, comment):
-    test_label = IssuePredictor(self.classification_mdoel_path).predict(config, self.string)
+  def compare_generate_review(self, comparator_model_path, str1, data, comment):
+
     data.insert(0, self.string)
-    label.insert(0, test_label)
+
+    tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
+    model = AutoModel.from_pretrained(comparator_model_path).to("cuda")
 
     #Tokenize sentences
-    encoded_input = self.tokenizer(data, padding=True, truncation=True, max_length=32, return_tensors='pt')
+    encoded_input = tokenizer(data, padding=True, truncation=True, max_length=32, return_tensors='pt')
 
     gc.collect()
     torch.cuda.empty_cache()
 
     with torch.no_grad():
-      model_output = self.model(input_ids=encoded_input["input_ids"].to("cuda"))
+      model_output = model(input_ids=encoded_input["input_ids"].to("cuda"))
 
     #Perform pooling. In this case, mean pooling
     sentence_embeddings = self.mean_pooling(model_output, encoded_input['attention_mask'].to("cuda"))
@@ -54,79 +49,8 @@ class SimilarityComparator:
       print(f"{i}. {data[org]} <> {data[i]} \nScore: {cosine_scores[org][i]:.4f}")
 
     for i in temp.argsort(descending=True)[0:10]:
-      if(label[i]==label[org]):
-        print(label[i])
         print("review")
         print(data[i])
         print("comment")
         print(comment[i])
 
-
-class IssuePredictor:
-  def __init__(self, model_path):
-    print('1. Get KoELECTRA model')
-    device = torch.device("cpu")
-    # model = Model
-    electra_config = ElectraConfig.from_pretrained("monologg/koelectra-base-v3-discriminator")
-    model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = model_path, config = electra_config, num_labels = 7)
-    no_decay = ['bias', 'LayerNorm.weight']
-    optimizer_grouped_parameters = [
-      {
-        'params': [p for n, p in model.named_parameters() if not any(nd in n for nd in no_decay)],
-        'weight_decay': 0.01
-      },
-      {
-        'params': [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay)],
-        'weight_decay': 0.0
-      },
-    ]
-    optimizer = AdamW(optimizer_grouped_parameters, lr=5e-5)
-
-    checkpoint = torch.load(model_path)
-    model.load_state_dict(checkpoint['model_state_dict'])
-    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-    epoch = checkpoint['epoch']
-    loss = checkpoint['loss']
-
-    print('2. Load KoELECTRA Classifier Model')
-    model.eval()
-
-    print('3. Get Tokenizer')
-    # tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
-    tokenizer = SimilarityComparator.tokenizer
-
-    self.tokenizer = tokenizer
-    self.device = device
-    self.model = model
-    pass
-
-  def predict(self, config, review):
-    max_len = config.max_seq_len
-    batch_size = config.batch_size
-
-    unseen_test = [[review,0]]
-    # unseen_test = []
-    # row = []
-    # row.append(review)
-    # row.append(0)
-    # unseen_test.append(row)
-
-    test_dataset = KoElectraClassificationDataset(tokenizer=self.tokenizer, device=self.device, zipped_data = unseen_test, max_seq_len = max_len)
-    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
-
-    total_issue_info = 0
-    for batch_index, data in enumerate(test_loader):
-      with torch.no_grad():
-        inputs = {
-          'input_ids': data['input_ids'],
-          'attention_mask': data['attention_mask'],
-          'labels': data['labels']
-        }
-        outputs = self.model(**inputs)
-        loss = outputs[0]
-        logit = outputs[1]
-        for index, real_class_id in enumerate(inputs['labels']):
-          total_issue_info = logit.argmax(1)[index].item()
-
-    return total_issue_info
-		
