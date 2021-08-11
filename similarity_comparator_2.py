@@ -51,6 +51,7 @@ class SimilarityComparator:
   def compare_generate_review(self, str1, data, comment):
 
     data.insert(0, str1)
+    comment.insert(0, ".")
 
     #Tokenize sentences
     encoded_input = self.tokenizer(data, padding=True, truncation=True, max_length=32, return_tensors='pt')
@@ -59,6 +60,7 @@ class SimilarityComparator:
     torch.cuda.empty_cache()
 
     self.model.to("cuda")
+    self.model.eval()
     with torch.no_grad():
       model_output = self.model(input_ids=encoded_input["input_ids"].to("cuda"))
 
@@ -73,7 +75,7 @@ class SimilarityComparator:
     for i in temp.argsort(descending=True)[0:10]:
       print(f"{i}. {data[org]} <> {data[i]} \nScore: {cosine_scores[org][i]:.4f}")
 
-    for i in temp.argsort(descending=True)[0:10]:
+    for i in temp.argsort(descending=True)[1:10]:
         print("review")
         print(data[i])
         print("comment")
