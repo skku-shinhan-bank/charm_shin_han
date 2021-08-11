@@ -63,8 +63,9 @@ class SimilarityComparator:
     with torch.no_grad():
       model_output = self.model(input_ids=encoded_input["input_ids"].to("cuda"))
 
+    attention_mask = encoded_input['attention_mask'].to("cuda")
     #Perform pooling. In this case, mean pooling
-    sentence_embeddings = self.mean_pooling(model_output, encoded_input['attention_mask'].to("cuda"))
+    sentence_embeddings = self.mean_pooling(model_output, attention_mask)
     cosine_scores = util.pytorch_cos_sim(sentence_embeddings, sentence_embeddings)
 
     org = 0
