@@ -8,11 +8,33 @@ from transformers import (
 from transformers import AutoTokenizer, ElectraForSequenceClassification, AdamW
 from .model.koelectra_classifier import KoElectraClassifier
 from .koelectra_classification_trainer import KoElectraClassificationDataset
+from .koelectra_config import KoELECTRAConfig
+
 
 class SimilarityComparator:
   def __init__(self, comparator_model_path):
+    electra_config = ElectraConfig.from_pretrained("monologg/koelectra-base-v3-discriminator")
+    model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = comparator_model_path, config = electra_config, num_labels = 2)
     tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
-    model = AutoModel.from_pretrained(comparator_model_path).to("cuda")
+    
+    no_decay = ['bias', 'LayerNorm.weight']
+    optimizer_grouped_parameters = [
+      {
+        'params': [p for n, p in model.named_parameters() if not any(nd in n for nd in no_decay)],
+        'weight_decay': 0.01
+      },
+      {
+        'params': [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay)],
+        'weight_decay': 0.0
+      },
+    ]
+    optimizer = AdamW(optimizer_grouped_parameters, lr=5e-5)
+
+    checkpoint = torch.load(comparator_model_path)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    epoch = checkpoint['epoch']
+    loss = checkpoint['loss']
 
     self.tokenzier = tokenizer
     self.model = model
