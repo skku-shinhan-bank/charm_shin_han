@@ -54,7 +54,7 @@ class SimilarityComparator:
     comment.insert(0, ".")
 
     #Tokenize sentences
-    encoded_input = self.tokenizer(data, padding=True, truncation=True, max_length=32, return_tensors='pt')
+    encoded_input = self.tokenizer(data, padding="max_length", truncation=True, max_length=32, return_tensors='pt')
 
     gc.collect()
     torch.cuda.empty_cache()
