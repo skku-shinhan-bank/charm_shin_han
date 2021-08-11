@@ -36,7 +36,7 @@ class SimilarityComparator:
     epoch = checkpoint['epoch']
     loss = checkpoint['loss']
 
-    self.tokenzier = tokenizer
+    self.tokenizer = tokenizer
     self.model = model
     pass
 
