@@ -14,8 +14,8 @@ from .koelectra_config import KoELECTRAConfig
 class SimilarityComparator:
   def __init__(self, comparator_model_path):
     electra_config = ElectraConfig.from_pretrained("monologg/koelectra-base-v3-discriminator")
-    model = AutoModel.from_pretrained(comparator_model_path).to("cuda")
-    # model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = comparator_model_path, config = electra_config, num_labels = 2).to("cuda")
+    # model = AutoModel.from_pretrained(comparator_model_path).to("cuda")
+    model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = comparator_model_path, config = electra_config, num_labels = 2).to("cuda")
     tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
 
     # no_decay = ['bias', 'LayerNorm.weight']
@@ -31,8 +31,8 @@ class SimilarityComparator:
     # ]
     # optimizer = AdamW(optimizer_grouped_parameters, lr=5e-5)
 
-    # checkpoint = torch.load(comparator_model_path)
-    # model.load_state_dict(checkpoint['model_state_dict'])
+    checkpoint = torch.load(comparator_model_path)
+    model.load_state_dict(checkpoint['model_state_dict'])
     # optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     # epoch = checkpoint['epoch']
     # loss = checkpoint['loss']
@@ -59,7 +59,7 @@ class SimilarityComparator:
     gc.collect()
     torch.cuda.empty_cache()
 
-    # self.model.eval()
+    self.model.eval()
     with torch.no_grad():
       model_output = self.model(input_ids=encoded_input["input_ids"].to("cuda"))
 
