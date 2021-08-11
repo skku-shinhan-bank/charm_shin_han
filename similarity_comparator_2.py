@@ -43,7 +43,7 @@ class SimilarityComparator:
   def mean_pooling(self, model_output, attention_mask):
     #Mean Pooling - Take attention mask into account for correct averaging
     token_embeddings = model_output[0] #First element of model_output contains all token embeddings
-    input_mask_expanded = attention_mask.squeeze(-1).expand(token_embeddings.size()).float()
+    input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
     sum_embeddings = torch.sum(token_embeddings * input_mask_expanded, 1)
     sum_mask = torch.clamp(input_mask_expanded.sum(1), min=1e-9)
     return sum_embeddings / sum_mask
@@ -54,12 +54,12 @@ class SimilarityComparator:
     comment.insert(0, ".")
 
     #Tokenize sentences
-    encoded_input = self.tokenizer(data, max_length=18, padding="max_length", truncation=True, return_tensors='pt')
+    encoded_input = self.tokenizer(data, padding=True, truncation=True, max_length=18, return_tensors='pt')
 
     gc.collect()
     torch.cuda.empty_cache()
 
-    self.model.eval()
+    # self.model.eval()
     with torch.no_grad():
       model_output = self.model(input_ids=encoded_input["input_ids"].to("cuda"))
 
