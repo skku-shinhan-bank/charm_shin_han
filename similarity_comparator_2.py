@@ -10,7 +10,12 @@ from .model.koelectra_classifier import KoElectraClassifier
 from .koelectra_classification_trainer import KoElectraClassificationDataset
 
 class SimilarityComparator:
-  def __init__(self):
+  def __init__(self, comparator_model_path):
+    tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
+    model = AutoModel.from_pretrained(comparator_model_path).to("cuda")
+
+    self.tokenzier = tokenizer
+    self.model = model
     pass
 
   def mean_pooling(self, model_output, attention_mask):
@@ -21,21 +26,18 @@ class SimilarityComparator:
     sum_mask = torch.clamp(input_mask_expanded.sum(1), min=1e-9)
     return sum_embeddings / sum_mask
 
-  def compare_generate_review(self, comparator_model_path, str1, data, comment):
+  def compare_generate_review(self, str1, data, comment):
 
-    data.insert(0, self.string)
-
-    tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
-    model = AutoModel.from_pretrained(comparator_model_path).to("cuda")
+    data.insert(0, str1)
 
     #Tokenize sentences
-    encoded_input = tokenizer(data, padding=True, truncation=True, max_length=32, return_tensors='pt')
+    encoded_input = self.tokenizer(data, padding=True, truncation=True, max_length=32, return_tensors='pt')
 
     gc.collect()
     torch.cuda.empty_cache()
 
     with torch.no_grad():
-      model_output = model(input_ids=encoded_input["input_ids"].to("cuda"))
+      model_output = self.model(input_ids=encoded_input["input_ids"].to("cuda"))
 
     #Perform pooling. In this case, mean pooling
     sentence_embeddings = self.mean_pooling(model_output, encoded_input['attention_mask'].to("cuda"))
