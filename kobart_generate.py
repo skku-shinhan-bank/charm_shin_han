@@ -12,16 +12,16 @@ from transformers import (BartForConditionalGeneration,
                           PreTrainedTokenizerFast)
 from transformers.optimization import AdamW, get_cosine_schedule_with_warmup
 
-# parser = argparse.ArgumentParser(description='KoBART Chit-Chat')
+parser = argparse.ArgumentParser(description='KoBART Chit-Chat')
 
-# parser.add_argument('--checkpoint_path',
-#                     type=str,
-#                     help='checkpoint path')
+parser.add_argument('--checkpoint_path',
+                    type=str,
+                    help='checkpoint path')
 
-# parser.add_argument('--chat',
-#                     action='store_true',
-#                     default=False,
-#                     help='response generation on given user input')
+parser.add_argument('--chat',
+                    action='store_true',
+                    default=False,
+                    help='response generation on given user input')
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -309,7 +309,7 @@ class KoBartGenerator:
 
         parser = pl.Trainer.add_argparse_args(parser)
         args = parser.parse_args()
-        logging.info(args)
+        # logging.info(args)
 
         model = KoBARTConditionalGeneration(args)
 
@@ -318,16 +318,16 @@ class KoBartGenerator:
                             os.path.join(args.tokenizer_path, 'model.json'),
                             max_seq_len=args.max_seq_len,
                             num_workers=args.num_workers)
-        # checkpoint_callback = pl.callbacks.ModelCheckpoint(monitor='val_loss',
-        #                                                 dirpath=args.default_root_dir,
-        #                                                 filename='model_chp/{epoch:02d}-{val_loss:.3f}',
-        #                                                 verbose=True,
-        #                                                 save_last=True,
-        #                                                 mode='min',
-        #                                                 save_top_k=-1,
-        #                                                 prefix='kobart_chitchat')
+        checkpoint_callback = pl.callbacks.ModelCheckpoint(monitor='val_loss',
+                                                        dirpath=args.default_root_dir,
+                                                        filename='model_chp/{epoch:02d}-{val_loss:.3f}',
+                                                        verbose=True,
+                                                        save_last=True,
+                                                        mode='min',
+                                                        save_top_k=-1,
+                                                        prefix='kobart_chitchat')
         tb_logger = pl_loggers.TensorBoardLogger(os.path.join(args.default_root_dir, 'tb_logs'))
-        # lr_logger = pl.callbacks.LearningRateMonitor()
+        lr_logger = pl.callbacks.LearningRateMonitor()
         trainer = pl.Trainer.from_argparse_args(args, logger=tb_logger)
                                                 # callbacks=[checkpoint_callback, lr_logger])
         trainer.fit(model, dm)
