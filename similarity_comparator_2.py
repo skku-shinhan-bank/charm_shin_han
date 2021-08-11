@@ -16,7 +16,7 @@ class SimilarityComparator:
     electra_config = ElectraConfig.from_pretrained("monologg/koelectra-base-v3-discriminator")
     model = KoElectraClassifier.from_pretrained(pretrained_model_name_or_path = comparator_model_path, config = electra_config, num_labels = 2)
     tokenizer = AutoTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
-    
+
     no_decay = ['bias', 'LayerNorm.weight']
     optimizer_grouped_parameters = [
       {
@@ -58,6 +58,7 @@ class SimilarityComparator:
     gc.collect()
     torch.cuda.empty_cache()
 
+    self.model.to("cuda")
     with torch.no_grad():
       model_output = self.model(input_ids=encoded_input["input_ids"].to("cuda"))
 
