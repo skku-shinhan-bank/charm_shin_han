@@ -54,7 +54,7 @@ class SimilarityComparator:
 
   def compare_generate_review(self, string, config, data, label, comment, model_path):
     test_label = IssuePredictor(model_path).predict(config, string)
-    data.insert(0, self.string)
+    data.insert(0, string)
     label.insert(0, test_label)
 
     #Tokenize sentences
