@@ -167,7 +167,7 @@ class ChatDataModule(pl.LightningDataModule):
 class Base(pl.LightningModule):
     def __init__(self, hparams, **kwargs) -> None:
         super(Base, self).__init__()
-        self.hparams = hparams
+        self.save_hyperparameters(hparams)
 
     @staticmethod
     def add_model_specific_args(parent_parser):
@@ -232,9 +232,7 @@ class KoBARTConditionalGeneration(Base):
         self.model.train()
         self.bos_token = '<s>'
         self.eos_token = '</s>'
-        self.tokenizer = PreTrainedTokenizerFast(
-            tokenizer_file=os.path.join(self.hparams.tokenizer_path, 'model.json'),
-            bos_token=self.bos_token, eos_token=self.eos_token, unk_token='<unk>', pad_token='<pad>', mask_token='<mask>')
+        self.tokenizer = PreTrainedTokenizerFast(self.hparams.tokenizer_path)
 
     def forward(self, inputs):
         return self.model(input_ids=inputs['input_ids'],
