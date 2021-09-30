@@ -66,10 +66,7 @@ class ChatDataset(Dataset):
         self.bos_token = '<s>'
         self.eos_token = '</s>'
         self.max_seq_len = max_seq_len
-        self.tokenizer = PreTrainedTokenizerFast(
-            tokenizer_file=tok_vocab,
-            bos_token=self.bos_token, eos_token=self.eos_token, unk_token='<unk>', pad_token='<pad>', mask_token='<mask>')
-
+        self.tokenizer = PreTrainedTokenizerFast.from_pretrained(tokenizer_file=tok_vocab)
     def __len__(self):
         return len(self.data)
 
