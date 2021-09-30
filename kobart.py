@@ -297,5 +297,5 @@ if __name__ == '__main__':
             q = input('user > ').strip()
             if q == 'quit':
                 break
-            print("Simsimi > {}".format(model.chat(q)))
+            print("ShinhanBank > {}".format(model.chat(q)))
             
