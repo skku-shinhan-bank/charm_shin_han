@@ -6,11 +6,13 @@ import numpy as np
 import pandas as pd
 import pytorch_lightning as pl
 import torch
+import transformers
 from pytorch_lightning import loggers as pl_loggers
 from torch.utils.data import DataLoader, Dataset
 from transformers import (BartForConditionalGeneration,
                           PreTrainedTokenizerFast)
 from transformers.optimization import AdamW, get_cosine_schedule_with_warmup
+from kobart_transformers import get_kobart_tokenizer
 
 
 parser = argparse.ArgumentParser(description='KoBART Chit-Chat')
