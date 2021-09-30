@@ -232,7 +232,7 @@ class KoBARTConditionalGeneration(Base):
         self.model.train()
         self.bos_token = '<s>'
         self.eos_token = '</s>'
-        self.tokenizer = PreTrainedTokenizerFast(self.hparams.tokenizer_path)
+        self.tokenizer = PreTrainedTokenizerFast.from_pretrained(self.hparams.tokenizer_path)
 
     def forward(self, inputs):
         return self.model(input_ids=inputs['input_ids'],
