@@ -66,7 +66,7 @@ class ChatDataset(Dataset):
         self.bos_token = '<s>'
         self.eos_token = '</s>'
         self.max_seq_len = max_seq_len
-        self.tokenizer = PreTrainedTokenizerFast.from_pretrained(tokenizer_pretrained_model_name_or_path=tok_vocab)
+        self.tokenizer = get_kobart_tokenizer()
     def __len__(self):
         return len(self.data)
 
@@ -229,7 +229,7 @@ class KoBARTConditionalGeneration(Base):
         self.model.train()
         self.bos_token = '<s>'
         self.eos_token = '</s>'
-        self.tokenizer = PreTrainedTokenizerFast.from_pretrained(self.hparams.tokenizer_path)
+        self.tokenizer = get_kobart_tokenizer()
 
     def forward(self, inputs):
         return self.model(input_ids=inputs['input_ids'],
