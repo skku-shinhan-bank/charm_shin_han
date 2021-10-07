@@ -62,7 +62,7 @@ class ArgsBase():
 
 
 class ChatDataset(Dataset):
-    def __init__(self, filepath, tok_vocab, max_seq_len=256) -> None:
+    def __init__(self, filepath, tok_vocab, max_seq_len=128) -> None:
         self.filepath = filepath
         self.data = pd.read_csv(self.filepath)
         self.bos_token = '<s>'
