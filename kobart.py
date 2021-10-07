@@ -113,7 +113,7 @@ class ChatDataset(Dataset):
 class ChatDataModule(pl.LightningDataModule):
     def __init__(self, train_file,
                  test_file, tok_vocab,
-                 max_seq_len=256,
+                 max_seq_len=128,
                  batch_size=32,
                  num_workers=5):
         super().__init__()
