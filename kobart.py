@@ -56,13 +56,13 @@ class ArgsBase():
                             help='')
         parser.add_argument('--max_seq_len',
                             type=int,
-                            default=36,
+                            default=256,
                             help='max seq len')
         return parser
 
 
 class ChatDataset(Dataset):
-    def __init__(self, filepath, tok_vocab, max_seq_len=128) -> None:
+    def __init__(self, filepath, tok_vocab, max_seq_len=256) -> None:
         self.filepath = filepath
         self.data = pd.read_csv(self.filepath)
         self.bos_token = '<s>'
@@ -113,7 +113,7 @@ class ChatDataset(Dataset):
 class ChatDataModule(pl.LightningDataModule):
     def __init__(self, train_file,
                  test_file, tok_vocab,
-                 max_seq_len=128,
+                 max_seq_len=256,
                  batch_size=32,
                  num_workers=5):
         super().__init__()
