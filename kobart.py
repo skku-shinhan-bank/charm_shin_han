@@ -262,7 +262,6 @@ class KoBARTConditionalGeneration(Base):
         a = self.tokenizer.batch_decode(res_ids.tolist())[0]
         return a.replace('<s>', '').replace('</s>', '')
 
-
 if __name__ == '__main__':
     parser = Base.add_model_specific_args(parser)
     parser = ArgsBase.add_model_specific_args(parser)
@@ -293,9 +292,59 @@ if __name__ == '__main__':
     trainer.fit(model, dm)
     if args.chat:
         model.model.eval()
-        while 1:
-            q = input('user > ').strip()
-            if q == 'quit':
-                break
-            print("ShinhanBank > {}".format(model.chat(q)))
+
+        predict_output = []
+        cnt=0
+        model.model.eval()
+        predict_data_path = input()
+        predict_data= pd.read_excel(predict_data_path)
+        for sentence in predict_data['review']:
+            row = []
+
+            cnt = cnt + 1
+            print(cnt)
+            row.append(sentence)
+            row.append(model.chat(sentence))
+
+            predict_output.append(row)
+        
+        predict_output = pd.DataFrame(predict_output) #데이터 프레임으로 전환
+        predict_output.to_excel(excel_writer='KoBART_predict_data.xlsx', encoding='utf-8') #엑셀로 저장          
+
+
+# if __name__ == '__main__':
+#     parser = Base.add_model_specific_args(parser)
+#     parser = ArgsBase.add_model_specific_args(parser)
+#     parser = ChatDataModule.add_model_specific_args(parser)
+#     parser = pl.Trainer.add_argparse_args(parser)
+#     args = parser.parse_args()
+#     logging.info(args)
+
+#     model = KoBARTConditionalGeneration(args)
+
+#     dm = ChatDataModule(args.train_file,
+#                         args.test_file,
+#                         os.path.join(args.tokenizer_path, 'model.json'),
+#                         max_seq_len=args.max_seq_len,
+#                         num_workers=args.num_workers)
+#     checkpoint_callback = pl.callbacks.ModelCheckpoint(monitor='val_loss',
+#                                                        dirpath=args.default_root_dir,
+#                                                        filename='model_chp/{epoch:02d}-{val_loss:.3f}',
+#                                                        verbose=True,
+#                                                        save_last=True,
+#                                                        mode='min',
+#                                                        save_top_k=-1
+#                                                        )
+#     tb_logger = pl_loggers.TensorBoardLogger(os.path.join(args.default_root_dir, 'tb_logs'))
+#     lr_logger = pl.callbacks.LearningRateMonitor()
+#     trainer = pl.Trainer.from_argparse_args(args, logger=tb_logger,
+#                                             callbacks=[checkpoint_callback, lr_logger])
+#     trainer.fit(model, dm)
+#     if args.chat:
+#         model.model.eval()
+#         while 1:
+#             q = input('user > ').strip()
+#             if q == 'quit':
+#                 break
+#             print("ShinhanBank > {}".format(model.chat(q)))
             
