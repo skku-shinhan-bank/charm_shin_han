@@ -15,7 +15,7 @@ from transformers.optimization import AdamW, get_cosine_schedule_with_warmup
 from kobart_transformers import get_kobart_tokenizer
 
 
-parser = argparse.ArgumentParser(description='KoBART Chit-Chat')
+parser = argparse.ArgumentParser(description='Shinhan_KoBART_generator')
 
 
 parser.add_argument('--checkpoint_path',
