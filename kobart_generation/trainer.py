@@ -16,7 +16,7 @@ from kobart_transformers import get_kobart_tokenizer
 
 
 from .model import Base
-from .dataset import CommentDataModule
+from .dataset import CommentDataModule, CommentDataset
 
 class KoBARTGenerationTrainer(Base):
     def __init__(self, hparams, **kwargs):
@@ -119,4 +119,3 @@ if __name__ == '__main__':
     trainer = pl.Trainer.from_argparse_args(args, logger=tb_logger,
                                             callbacks=[checkpoint_callback, lr_logger])
     trainer.fit(model, dm)
-    
