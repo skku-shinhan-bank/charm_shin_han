@@ -14,7 +14,7 @@ from transformers import (BartForConditionalGeneration,
 from transformers.optimization import AdamW, get_cosine_schedule_with_warmup
 from kobart_transformers import get_kobart_tokenizer
 
-from .model import Base
+from .kobart_model import Base
 
 class KoBARTConditionalGeneration(Base):
     def __init__(self, hparams, **kwargs):
