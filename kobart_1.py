@@ -1,6 +1,7 @@
 import argparse
 import logging
 import os
+
 import numpy as np
 import pandas as pd
 import pytorch_lightning as pl
@@ -12,16 +13,24 @@ from transformers import (BartForConditionalGeneration,
                           PreTrainedTokenizerFast)
 from transformers.optimization import AdamW, get_cosine_schedule_with_warmup
 from kobart_transformers import get_kobart_tokenizer
+
+
 parser = argparse.ArgumentParser(description='KoBART Chit-Chat')
+
+
 parser.add_argument('--checkpoint_path',
                     type=str,
                     help='checkpoint path')
+
 parser.add_argument('--chat',
                     action='store_true',
                     default=False,
                     help='response generation on given user input')
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+
 class ArgsBase():
     @staticmethod
     def add_model_specific_args(parent_parser):
@@ -31,10 +40,12 @@ class ArgsBase():
                             type=str,
                             default='Chatbot_data/train.csv',
                             help='train file')
+
         parser.add_argument('--test_file',
                             type=str,
                             default='Chatbot_data/test.csv',
                             help='test file')
+
         parser.add_argument('--tokenizer_path',
                             type=str,
                             default='tokenizer',
@@ -48,6 +59,8 @@ class ArgsBase():
                             default=256,
                             help='max seq len')
         return parser
+
+
 class ChatDataset(Dataset):
     def __init__(self, filepath, tok_vocab, max_seq_len=128) -> None:
         self.filepath = filepath
@@ -58,6 +71,7 @@ class ChatDataset(Dataset):
         self.tokenizer = get_kobart_tokenizer()
     def __len__(self):
         return len(self.data)
+
     def make_input_id_mask(self, tokens, index):
         input_id = self.tokenizer.convert_tokens_to_ids(tokens)
         attention_mask = [1] * len(input_id)
@@ -71,6 +85,7 @@ class ChatDataset(Dataset):
                 self.tokenizer.eos_token_id]
             attention_mask = attention_mask[:self.max_seq_len]
         return input_id, attention_mask
+
     def __getitem__(self, index):
         record = self.data.iloc[index]
         q, a = record['Q'], record['A']
@@ -93,6 +108,8 @@ class ChatDataset(Dataset):
                 'decoder_input_ids': np.array(decoder_input_id, dtype=np.int_),
                 'decoder_attention_mask': np.array(decoder_attention_mask, dtype=np.float_),
                 'labels': np.array(labels, dtype=np.int_)}
+
+
 class ChatDataModule(pl.LightningDataModule):
     def __init__(self, train_file,
                  test_file, tok_vocab,
@@ -106,6 +123,7 @@ class ChatDataModule(pl.LightningDataModule):
         self.test_file_path = test_file
         self.tok_vocab = tok_vocab
         self.num_workers = num_workers
+
     @staticmethod
     def add_model_specific_args(parent_parser):
         parser = argparse.ArgumentParser(
@@ -115,6 +133,7 @@ class ChatDataModule(pl.LightningDataModule):
                             default=5,
                             help='num of worker for dataloader')
         return parser
+
     # OPTIONAL, called for every GPU/machine (assigning state is OK)
     def setup(self, stage):
         # split dataset
@@ -124,47 +143,58 @@ class ChatDataModule(pl.LightningDataModule):
         self.test = ChatDataset(self.test_file_path,
                                 self.tok_vocab,
                                 self.max_seq_len)
+
     def train_dataloader(self):
         train = DataLoader(self.train,
                            batch_size=self.batch_size,
                            num_workers=self.num_workers, shuffle=True)
         return train
+
     def val_dataloader(self):
         val = DataLoader(self.test,
                          batch_size=self.batch_size,
                          num_workers=self.num_workers, shuffle=False)
         return val
+
     def test_dataloader(self):
         test = DataLoader(self.test,
                           batch_size=self.batch_size,
                           num_workers=self.num_workers, shuffle=False)
         return test
+
+
 class Base(pl.LightningModule):
     def __init__(self, hparams, **kwargs) -> None:
         super(Base, self).__init__()
         self.save_hyperparameters(hparams)
+
     @staticmethod
     def add_model_specific_args(parent_parser):
         # add model specific args
         parser = argparse.ArgumentParser(
             parents=[parent_parser], add_help=False)
+
         parser.add_argument('--batch-size',
                             type=int,
                             default=14,
                             help='batch size for training (default: 96)')
+
         parser.add_argument('--lr',
                             type=float,
                             default=5e-5,
                             help='The initial learning rate')
+
         parser.add_argument('--warmup_ratio',
                             type=float,
                             default=0.1,
                             help='warmup ratio')
+
         parser.add_argument('--model_path',
                             type=str,
                             default=None,
                             help='kobart model path')
         return parser
+
     def configure_optimizers(self):
         # Prepare optimizer
         param_optimizer = list(self.model.named_parameters())
@@ -192,6 +222,8 @@ class Base(pl.LightningModule):
                         'monitor': 'loss', 'interval': 'step',
                         'frequency': 1}
         return [optimizer], [lr_scheduler]
+
+
 class KoBARTConditionalGeneration(Base):
     def __init__(self, hparams, **kwargs):
         super(KoBARTConditionalGeneration, self).__init__(hparams, **kwargs)
@@ -200,21 +232,26 @@ class KoBARTConditionalGeneration(Base):
         self.bos_token = '<s>'
         self.eos_token = '</s>'
         self.tokenizer = get_kobart_tokenizer()
+
     def forward(self, inputs):
         return self.model(input_ids=inputs['input_ids'],
                           attention_mask=inputs['attention_mask'],
                           decoder_input_ids=inputs['decoder_input_ids'],
                           decoder_attention_mask=inputs['decoder_attention_mask'],
                           labels=inputs['labels'], return_dict=True)
+
     def training_step(self, batch, batch_idx):
         outs = self(batch)
         loss = outs.loss
         self.log('train_loss', loss, prog_bar=True, on_step=True, on_epoch=True)
         return loss
+
     def validation_step(self, batch, batch_idx):
         outs = self(batch)
         loss = outs['loss']
         self.log('val_loss', loss, on_step=True, on_epoch=True, prog_bar=True)
+
+
     def chat(self, text):
         input_ids =  [self.tokenizer.bos_token_id] + self.tokenizer.encode(text) + [self.tokenizer.eos_token_id]
         res_ids = self.model.generate(torch.tensor([input_ids]),
@@ -232,7 +269,9 @@ if __name__ == '__main__':
     parser = pl.Trainer.add_argparse_args(parser)
     args = parser.parse_args()
     logging.info(args)
+
     model = KoBARTConditionalGeneration(args)
+
     dm = ChatDataModule(args.train_file,
                         args.test_file,
                         os.path.join(args.tokenizer_path, 'model.json'),
@@ -253,6 +292,7 @@ if __name__ == '__main__':
     trainer.fit(model, dm)
     if args.chat:
         model.model.eval()
+
         predict_output = []
         cnt=0
         model.model.eval()
@@ -267,43 +307,7 @@ if __name__ == '__main__':
             row.append(model.chat(sentence))
 
             predict_output.append(row)
-
+        
         predict_output = pd.DataFrame(predict_output) #데이터 프레임으로 전환
         predict_output.to_excel(excel_writer='KoBART_predict_data.xlsx', encoding='utf-8') #엑셀로 저장          
-
-
-# if __name__ == '__main__':
-#     parser = Base.add_model_specific_args(parser)
-#     parser = ArgsBase.add_model_specific_args(parser)
-#     parser = ChatDataModule.add_model_specific_args(parser)
-#     parser = pl.Trainer.add_argparse_args(parser)
-#     args = parser.parse_args()
-#     logging.info(args)
-
-#     model = KoBARTConditionalGeneration(args)
-
-#     dm = ChatDataModule(args.train_file,
-#                         args.test_file,
-#                         os.path.join(args.tokenizer_path, 'model.json'),
-#                         max_seq_len=args.max_seq_len,
-#                         num_workers=args.num_workers)
-#     checkpoint_callback = pl.callbacks.ModelCheckpoint(monitor='val_loss',
-#                                                        dirpath=args.default_root_dir,
-#                                                        filename='model_chp/{epoch:02d}-{val_loss:.3f}',
-#                                                        verbose=True,
-#                                                        save_last=True,
-#                                                        mode='min',
-#                                                        save_top_k=-1
-#                                                        )
-#     tb_logger = pl_loggers.TensorBoardLogger(os.path.join(args.default_root_dir, 'tb_logs'))
-#     lr_logger = pl.callbacks.LearningRateMonitor()
-#     trainer = pl.Trainer.from_argparse_args(args, logger=tb_logger,
-#                                             callbacks=[checkpoint_callback, lr_logger])
-#     trainer.fit(model, dm)
-#     if args.chat:
-#         model.model.eval()
-#         while 1:
-#             q = input('user > ').strip()
-#             if q == 'quit':
-#                 break
-#             print("ShinhanBank > {}".format(model.chat(q)))
+        
