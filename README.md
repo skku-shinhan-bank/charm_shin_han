@@ -106,5 +106,5 @@ train_data = [
   'hello', 'hi', 'im', 'shinhan', 'app review'
 ]
 ke = KeywordExtracter()
-keyword_rank = KeywordExtracter(train_data)
+keyword_rank = ke.analyze(train_data)
 ```
