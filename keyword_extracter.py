@@ -79,7 +79,7 @@ class KeywordExtracter:
       else:
         ngram_score[key] = float( (ngram_counter[key] - ngram_threshold) / (monogram_counter[key[0]] * monogram_counter[key[1]] * monogram_counter[key[2]]) )
     
-    for sent in notebook.tqdm(shinhan_data):
+    for sent in notebook.tqdm(data):
       self.corpus_list.append([])
       pos_sent = self.pos(sent)
       temp_corpus = []
