@@ -14,6 +14,13 @@ KoElectra Classification
 pip install -r koelectra-training-requirements.txt
 ```
 
+Keyword Extracter
+
+```
+pip install -r keyword-extracter-requirements.txt
+```
+
+
 ## usage
 
 ### Data Maker
@@ -87,4 +94,17 @@ device = torch.device(ctx)
 
 trainer = KoElectraClassificationTrainer()
 trainer.train(train_data=train_data, train_label=train_label, test_data=test_data, test_label=test_label, config=config, device=device, model_output_path='output.pth')
+```
+
+### Keyword Extracter
+
+```python
+from charm_shin_han.keyword_extracter import KeywordExtracter
+import torch
+
+train_data = [
+  'hello', 'hi', 'im', 'shinhan', 'app review'
+]
+ke = KeywordExtracter()
+keyword_rank = KeywordExtracter(train_data)
 ```
