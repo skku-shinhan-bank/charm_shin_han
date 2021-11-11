@@ -274,50 +274,50 @@ class KoBartGenerator:
         self.train_file=train_file
         self.test_file=test_file
 
-        parser = argparse.ArgumentParser(add_help=False)
-        #parents=[parent_parser], 
+        # parser = argparse.ArgumentParser(add_help=False)
+        # #parents=[parent_parser], 
 
-        parser.add_argument('--train_file',
-                            type=str,
-                            default=self.train_file, 
-                            help='train file')
-        parser.add_argument('--test_file',
-                            type=str,
-                            default=self.test_file,
-                            help='test file')
-        parser.add_argument('--batch-size',
-                            type=int,
-                            default=config.batch_size,
-                            help='batch size for training (default: 96)')
-        parser.add_argument('--max_seq_len',
-                            type=int,
-                            default=config.max_seq_len,
-                            help='max_seq_len')
-        parser.add_argument('--lr',
-                            type=int,
-                            default=config.lr,
-                            help='learing_rate')
-        parser.add_argument('--warmup_ratio',
-                            type=int,
-                            default=config.warmup_ratio,
-                            help='warmup_ratio')
-        parser.add_argument('--num_workers',
-                            type=int,
-                            default=config.num_workers,
-                            help='num_workers')
+        # parser.add_argument('--train_file',
+        #                     type=str,
+        #                     default=self.train_file, 
+        #                     help='train file')
+        # parser.add_argument('--test_file',
+        #                     type=str,
+        #                     default=self.test_file,
+        #                     help='test file')
+        # parser.add_argument('--batch-size',
+        #                     type=int,
+        #                     default=config.batch_size,
+        #                     help='batch size for training (default: 96)')
+        # parser.add_argument('--max_seq_len',
+        #                     type=int,
+        #                     default=config.max_seq_len,
+        #                     help='max_seq_len')
+        # parser.add_argument('--lr',
+        #                     type=int,
+        #                     default=config.lr,
+        #                     help='learing_rate')
+        # parser.add_argument('--warmup_ratio',
+        #                     type=int,
+        #                     default=config.warmup_ratio,
+        #                     help='warmup_ratio')
+        # parser.add_argument('--num_workers',
+        #                     type=int,
+        #                     default=config.num_workers,
+        #                     help='num_workers')
         
 
-        parser = pl.Trainer.add_argparse_args(parser)
-        args = parser.parse_args()
+        # parser = pl.Trainer.add_argparse_args(parser)
+        # args = parser.parse_args()
         # logging.info(args)
 
         model = KoBARTConditionalGeneration(args)
 
-        dm = ChatDataModule(train_file,
-                            test_file,
-                            os.path.join(args.tokenizer_path, 'model.json'),
-                            max_seq_len=args.max_seq_len,
-                            num_workers=args.num_workers)
+        dm = ChatDataModule(self.train_file,
+                            self.test_file,
+                            os.path.join(config.tokenizer_path, 'model.json'),
+                            max_seq_len=config.max_seq_len,
+                            num_workers=config.num_workers)
         checkpoint_callback = pl.callbacks.ModelCheckpoint(monitor='val_loss',
                                                         dirpath=args.default_root_dir,
                                                         filename='model_chp/{epoch:02d}-{val_loss:.3f}',
