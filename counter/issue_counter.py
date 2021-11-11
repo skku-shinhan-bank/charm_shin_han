@@ -97,16 +97,16 @@ class MonthCounter:
 
         #count표 만들기
         data_month = pd.concat([month_data_0, month_data_1, month_data_2, month_data_3, month_data_4, month_data_5], axis=1)
-        month_data = pd.DataFrame(data_month, columns=['issue0', 'issue1', 'issue2', 'issue3', 'issue4', 'issue5', 'x_label_issue0'])
-        month_data = month_data.rename(columns={'x_label_issue0':'x_label'})
+        month_data = pd.DataFrame(data_month, columns=['issue0', 'issue1', 'issue2', 'issue3', 'issue4', 'issue5', 'x_label_issue3'])
+        month_data = month_data.rename(columns={'x_label_issue3':'x_label'})
         month_data.index.name='x'
-        month_data = month_data.fillna(0);
+        month_data = month_data.fillna(0)
 
         data_day = pd.concat([day_data_0, day_data_1, day_data_2, day_data_3, day_data_4, day_data_5], axis=1)
-        day_data = pd.DataFrame(data_day, columns=['issue0', 'issue1', 'issue2', 'issue3', 'issue4', 'issue5', 'x_label_issue0'])
-        day_data = day_data.rename(columns={'x_label_issue0':'x_label'})
+        day_data = pd.DataFrame(data_day, columns=['issue0', 'issue1', 'issue2', 'issue3', 'issue4', 'issue5', 'x_label_issue1'])
+        day_data = day_data.rename(columns={'x_label_issue1':'x_label'})
         day_data.index.name='x'
-        day_data = day_data.fillna(0);
+        day_data = day_data.fillna(0)
 
         month_json = self.tojson(month_data)
         day_json = self.tojson(day_data)
@@ -115,7 +115,7 @@ class MonthCounter:
         x_label = pd.Series([str(i) for i in month_data['x_label']])
         Month = pd.DataFrame(month_data, columns=['issue0', 'issue1', 'issue2', 'issue3', 'issue4', 'issue5'])
         Month = Month.set_index(keys=[x_label], inplace=False)
-        self.show(month_data)
+        self.show(Month)
 
         print("\n일별 이슈 분포\n")
         xx_label = pd.Series([str(i) for i in day_data['x_label']])
