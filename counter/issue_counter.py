@@ -5,7 +5,7 @@ from operator import itemgetter
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 
-class MonthCounter:
+class Counter:
     def __init__(self):
         return
     
