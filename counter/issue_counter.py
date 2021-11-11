@@ -93,7 +93,18 @@ class MonthCounter:
         month_data_5 = self.counter(issue_5_month_data, 'issue5')
         day_data_5 = self.counter(issue_5_day_data, 'issue5')
 
-        return
+        data_month = pd.concat([month_data_0, month_data_1, month_data_2, month_data_3, month_data_4, month_data_5], axis=1)
+        month_data = pd.DataFrame(data_month, columns=['issue0', 'issue1', 'issue2', 'issue3', 'issue4', 'issue5', 'x_label_issue0'])
+        month_data.index.name='x'
+
+        data_day = pd.concat([day_data_0, day_data_1, day_data_2, day_data_3, day_data_4, day_data_5], axis=1)
+        day_data = pd.DataFrame(data_day, columns=['issue0', 'issue1', 'issue2', 'issue3', 'issue4', 'issue5', 'x_label_issue0'])
+        day_data.index.name='x'
+
+        month_json = self.tojson(month_data)
+        day_json = self.tojson(day_data)
+
+        return month_data, day_data, month_json, day_json
 
 
     def counter(self, data, issue):
@@ -114,8 +125,11 @@ class MonthCounter:
         Data = pd.read_excel('./month_'+issue+'.xlsx')
         Month = pd.DataFrame(Data, columns=['y', 'x_label'])
         Month = Month.rename(columns={'y':issue})
-        Month.index.name='x'
+        Month = Month.rename(columns={'x_label':'x_label_'+issue})
 
         return Month
-
+        
+    def tojson(data):
+        js = data.to_json(orient = 'table')
+        return js
     
