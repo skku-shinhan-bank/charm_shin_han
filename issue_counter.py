@@ -31,8 +31,8 @@ class Counter:
                 issue_0_month_data.append(str(origin_data['일자'][i])[:7])
                 issue_0_day_data.append(str(origin_data['일자'][i])[:10])
 
-        month_data_0 = self.counter(issue_0_month_data, 'issue0')
-        day_data_0 = self.counter(issue_0_day_data, 'issue0')
+        month_data_0 = self.num_counter(issue_0_month_data, 'issue0')
+        day_data_0 = self.num_counter(issue_0_day_data, 'issue0')
 
         #issue_1 로그인
         for i in range (len(origin_data)):
@@ -41,8 +41,8 @@ class Counter:
                 issue_1_month_data.append(str(origin_data['일자'][i])[:7])
                 issue_1_day_data.append(str(origin_data['일자'][i])[:10])
 
-        month_data_1 = self.counter(issue_1_month_data, 'issue1')
-        day_data_1 = self.counter(issue_1_day_data, 'issue1')
+        month_data_1 = self.num_counter(issue_1_month_data, 'issue1')
+        day_data_1 = self.num_counter(issue_1_day_data, 'issue1')
 
         #issue_2 회원가입
         for i in range (len(origin_data)):
@@ -50,8 +50,8 @@ class Counter:
                 issue_2_month_data.append(str(origin_data['일자'][i])[:7])
                 issue_2_day_data.append(str(origin_data['일자'][i])[:10])
 
-        month_data_2 = self.counter(issue_2_month_data, 'issue2')
-        day_data_2 = self.counter(issue_2_day_data, 'issue2')
+        month_data_2 = self.num_counter(issue_2_month_data, 'issue2')
+        day_data_2 = self.num_counter(issue_2_day_data, 'issue2')
 
         #issue_3 긍융
         for i in range (len(origin_data)):
@@ -64,8 +64,8 @@ class Counter:
                 issue_3_month_data.append(str(origin_data['일자'][i])[:7])
                 issue_3_day_data.append(str(origin_data['일자'][i])[:10])
 
-        month_data_3 = self.counter(issue_3_month_data, 'issue3')
-        day_data_3 = self.counter(issue_3_day_data, 'issue3')
+        month_data_3 = self.num_counter(issue_3_month_data, 'issue3')
+        day_data_3 = self.num_counter(issue_3_day_data, 'issue3')
 
         #issue_4 기타
         for i in range (len(origin_data)):
@@ -82,8 +82,8 @@ class Counter:
                 issue_4_month_data.append(str(origin_data['일자'][i])[:7])
                 issue_4_day_data.append(str(origin_data['일자'][i])[:10])
 
-        month_data_4 = self.counter(issue_4_month_data, 'issue4')
-        day_data_4 = self.counter(issue_4_day_data, 'issue4')
+        month_data_4 = self.num_counter(issue_4_month_data, 'issue4')
+        day_data_4 = self.num_counter(issue_4_day_data, 'issue4')
 
         #issue_5 앱 외부
         for i in range (len(origin_data)):
@@ -92,8 +92,8 @@ class Counter:
                 issue_5_month_data.append(str(origin_data['일자'][i])[:7])
                 issue_5_day_data.append(str(origin_data['일자'][i])[:10])
 
-        month_data_5 = self.counter(issue_5_month_data, 'issue5')
-        day_data_5 = self.counter(issue_5_day_data, 'issue5')
+        month_data_5 = self.num_counter(issue_5_month_data, 'issue5')
+        day_data_5 = self.num_counter(issue_5_day_data, 'issue5')
 
         #count표 만들기
         data_month = pd.concat([month_data_0, month_data_1, month_data_2, month_data_3, month_data_4, month_data_5], axis=1)
@@ -126,7 +126,7 @@ class Counter:
         return month_data, day_data, month_json, day_json
 
 
-    def counter(self, data, issue):
+    def num_counter(self, data, issue):
         data = collections.Counter(data)
         sorted_data = sorted(data.items(), key=itemgetter(1), reverse=True)
         sorted_data = sorted(sorted_data)
