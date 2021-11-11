@@ -31,8 +31,9 @@ class Counter:
                 issue_0_month_data.append(str(origin_data['일자'][i])[:7])
                 issue_0_day_data.append(str(origin_data['일자'][i])[:10])
 
-        month_data_0 = self.num_counter(issue_0_month_data, 'issue0')
-        day_data_0 = self.num_counter(issue_0_day_data, 'issue0')
+        issue_0='issue0'
+        month_data_0 = self.num_counter(issue_0_month_data, issue_0)
+        day_data_0 = self.num_counter(issue_0_day_data, issue_0)
 
         #issue_1 로그인
         for i in range (len(origin_data)):
