@@ -1,9 +1,12 @@
+#-*- coding:utf-8 -*-
+import sys
 import collections
 import numpy as np
 import pandas as pd
 from operator import itemgetter
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
+sys.setdefaultencoding('utf-8')
 
 class IssueCounter:
     def __init__(self):
