@@ -98,13 +98,13 @@ class IssueCounter:
         #count표 만들기
         data_month = pd.concat([month_data_0, month_data_1, month_data_2, month_data_3, month_data_4, month_data_5], axis=1)
         month_data = pd.DataFrame(data_month, columns=['실행기능', '로그인', '회원가입', '금융', '기타', '앱외부', 'x_label_금융'])
-        month_data = month_data.rename(columns={'x_label_issue3':'x_label'})
+        month_data = month_data.rename(columns={'x_label_금융':'x_label'})
         month_data.index.name='x'
         month_data = month_data.fillna(0)
 
         data_day = pd.concat([day_data_0, day_data_1, day_data_2, day_data_3, day_data_4, day_data_5], axis=1)
         day_data = pd.DataFrame(data_day, columns=['실행기능', '로그인', '회원가입', '금융', '기타', '앱외부', 'x_label_로그인'])
-        day_data = day_data.rename(columns={'x_label_issue1':'x_label'})
+        day_data = day_data.rename(columns={'x_label_로그인':'x_label'})
         day_data.index.name='x'
         day_data = day_data.fillna(0)
 
