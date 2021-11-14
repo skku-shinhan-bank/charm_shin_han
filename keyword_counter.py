@@ -9,8 +9,48 @@ class KeywordCouter:
     def __init__(self):
         return
     
-    def makecount(self, issue0, issue1, issue2, issue3, issue4, issue5):  #list
-        top = issue0['0'][:5]+issue1
+    def makecount(self, issue_0, issue_1, issue_2, issue_3, issue_4, issue_5):  #list
+        issue0 = self.makeDataFrame(issue_0)
+        issue1 = self.makeDataFrame(issue_1)
+        issue2 = self.makeDataFrame(issue_2)
+        issue3 = self.makeDataFrame(issue_3)
+        issue4 = self.makeDataFrame(issue_4)
+        issue5 = self.makeDataFrame(issue_5)
+
+        top5 = []
+        for i in range(5):
+            top5.append(issue0[0][i])
+            top5.append(issue1[0][i])
+            top5.append(issue2[0][i])
+            top5.append(issue3[0][i])
+            top5.append(issue4[0][i])
+            top5.append(issue5[0][i])
+
+        issue00 = self.counter(issue0, top5)
+        issue11 = self.counter(issue1, top5)
+        issue22 = self.counter(issue2, top5)
+        issue33 = self.counter(issue3, top5)
+        issue44 = self.counter(issue4, top5)
+        issue55 = self.counter(issue5, top5)
+
+        pre_count = []
+        pre_count.append(issue00)
+        pre_count.append(issue11)
+        pre_count.append(issue22)
+        pre_count.append(issue33)
+        pre_count.append(issue44)
+        pre_count.append(issue55)
+        pre_count = np.transpose(pre_count)
+        count = pd.DataFrame.from_records(pre_count)
+        count = count.rename(columns={0:'실행기능'})
+        count = count.rename(columns={1:'로그인'})
+        count = count.rename(columns={2:'회원가입'})
+        count = count.rename(columns={3:'금융'})
+        count = count.rename(columns={4:'기타'})
+        count = count.rename(columns={5:'앱외부'})
+        count = count.set_index(keys=[top5], inplace=False)
+
+
 
         return
 
@@ -75,5 +115,17 @@ class KeywordCouter:
         data = pd.DataFrame.from_records(issue)
         return data
 
-    
+    def counter(self, issue, top5):
+        issue_ = []
+
+        for n in range(len(top5)):
+            exist = False
+            for i in range(len(issue)):
+                if issue[0][i] == top5[n]:
+                 issue_.append(issue[1][i])
+                exist = True
+            if exist == False:
+                issue_.append(0)
+        
+        return issue_
 
