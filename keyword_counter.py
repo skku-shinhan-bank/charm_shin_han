@@ -77,7 +77,7 @@ class KeywordCouter:
          #issue_2 회원가입
         for i in range (len(origin_data)):
             if(origin_data['issue-function'][i] == 3 or origin_data['issue-function'][i] == 7):
-                issue_2_data.append(str(origin_data['reveiw'][i]))
+                issue_2_data.append(str(origin_data['review'][i]))
 
         #issue_3 긍융
         for i in range (len(origin_data)):
