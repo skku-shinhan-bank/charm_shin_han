@@ -50,9 +50,9 @@ class KeywordCouter:
         count = count.rename(columns={5:'앱외부'})
         count = count.set_index(keys=[top5], inplace=False)
 
+        count.plot()
 
-
-        return
+        return count
 
     def issueClassifier(self, data_path):
         origin_data = pd.read_excel(data_path)
