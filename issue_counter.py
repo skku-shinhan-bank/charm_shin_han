@@ -6,7 +6,7 @@ import pandas as pd
 from operator import itemgetter
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
-sys.setdefaultencoding('utf-8')
+# sys.setdefaultencoding('utf-8')
 
 class IssueCounter:
     def __init__(self):
