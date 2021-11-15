@@ -2,7 +2,7 @@ from collections import defaultdict
 from numpy import dot
 from numpy.linalg import norm
 import numpy as np
-import torch
+#import torch
 from tqdm import notebook
 import mecab
 from sklearn.feature_extraction.text import TfidfVectorizer
