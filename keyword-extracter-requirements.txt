@@ -1,2 +1,1 @@
-pororo
 python-mecab-ko

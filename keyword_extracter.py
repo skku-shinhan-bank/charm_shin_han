@@ -2,19 +2,24 @@ from collections import defaultdict
 from numpy import dot
 from numpy.linalg import norm
 import numpy as np
-#import torch
+import torch
 from tqdm import notebook
-from pororo import Pororo
+import mecab
 from sklearn.feature_extraction.text import TfidfVectorizer
+from gensim.models import Word2Vec
 
 class KeywordExtracter:
   def __init__(self):
-    self.pos = Pororo(task="pos_tagging", lang="ko") # Pos tagger
+    mecab_ = mecab.MeCab()
+    # POS tagger
+    self.pos = mecab_.pos
     # self.corpus_list: contains words (that can be keywords) for each reviews
     # self.keyword_rank: ranking of keyword
     # self.tfidf_matrix: contains tf-idf value of each word in the self.corpus_list
 
   def to_surface(self, tok1, tok2, tok3=''):
+    if (tok1+tok2+tok3 in self.synonym_dict):
+      return self.synonym_dict[tok1+tok2+tok3]
     return tok1 + tok2 + tok3
 
   # 문장 별로 단축된 tfidf를 단어와 함께 반환
@@ -30,18 +35,30 @@ class KeywordExtracter:
     short_dict = sorted(short_dict.items(), reverse=True, key = lambda item: item[1]) #sorting
     return short_dict
 
-  def analyze(self, data, ngram_threshold = 5, pmi_threshold = 0.0001): # return self.keyword_rank as List[(keyword as str, frequency as int), ....]
+  def analyze(self, data, ngram_threshold = 5, pmi_threshold = 0.0001, use_noun = True, use_predicate = True, synonym_dict = {}): # return self.keyword_rank as List[(keyword as str, frequency as int), ....]
+    # data: (list type) review to be analyzed
+    # ngram_threshold: The minimum value of the number of words to be registered as n-gram
+    # pmi_threshold: The minimum value of the PMI value of n-gram to be registered as keyword
+    # use_noun: make nouns can be keywords
+    # use_predicate: make predicates can be keywords
+    # synonym_dict: (dictionary type) convert words to their synonym
     self.corpus_list = []
+    self.synonym_dict = synonym_dict
 
     monogram_list = [] # for monogram
     ngram_list = [] # for bi-gram and tri-gram
 
-    append_pos_list = ['NNG', 'NNP', 'NF', 'VV', 'VA', 'MM'] # only words whose POS in the list can be the keyword
+    append_pos_list = [] # only words whose POS in the list can be the keyword
     noun_list = ['NNG', 'NNP', 'NF']
+    predicate_list = ['VV', 'VA', 'MM']
+    if use_noun:
+      append_pos_list += noun_list
+    if use_predicate:
+      append_pos_list += predicate_list
     josa_list = ['JKS', 'JKC', 'JKG', 'JKO', 'JKB', 'JKV', 'JKQ', 'JX', 'JC'] # JOSA
 
     print("Collecting n-grams...")
-    for sent in data:
+    for sent in notebook.tqdm(data):
       monogram_list.append([])
       ngram_list.append([])
       pos_sent = self.pos(sent)
@@ -78,9 +95,8 @@ class KeywordExtracter:
         ngram_score[key] = float( (ngram_counter[key] - ngram_threshold) / (monogram_counter[key[0]] * monogram_counter[key[1]]) )
       else:
         ngram_score[key] = float( (ngram_counter[key] - ngram_threshold) / (monogram_counter[key[0]] * monogram_counter[key[1]] * monogram_counter[key[2]]) )
-    
+    print("Get n-gram keyword by PMI")
     for sent in notebook.tqdm(data):
-      self.corpus_list.append([])
       pos_sent = self.pos(sent)
       temp_corpus = []
       for i, word in enumerate(pos_sent):
@@ -102,17 +118,21 @@ class KeywordExtracter:
                 temp_corpus.append(self.to_surface(word[0], pos_sent[i+1][0]))
                 i+=1
                 continue
-          temp_corpus.append(word[0])
+          if word[0] in synonym_dict:
+            temp_corpus.append(synonym_dict[word[0]])
+          else:
+            temp_corpus.append(word[0])
           
       self.corpus_list.append(temp_corpus)
     
     tfidfv = TfidfVectorizer(preprocessor = ' '.join)
     self.tfidf_matrix = tfidfv.fit_transform(self.corpus_list).toarray()
-    dic_list = []
+    self.dic_list = []
+    print("TF-IDF")
     for i in notebook.tqdm(range(len(data))):
-      dic_list.append(self.get_short_tfidf(i, self.tfidf_matrix, tfidfv))
+      self.dic_list.append(self.get_short_tfidf(i, self.tfidf_matrix, tfidfv))
     self.keyword_rank = {}
-    for i in dic_list:
+    for i in self.dic_list:
       if not i: continue # discard empty lists
       if i[0][0] in self.keyword_rank:
         self.keyword_rank[i[0][0]] += 1
@@ -120,3 +140,6 @@ class KeywordExtracter:
         self.keyword_rank[i[0][0]] = 1
     self.keyword_rank = sorted(self.keyword_rank.items(), reverse=True, key = lambda item: item[1]) #sorting
     return self.keyword_rank
+  def view_review(self, data, review_idx):
+    print(data[review_idx])
+    print(self.dic_list[review_idx])
