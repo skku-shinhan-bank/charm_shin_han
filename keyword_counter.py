@@ -1,7 +1,5 @@
-import collections
 import numpy as np
 import pandas as pd
-from operator import itemgetter
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 
@@ -17,14 +15,17 @@ class KeywordCouter:
         issue4 = self.makeDataFrame(issue_4)
         issue5 = self.makeDataFrame(issue_5)
 
-        top5 = []
+        pre_top5 = []
         for i in range(5):
-            top5.append(issue0[0][i])
-            top5.append(issue1[0][i])
-            top5.append(issue2[0][i])
-            top5.append(issue3[0][i])
-            top5.append(issue4[0][i])
-            top5.append(issue5[0][i])
+            pre_top5.append(issue0[0][i])
+            pre_top5.append(issue1[0][i])
+            pre_top5.append(issue2[0][i])
+            pre_top5.append(issue3[0][i])
+            pre_top5.append(issue4[0][i])
+            pre_top5.append(issue5[0][i])
+
+        top = set(pre_top5)
+        top5 = list(top)    
 
         issue00 = self.counter(issue0, top5)
         issue11 = self.counter(issue1, top5)
@@ -122,8 +123,8 @@ class KeywordCouter:
             exist = False
             for i in range(len(issue)):
                 if issue[0][i] == top5[n]:
-                 issue_.append(issue[1][i])
-                exist = True
+                    issue_.append(issue[1][i])
+                    exist = True
             if exist == False:
                 issue_.append(0)
         
