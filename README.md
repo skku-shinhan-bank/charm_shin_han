@@ -112,6 +112,8 @@ ke = KeywordExtracter()
 
 keyword_rank = ke.analyze(train_data) # default
 
+ke.get_similar_keyword('shinhan') # get similar keyword of 'shinhan'
+
 #Options
 
 keyword_rank = ke.analyze(train_data, synonym_dict = synonym_data) # using USER-DEFINED synonym_dict to combine synonyms

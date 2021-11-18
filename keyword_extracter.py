@@ -13,8 +13,10 @@ class KeywordExtracter:
     # POS tagger
     self.pos = mecab_.pos
     # self.corpus_list: contains words (that can be keywords) for each reviews
+    # self.keyword_set: every keyword in the data
     # self.keyword_rank: ranking of keyword
     # self.tfidf_matrix: contains tf-idf value of each word in the self.corpus_list
+    self.keyword_tf = defaultdict(int)  # Term Frequency value of keyword
 
   def to_surface(self, tok1, tok2, tok3=''):
     if (tok1+tok2+tok3 in self.synonym_dict):
@@ -89,6 +91,7 @@ class KeywordExtracter:
 
     # PMI: (#ngram - threhold)/∏#monogram임을 이용하여 PMI 값을 구함
     ngram_score = defaultdict(float)
+    self.keyword_set = set()
     for key in ngram_counter:
       if len(key) == 2:
         ngram_score[key] = float( (ngram_counter[key] - ngram_threshold) / (monogram_counter[key[0]] * monogram_counter[key[1]]) )
@@ -105,22 +108,30 @@ class KeywordExtracter:
               bigram_score = ngram_score[(word[0], pos_sent[i+1][0])]
               trigram_score = ngram_score[(word[0], pos_sent[i+1][0], pos_sent[i+2][0])]
               if bigram_score > trigram_score and bigram_score > pmi_threshold:
-                temp_corpus.append(self.to_surface(word[0], pos_sent[i+1][0]))
+                bigram = self.to_surface(word[0], pos_sent[i+1][0])
+                temp_corpus.append(bigram)
+                self.keyword_set.add(bigram)
                 i+=1
                 continue
               if trigram_score > bigram_score and trigram_score > pmi_threshold:
-                temp_corpus.append(self.to_surface(word[0], pos_sent[i+1][0], pos_sent[i+2][0]))
+                trigram = self.to_surface(word[0], pos_sent[i+1][0], pos_sent[i+2][0])
+                temp_corpus.append(trigram)
+                self.keyword_set.add(trigram)
                 i+=2
                 continue
             else:
               if ngram_score[(word[0], pos_sent[i+1][0])] > pmi_threshold:
-                temp_corpus.append(self.to_surface(word[0], pos_sent[i+1][0]))
+                bigram = self.to_surface(word[0], pos_sent[i+1][0])
+                temp_corpus.append(bigram)
+                self.keyword_set.add(bigram)
                 i+=1
                 continue
           if word[0] in synonym_dict:
             temp_corpus.append(synonym_dict[word[0]])
+            self.keyword_set.add(synonym_dict[word[0]])
           else:
             temp_corpus.append(word[0])
+            self.keyword_set.add(word[0])
           
       self.corpus_list.append(temp_corpus)
     
@@ -129,6 +140,8 @@ class KeywordExtracter:
     self.dic_list = []
     print("TF-IDF")
     for i in notebook.tqdm(range(len(data))):
+      for term in self.corpus_list[i]:
+        self.keyword_tf[term] += 1
       self.dic_list.append(self.get_short_tfidf(i, self.tfidf_matrix, tfidfv))
     self.keyword_rank = {}
     for i in self.dic_list:
@@ -138,7 +151,29 @@ class KeywordExtracter:
       else:
         self.keyword_rank[i[0][0]] = 1
     self.keyword_rank = sorted(self.keyword_rank.items(), reverse=True, key = lambda item: item[1]) #sorting
+    self.get_similar_keyword_list() # get similar keyword list
     return self.keyword_rank
+  def get_similar_keyword_list(self):
+    self.similar_keyword = {}
+    if not self.corpus_list: # if corpus_list is empty
+      print("Analyze the data first!")
+      return
+    for rev in notebook.tqdm(self.corpus_list):
+      for term in rev:
+        if term not in self.similar_keyword:
+          self.similar_keyword[term] = {}
+      for i, term1 in enumerate(rev):
+        for term2 in rev[i+1:]:
+          if term2 not in self.similar_keyword[term1]:
+            self.similar_keyword[term1][term2] = 0
+          self.similar_keyword[term1][term2] += 1
+          if term1 not in self.similar_keyword[term2]:
+            self.similar_keyword[term2][term1] = 0
+          self.similar_keyword[term2][term1] += 1
+  def get_similar_keyword(self, keyword):
+    if keyword not in self.similar_keyword:
+      return
+    return sorted(self.similar_keyword[keyword].items(), reverse=True, key = lambda item: item[1])
   def view_review(self, data, review_idx):
     print(data[review_idx])
     print(self.dic_list[review_idx])
