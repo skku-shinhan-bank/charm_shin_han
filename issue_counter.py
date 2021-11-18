@@ -1,8 +1,5 @@
 #-*- coding:utf-8 -*-
-import collections
 import pandas as pd
-import numpy as np
-from operator import itemgetter
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 # sys.setdefaultencoding('utf-8')
@@ -112,7 +109,6 @@ class IssueCounter:
         month = month.fillna(0)
         week = data.resample('W').sum()
         week = week.fillna(0)
-
 
         return month, week
         
