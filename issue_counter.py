@@ -30,8 +30,8 @@ class IssueCounter:
         #issue_0 실행기능
         for i in range (len(origin_data)):
             if(origin_data['issue-function'][i] == 2 or origin_data['issue-function'][i] == 43):
-                issue_0_month_data.append(str(origin_data['일자'][i][:7]))
-                issue_0_day_data.append(str(origin_data['일자'][i][:10]))
+                issue_0_month_data.append(str(origin_data['일자'][i])[:7])
+                issue_0_day_data.append(str(origin_data['일자'][i])[:10])
 
         month_data_0 = self.num_counter(issue_0_month_data, '실행기능')
         day_data_0 = self.num_counter(issue_0_day_data, '실행기능')
@@ -40,8 +40,8 @@ class IssueCounter:
         for i in range (len(origin_data)):
             if(origin_data['issue-function'][i] == 0 or origin_data['issue-function'][i] == 1 or origin_data['issue-function'][i] == 12
             or origin_data['issue-function'][i] == 52or origin_data['issue-function'][i] == 16):
-                issue_1_month_data.append(str(origin_data['일자'][i][:7]))
-                issue_1_day_data.append(str(origin_data['일자'][i][:10]))
+                issue_1_month_data.append(str(origin_data['일자'][i])[:7])
+                issue_1_day_data.append(str(origin_data['일자'][i])[:10])
 
         month_data_1 = self.num_counter(issue_1_month_data, '로그인')
         day_data_1 = self.num_counter(issue_1_day_data, '로그인')
@@ -49,8 +49,8 @@ class IssueCounter:
         #issue_2 회원가입
         for i in range (len(origin_data)):
             if(origin_data['issue-function'][i] == 3 or origin_data['issue-function'][i] == 7):
-                issue_2_month_data.append(str(origin_data['일자'][i][:7]))
-                issue_2_day_data.append(str(origin_data['일자'][i][:10]))
+                issue_2_month_data.append(str(origin_data['일자'][i])[:7])
+                issue_2_day_data.append(str(origin_data['일자'][i])[:10])
 
         month_data_2 = self.num_counter(issue_2_month_data, '회원가입')
         day_data_2 = self.num_counter(issue_2_day_data, '회원가입')
@@ -63,8 +63,8 @@ class IssueCounter:
             or origin_data['issue-function'][i] == 50 or origin_data['issue-function'][i] == 46 or origin_data['issue-function'][i] == 56
             or origin_data['issue-function'][i] == 58 or origin_data['issue-function'][i] == 18 or origin_data['issue-function'][i] == 63
             or origin_data['issue-function'][i] == 66):
-                issue_3_month_data.append(str(origin_data['일자'][i][:7]))
-                issue_3_day_data.append(str(origin_data['일자'][i][:10]))
+                issue_3_month_data.append(str(origin_data['일자'][i])[:7])
+                issue_3_day_data.append(str(origin_data['일자'][i])[:10])
 
         month_data_3 = self.num_counter(issue_3_month_data, '금융')
         day_data_3 = self.num_counter(issue_3_day_data, '금융')
@@ -81,8 +81,8 @@ class IssueCounter:
             or origin_data['issue-function'][i] == 57 or origin_data['issue-function'][i] == 17 or origin_data['issue-function'][i] == 59
             or origin_data['issue-function'][i] == 60 or origin_data['issue-function'][i] == 61 or origin_data['issue-function'][i] == 62
             or origin_data['issue-function'][i] == 64 or origin_data['issue-function'][i] == 65 or origin_data['issue-function'][i] == 67):
-                issue_4_month_data.append(str(origin_data['일자'][i][:7]))
-                issue_4_day_data.append(str(origin_data['일자'][i][:10]))
+                issue_4_month_data.append(str(origin_data['일자'][i])[:7])
+                issue_4_day_data.append(str(origin_data['일자'][i])[:10])
 
         month_data_4 = self.num_counter(issue_4_month_data, '기타')
         day_data_4 = self.num_counter(issue_4_day_data, '기타')
@@ -91,8 +91,8 @@ class IssueCounter:
         for i in range (len(origin_data)):
             if(origin_data['issue-function'][i] == 22 or origin_data['issue-function'][i] == 5 or origin_data['issue-function'][i] == 41
             or origin_data['issue-function'][i] == 68):
-                issue_5_month_data.append(str(origin_data['일자'][i][:7]))
-                issue_5_day_data.append(str(origin_data['일자'][i][:10]))
+                issue_5_month_data.append(str(origin_data['일자'][i])[:7])
+                issue_5_day_data.append(str(origin_data['일자'][i])[:10])
 
         month_data_5 = self.num_counter(issue_5_month_data, '앱외부')
         day_data_5 = self.num_counter(issue_5_day_data, '앱외부')
