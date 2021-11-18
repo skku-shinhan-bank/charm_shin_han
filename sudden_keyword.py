@@ -30,6 +30,8 @@ class SuddenKeyword:
             month_index.append(str(data['일자'][i])[:7])
 
         month_index = set(month_index)
+        month_index = list(month_index)
+        month_index.sort()
 
         for m in month_index:
             temp = []
