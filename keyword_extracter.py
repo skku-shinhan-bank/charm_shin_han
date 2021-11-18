@@ -164,6 +164,8 @@ class KeywordExtracter:
           self.similar_keyword[term] = {}
       for i, term1 in enumerate(rev):
         for term2 in rev[i+1:]:
+          if term1 == term2:
+            continue # avoid duplication problem
           if term2 not in self.similar_keyword[term1]:
             self.similar_keyword[term1][term2] = 0
           self.similar_keyword[term1][term2] += 1
