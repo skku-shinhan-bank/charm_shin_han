@@ -86,6 +86,7 @@ class IssueCounter:
         # month_data = pd.DataFrame(data_month, columns=['실행기능', '로그인', '회원가입', '금융', '기타', '앱외부'])
         # month_data = month_data.rename(columns={'x_label_금융':'x_label'})
         # month_data.index.name='x'
+        data_month.fillna(0)
 
         #주별
         data_week = pd.concat([week_data_0, week_data_1, week_data_2, week_data_3, week_data_4, week_data_5], axis=1)
@@ -94,6 +95,7 @@ class IssueCounter:
         # day_data.index.name='x'
         # day_data['x_label'] = day_data['x_label'].apply(lambda x: pd.to_datetime(str(x), format='%Y-%m'))
         # week_data = day_data.resample('W-Mon', how={'x_label' : np.sum}.fillna(0))
+        data_week.fillna(0)
 
         print("월별 이슈 분포\n")
         # x_label = pd.Series([str(i) for i in month_data['x_label']])
