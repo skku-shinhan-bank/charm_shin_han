@@ -83,38 +83,22 @@ class IssueCounter:
         #count표 만들기
         #월별
         data_month = pd.concat([month_data_0, month_data_1, month_data_2, month_data_3, month_data_4, month_data_5], axis=1)
-        # month_data = pd.DataFrame(data_month, columns=['실행기능', '로그인', '회원가입', '금융', '기타', '앱외부'])
-        # month_data = month_data.rename(columns={'x_label_금융':'x_label'})
-        # month_data.index.name='x'
         data_month.fillna(0)
 
         #주별
         data_week = pd.concat([week_data_0, week_data_1, week_data_2, week_data_3, week_data_4, week_data_5], axis=1)
-        # day_data = pd.DataFrame(data_day, columns=['실행기능', '로그인', '회원가입', '금융', '기타', '앱외부'])
-        # day_data = day_data.rename(columns={'x_label_로그인':'x_label'})
-        # day_data.index.name='x'
-        # day_data['x_label'] = day_data['x_label'].apply(lambda x: pd.to_datetime(str(x), format='%Y-%m'))
-        # week_data = day_data.resample('W-Mon', how={'x_label' : np.sum}.fillna(0))
-        data_week.fillna(0)
+        # data_week.fillna(0)
 
         print("월별 이슈 분포\n")
-        # x_label = pd.Series([str(i) for i in month_data['x_label']])
-        # Month = pd.DataFrame(month_data, columns=['실행기능', '로그인', '회원가입', '금융', '기타', '앱외부'])
-        # Month = Month.set_index(keys=[x_label], inplace=False)
         self.show(data_week)
 
         print("\n주별 이슈 분포\n")
-        # xx_label = pd.Series([str(i) for i in day_data['x_label']])
-        # Day = pd.DataFrame(day_data, columns=['실행기능', '로그인', '회원가입', '금융', '기타', '앱외부'])
-        # Day = Day.set_index(keys=[xx_label], inplace=False)
         self.show(data_week)
 
         month_json = self.tojson(data_month)
         week_json = self.tojson(data_week)
 
-
         return data_month, data_week, month_json, week_json
-
 
     def num_counter(self, data, issue):
         data = pd.DataFrame(data)
@@ -124,8 +108,11 @@ class IssueCounter:
         data = data.drop('datetime',1)
         data = data.drop('date',1)
         data[issue] = 1
-        month = data.resample('M').sum().fillna(0)
-        week = data.resample('W').sum().fillna(0)
+        month = data.resample('M').sum()
+        month = month.fillna(0)
+        week = data.resample('W').sum()
+        week = week.fillna(0)
+
 
         return month, week
         
