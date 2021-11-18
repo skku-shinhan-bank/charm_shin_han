@@ -83,11 +83,11 @@ class IssueCounter:
         #count표 만들기
         #월별
         data_month = pd.concat([month_data_0, month_data_1, month_data_2, month_data_3, month_data_4, month_data_5], axis=1)
-        data_month.fillna(0)
+        data_month = data_month.fillna(0)
 
         #주별
         data_week = pd.concat([week_data_0, week_data_1, week_data_2, week_data_3, week_data_4, week_data_5], axis=1)
-        # data_week.fillna(0)
+        data_week = data_week.fillna(0)
 
         print("월별 이슈 분포\n")
         self.show(data_week)
