@@ -41,9 +41,10 @@ class SuddenKeyword:
             month_data.append(temp)
 
         month = pd.DataFrame(month_data)
-        n = 0
-        for i in month_index:
-            month = month.rename(columns={n:i})
-            n += 1
+        month = month.set_index(keys=[month_index], append=False)
+        # n = 0
+        # for i in month_index:
+        #     month = month.rename(columns={n:i})
+        #     n += 1
 
-        return month, month_index
+        return month
