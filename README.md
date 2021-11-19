@@ -117,6 +117,6 @@ ke.get_similar_keyword('shinhan') # get similar keyword of 'shinhan'
 #Options
 
 keyword_rank = ke.analyze(train_data, synonym_dict = synonym_data) # using USER-DEFINED synonym_dict to combine synonyms
-keyword_rank = ke.analyze(train_data, ngram_threshold = 10, pmi_threshold = 1E-06) # change threshold values (Default: ngram_threshold = 5, pmi_threshold = 0.0001)
+keyword_rank = ke.analyze(train_data, ngram_threshold = 10, pmi_threshold = 1E-06, sim_threshold = 15) # change threshold values (Default: ngram_threshold = 5, pmi_threshold = 0.0001, sim_threshold = 10)
 keyword_rank = ke.analyze(train_data, use_noun = True, use_prodicate = False) # Choose whether to register nouns or prodicates to keyword 
 ```

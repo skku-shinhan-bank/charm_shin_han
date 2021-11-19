@@ -36,7 +36,8 @@ class KeywordExtracter:
     short_dict = sorted(short_dict.items(), reverse=True, key = lambda item: item[1]) #sorting
     return short_dict
 
-  def analyze(self, data, ngram_threshold = 5, pmi_threshold = 0.0001, use_noun = True, use_predicate = True, synonym_dict = {}): # return self.keyword_rank as List[(keyword as str, frequency as int), ....]
+  def analyze(self, data, ngram_threshold = 5, pmi_threshold = 0.0001,
+              use_noun = True, use_predicate = True, synonym_dict = {}, sim_threshold = 10): # return self.keyword_rank as List[(keyword as str, frequency as int), ....]
     # data: (list type) review to be analyzed
     # ngram_threshold: The minimum value of the number of words to be registered as n-gram
     # pmi_threshold: The minimum value of the PMI value of n-gram to be registered as keyword
@@ -111,12 +112,14 @@ class KeywordExtracter:
                 bigram = self.to_surface(word[0], pos_sent[i+1][0])
                 temp_corpus.append(bigram)
                 self.keyword_set.add(bigram)
+                self.keyword_tf[bigram] += 1
                 i+=1
                 continue
               if trigram_score > bigram_score and trigram_score > pmi_threshold:
                 trigram = self.to_surface(word[0], pos_sent[i+1][0], pos_sent[i+2][0])
                 temp_corpus.append(trigram)
                 self.keyword_set.add(trigram)
+                self.keyword_tf[trigram] += 1
                 i+=2
                 continue
             else:
@@ -124,14 +127,17 @@ class KeywordExtracter:
                 bigram = self.to_surface(word[0], pos_sent[i+1][0])
                 temp_corpus.append(bigram)
                 self.keyword_set.add(bigram)
+                self.keyword_tf[bigram] += 1
                 i+=1
                 continue
           if word[0] in synonym_dict:
             temp_corpus.append(synonym_dict[word[0]])
             self.keyword_set.add(synonym_dict[word[0]])
+            self.keyword_tf[synonym_dict[word[0]]] += 1
           else:
             temp_corpus.append(word[0])
             self.keyword_set.add(word[0])
+            self.keyword_tf[word[0]] += 1
           
       self.corpus_list.append(temp_corpus)
     
@@ -151,9 +157,9 @@ class KeywordExtracter:
       else:
         self.keyword_rank[i[0][0]] = 1
     self.keyword_rank = sorted(self.keyword_rank.items(), reverse=True, key = lambda item: item[1]) #sorting
-    self.get_similar_keyword_list() # get similar keyword list
+    self.get_similar_keyword_list(sim_threshold = sim_threshold) # get similar keyword list
     return self.keyword_rank
-  def get_similar_keyword_list(self):
+  def get_similar_keyword_list(self, sim_threshold = 10):
     self.similar_keyword = {}
     if not self.corpus_list: # if corpus_list is empty
       print("Analyze the data first!")
@@ -172,6 +178,10 @@ class KeywordExtracter:
           if term1 not in self.similar_keyword[term2]:
             self.similar_keyword[term2][term1] = 0
           self.similar_keyword[term2][term1] += 1
+    for term1 in self.similar_keyword:
+      for term2 in self.similar_keyword[term1]:
+        self.similar_keyword[term1][term2] -= sim_threshold
+        self.similar_keyword[term1][term2] /= self.keyword_tf[term1] * self.keyword_tf[term2]
   def get_similar_keyword(self, keyword):
     if keyword not in self.similar_keyword:
       return
