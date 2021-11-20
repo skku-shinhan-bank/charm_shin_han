@@ -65,21 +65,23 @@ class IssueCounter:
         #월별
         data_month = pd.concat([month_data_0, month_data_1, month_data_2, month_data_3, month_data_5], axis=1)
         data_month = data_month.fillna(0)
-        data_month = data_month.drop(['2020-04-30', '2020-05-31', '2020-06-30', '2020-07-31', '2020-08-31', '2020-09-30', '2020-10-31',
-        '2020-11-30', '2020-12-31'])
+        # data_month = data_month.drop(['2020-04-30', '2020-05-31', '2020-06-30', '2020-07-31', '2020-08-31', '2020-09-30', '2020-10-31',
+        # '2020-11-30', '2020-12-31'])
         
 
         #주별
         data_week = pd.concat([week_data_0, week_data_1, week_data_2, week_data_3, week_data_5], axis=1)
         data_week = data_week.fillna(0)
-        data_week = data_week.drop(['2020-04', '2020-05', '2020-06', '2020-07', '2020-08', '2020-09', '2020-10',
-        '2020-11', '2020-12'])
+        # data_week = data_week.drop(['2020-04', '2020-05', '2020-06', '2020-07', '2020-08', '2020-09', '2020-10',
+        # '2020-11', '2020-12'])
 
         print("월별 이슈 분포\n")
         self.show(data_week)
 
         print("\n주별 이슈 분포\n")
         self.show(data_week)
+
+        
 
         month_json = self.tojson(data_month)
         week_json = self.tojson(data_week)
