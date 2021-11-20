@@ -52,22 +52,6 @@ class IssueCounter:
 
         month_data_3, week_data_3 = self.num_counter(issue_3_day_data, '금융')
 
-        #issue_4 기타
-        for i in range (len(origin_data)):
-            if(origin_data['issue-function'][i] == 13 or origin_data['issue-function'][i] == 14 or origin_data['issue-function'][i] == 26
-            or origin_data['issue-function'][i] == 8 or origin_data['issue-function'][i] == 6 or origin_data['issue-function'][i] == 21
-            or origin_data['issue-function'][i] == 42 or origin_data['issue-function'][i] == 38 or origin_data['issue-function'][i] == 39
-            or origin_data['issue-function'][i] == 40 or origin_data['issue-function'][i] == 11 or origin_data['issue-function'][i] == 9
-            or origin_data['issue-function'][i] == 44 or origin_data['issue-function'][i] == 45 or origin_data['issue-function'][i] == 47
-            or origin_data['issue-function'][i] == 48 or origin_data['issue-function'][i] == 49 or origin_data['issue-function'][i] == 51
-            or origin_data['issue-function'][i] == 53 or origin_data['issue-function'][i] == 54 or origin_data['issue-function'][i] == 55
-            or origin_data['issue-function'][i] == 57 or origin_data['issue-function'][i] == 17 or origin_data['issue-function'][i] == 59
-            or origin_data['issue-function'][i] == 60 or origin_data['issue-function'][i] == 61 or origin_data['issue-function'][i] == 62
-            or origin_data['issue-function'][i] == 64 or origin_data['issue-function'][i] == 65 or origin_data['issue-function'][i] == 67):
-                issue_4_day_data.append(str(origin_data['일자'][i])[:10])
-
-        month_data_4, week_data_4 = self.num_counter(issue_4_day_data, '기타')
-
         #issue_5 앱 외부
         for i in range (len(origin_data)):
             if(origin_data['issue-function'][i] == 22 or origin_data['issue-function'][i] == 5 or origin_data['issue-function'][i] == 41
@@ -79,12 +63,17 @@ class IssueCounter:
 
         #count표 만들기
         #월별
-        data_month = pd.concat([month_data_0, month_data_1, month_data_2, month_data_3, month_data_4, month_data_5], axis=1)
+        data_month = pd.concat([month_data_0, month_data_1, month_data_2, month_data_3, month_data_5], axis=1)
         data_month = data_month.fillna(0)
+        data_month = data_month.drop(['2020-04-30', '2020-05-31', '2020-06-30', '2020-07-31', '2020-08-31', '2020-09-30', '2020-10-31',
+        '2020-11-30', '2020-12-31'])
+        
 
         #주별
-        data_week = pd.concat([week_data_0, week_data_1, week_data_2, week_data_3, week_data_4, week_data_5], axis=1)
+        data_week = pd.concat([week_data_0, week_data_1, week_data_2, week_data_3, week_data_5], axis=1)
         data_week = data_week.fillna(0)
+        data_week = data_week.drop(['2020-04', '2020-05', '2020-06', '2020-07', '2020-08', '2020-09', '2020-10',
+        '2020-11', '2020-12'])
 
         print("월별 이슈 분포\n")
         self.show(data_week)
