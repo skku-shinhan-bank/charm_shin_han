@@ -15,7 +15,6 @@ class IssueCounter:
         issue_1_day_data = []
         issue_2_day_data = []
         issue_3_day_data = []
-        issue_4_day_data = []
         issue_5_day_data = []
 
         #issue_0 실행기능
@@ -65,22 +64,19 @@ class IssueCounter:
         #월별
         data_month = pd.concat([month_data_0, month_data_1, month_data_2, month_data_3, month_data_5], axis=1)
         data_month = data_month.fillna(0)
-        
 
         #주별
         data_week = pd.concat([week_data_0, week_data_1, week_data_2, week_data_3, week_data_5], axis=1)
         data_week = data_week.fillna(0)
 
-
-
+        #plot
         print("월별 이슈 분포\n")
         self.show(data_week)
 
         print("\n주별 이슈 분포\n")
         self.show(data_week)
 
-        
-
+        #json
         month_json0 = self.tojson(data_month, '실행기능')
         month_json1 = self.tojson(data_month, '로그인')
         month_json2 = self.tojson(data_month, '회원가입')
