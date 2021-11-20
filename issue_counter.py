@@ -65,15 +65,13 @@ class IssueCounter:
         #월별
         data_month = pd.concat([month_data_0, month_data_1, month_data_2, month_data_3, month_data_5], axis=1)
         data_month = data_month.fillna(0)
-        # data_month = data_month.drop(['2020-04-30', '2020-05-31', '2020-06-30', '2020-07-31', '2020-08-31', '2020-09-30', '2020-10-31',
-        # '2020-11-30', '2020-12-31'])
         
 
         #주별
         data_week = pd.concat([week_data_0, week_data_1, week_data_2, week_data_3, week_data_5], axis=1)
         data_week = data_week.fillna(0)
-        # data_week = data_week.drop(['2020-04', '2020-05', '2020-06', '2020-07', '2020-08', '2020-09', '2020-10',
-        # '2020-11', '2020-12'])
+
+
 
         print("월별 이슈 분포\n")
         self.show(data_week)
@@ -83,10 +81,18 @@ class IssueCounter:
 
         
 
-        month_json = self.tojson(data_month)
-        week_json = self.tojson(data_week)
+        month_json0 = self.tojson(data_month, '실행기능')
+        month_json1 = self.tojson(data_month, '로그인')
+        month_json2 = self.tojson(data_month, '회원가입')
+        month_json3 = self.tojson(data_month, '금융')
+        month_json4 = self.tojson(data_month, '앱외부')
+        week_json0 = self.tojson(data_week, '실행기능')
+        week_json1 = self.tojson(data_week, '로그인')
+        week_json2 = self.tojson(data_week, '회원가입')
+        week_json3 = self.tojson(data_week, '금융')
+        week_json4 = self.tojson(data_week, '앱외부')
 
-        return data_month, data_week, month_json, week_json
+        return data_month, data_week, month_json0, month_json1, month_json2, month_json3, month_json4, week_json0, week_json1, week_json2, week_json3, week_json4
 
     def num_counter(self, data, issue):
         data = pd.DataFrame(data)
@@ -103,7 +109,18 @@ class IssueCounter:
 
         return month, week
         
-    def tojson(self, data):
+    def tojson(self, data, issue):
+        date = [str(item)[:10] for item in data.index]
+        date = pd.DataFrame(date)
+        index = [i for i in range(len(date))]
+        issue0 = data[[issue]]
+        issue0 = pd.DataFrame(issue0)
+        issue0.set_index(keys=[index], inplace=True)
+        issue0_data = pd.concat([issue0, date], axis=1)
+        issue0_data = issue0_data.rename(columns={0:"x_label"})
+        issue0_data = issue0_data.rename(columns={issue:"y"})
+        issue0_data = issue0_data.rename_axis('x')
+        issue0_data
         js = data.to_json(orient = 'table')
         return js
     
