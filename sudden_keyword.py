@@ -50,4 +50,4 @@ class SuddenKeyword:
             temp = temp.rename(columns={0:m})
             month = pd.concat([month, temp], axis=1)
 
-        return month
+        return month, month_index
