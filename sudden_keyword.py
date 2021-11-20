@@ -24,7 +24,6 @@ class SuddenKeyword:
         data = pd.read_excel(data_path)
 
         month_index = []
-        month_data = []
 
         for i in range(len(data)):
             month_index.append(str(data['일자'][i])[:7])
@@ -33,18 +32,22 @@ class SuddenKeyword:
         month_index = list(month_index)
         month_index.sort()
 
+        month = []
+        for i in range(len(data)):
+            if str(data['일자'][i])[:7] == month_index[0]:
+                month.append(data['review'][i])
+
+        month = pd.DataFrame(month)
+        month = month.rename(columns={0:month_index[0]})
+        del month_index[0]
+
         for m in month_index:
             temp = []
             for i in range(len(data)):
                 if str(data['일자'][i])[:7] == m:
                     temp.append(data['review'][i])
-            month_data.append(temp)
-
-        month = pd.DataFrame(month_data)
-        month = month.set_index(keys=[month_index], append=False)
-        # n = 0
-        # for i in month_index:
-        #     month = month.rename(columns={n:i})
-        #     n += 1
+            temp = pd.DataFrame(temp)
+            temp = temp.rename(columns={0:m})
+            month = pd.concat([month, temp], axis=1)
 
         return month
