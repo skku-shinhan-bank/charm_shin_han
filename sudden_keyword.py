@@ -7,18 +7,24 @@ class SuddenKeyword:
         # self.ke = KeywordExtracter()
         return
 
-    def make_top10(self, data_path):
-        top10 = []
+    def make_top10(self, month, index):
+        rank = pd.DataFrame()
 
-        # data = pd.read_excel(data_path)
+        # for m in index:
+        #     list1 = pd.DataFrame(month, columns=[m])
+        #     list1 = list1.dropna()
+        #     list__ = list1.values.tolist()
+        #     list = []
+        #     for i in list__:
+        #         list.append(*i)
+        #     temp = self.ke.analyze(list)
+        #     temp = pd.DataFrame(temp)
+        #     temp = temp.rename(columns={0:m})
+        #     rank = pd.concat([rank, temp], axis=1)
 
-        # month, month_index = self.month_classifier(data)
-        
-        # for i in month_index:
-        #     top10.append(self.ke.analyze(list(month[i])))
 
 
-        return top10
+        return rank
 
     def month_classifier(self, data_path):
         data = pd.read_excel(data_path)
@@ -37,10 +43,7 @@ class SuddenKeyword:
             if str(data['일자'][i])[:7] == month_index[0]:
                 month.append(data['review'][i])
 
-        month = pd.DataFrame(month)
-        month = month.rename(columns={0:month_index[0]})
-        del month_index[0]
-
+        month = pd.DataFrame()
         for m in month_index:
             temp = []
             for i in range(len(data)):
