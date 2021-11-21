@@ -22,9 +22,10 @@ class SuddenKeyword:
         #     temp = temp.rename(columns={0:m})
         #     rank = pd.concat([rank, temp], axis=1)
 
+        keyword_rank = self.extract_sudden_keyword(rank, index)
 
 
-        return rank
+        return keyword_rank
 
     def month_classifier(self, data_path):
         data = pd.read_excel(data_path)
@@ -54,3 +55,36 @@ class SuddenKeyword:
             month = pd.concat([month, temp], axis=1)
 
         return month, month_index
+    
+    def extract_sudden_keyword(self, rank, index):
+        keyword_rank = pd.DataFrame()
+
+        for m in range(len(index)-1):
+            pre_keyword_rank = []
+            for i in range(3):
+                keyword_c = rank[m][i]  #수
+                keyword_d = rank[index[m]][i]  #키워드
+
+                try:
+                    a = rank.index[(rank[index[m-1]] == keyword_d)].tolist()[0]
+                except:
+                    count_a = 0
+                else:
+                    count_a = rank[m-1][a]
+
+                try:
+                    b = rank.index[(rank[index[m+1]] == keyword_d)].tolist()[0]
+                except:
+                    count_b = 0
+                else:
+                    count_b = rank[m+1][b]
+
+                if keyword_c > count_a and keyword_c > count_b:
+                    pre_keyword_rank.append(keyword_d)
+                else:
+                    continue
+            pre_keyword_rank = pd.DataFrame(pre_keyword_rank)
+            pre_keyword_rank = pre_keyword_rank.rename(columns={0:index[m]})
+            keyword_rank = pd.concat([keyword_rank, pre_keyword_rank], axis=1)
+
+        return keyword_rank
