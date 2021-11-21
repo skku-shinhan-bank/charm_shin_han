@@ -116,8 +116,8 @@ class IssueCounter:
         issue0_data = issue0_data.rename(columns={0:"x_label"})
         issue0_data = issue0_data.rename(columns={issue:"y"})
         issue0_data = issue0_data.rename_axis('x')
-        issue0_data
-        js = data.to_json(orient = 'table')
+        
+        js = issue0_data.to_json(orient = 'table')
         return js
     
     def show(self, data):       

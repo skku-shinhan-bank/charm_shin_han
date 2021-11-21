@@ -8,7 +8,7 @@ class SuddenKeyword:
         return
 
     def make_top10(self, month, index):
-        rank = pd.DataFrame()
+        # rank = pd.DataFrame()
 
         # for m in index:
         #     list1 = pd.DataFrame(month, columns=[m])
