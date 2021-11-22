@@ -24,23 +24,24 @@ class KeywordExtracter:
     return tok1 + tok2 + tok3
 
   # 문장 별로 단축된 tfidf를 단어와 함께 반환
-  def get_short_tfidf(self, NUM_SENTENCE, tfidfv_matrix, tfidfv):
-    tfidf_sent = [str(value) for value in tfidfv_matrix[NUM_SENTENCE] if not value == 0]
+  def get_short_tfidf(self, NUM_SENTENCE):
+    tfidf_sent = [str(value) for value in self.tfidfv_matrix[NUM_SENTENCE] if not value == 0]
     #print(shinhan_data[NUM_SENTENCE])
     short_dict = {}
-    for key, value in tfidfv.vocabulary_.items():
-      if tfidfv_matrix[NUM_SENTENCE][value] != 0:
+    for key, value in self.tfidfv.vocabulary_.items():
+      if self.tfidfv_matrix[NUM_SENTENCE][value] != 0:
         #print(key, "(",tfidfv_matrix[NUM_SENTENCE][value],"),", end=" ")
-        short_dict[key] = tfidfv_matrix[NUM_SENTENCE][value]
+        short_dict[key] = self.tfidfv_matrix[NUM_SENTENCE][value]
 
     short_dict = sorted(short_dict.items(), reverse=True, key = lambda item: item[1]) #sorting
     return short_dict
 
-  def analyze(self, data, ngram_threshold = 5, pmi_threshold = 0.0001,
-              use_noun = True, use_predicate = True, synonym_dict = {}, sim_threshold = 10): # return self.keyword_rank as List[(keyword as str, frequency as int), ....]
+  def analyze(self, data, ngram_threshold = 5, pmi_threshold = 0.0001, sim_threshold = 10, keyword_threshold = 3,
+              use_noun = True, use_predicate = True, synonym_dict = {}): # return self.keyword_rank as List[(keyword as str, frequency as int), ....]
     # data: (list type) review to be analyzed
     # ngram_threshold: The minimum value of the number of words to be registered as n-gram
     # pmi_threshold: The minimum value of the PMI value of n-gram to be registered as keyword
+    # keyword_threshold: The minumum value of the number of terms to be in the corpus list
     # use_noun: make nouns can be keywords
     # use_predicate: make predicates can be keywords
     # synonym_dict: (dictionary type) convert words to their synonym
@@ -141,24 +142,35 @@ class KeywordExtracter:
           
       self.corpus_list.append(temp_corpus)
     
-    tfidfv = TfidfVectorizer(preprocessor = ' '.join)
-    self.tfidf_matrix = tfidfv.fit_transform(self.corpus_list).toarray()
-    self.dic_list = []
-    print("TF-IDF")
-    for i in notebook.tqdm(range(len(data))):
-      for term in self.corpus_list[i]:
+    for rev in self.corpus_list:
+      for term in rev:
         self.keyword_tf[term] += 1
-      self.dic_list.append(self.get_short_tfidf(i, self.tfidf_matrix, tfidfv))
+    
+    for rev in self.corpus_list:
+      for term in rev:
+        if self.keyword_tf[term] < keyword_threshold: # if the keyword frequency is less then keyword_threshold, delete it from the corpus list.
+          rev.remove(term)
+
+    print("TF-IDF")
+    self.tfidfv = TfidfVectorizer(preprocessor = ' '.join)
+    self.tfidf_matrix = self.tfidfv.fit_transform(self.corpus_list).toarray()
+    #self.dic_list = []
+    
     self.keyword_rank = {}
-    for i in self.dic_list:
-      if not i: continue # discard empty lists
-      if i[0][0] in self.keyword_rank:
-        self.keyword_rank[i[0][0]] += 1
+    tfidf_voc = sorted(self.tfidfv.vocabulary_.items())
+
+    for i in notebook.tqdm(self.tfidf_matrix):
+      kw = tfidf_voc[i.argmax()][0]
+      if kw in self.keyword_rank:
+        self.keyword_rank[kw] += 1
       else:
-        self.keyword_rank[i[0][0]] = 1
+        self.keyword_rank[kw] = 1
+
     self.keyword_rank = sorted(self.keyword_rank.items(), reverse=True, key = lambda item: item[1]) #sorting
+    # Extracting similar keyword list!
     self.get_similar_keyword_list(sim_threshold = sim_threshold) # get similar keyword list
     return self.keyword_rank
+
   def get_similar_keyword_list(self, sim_threshold = 10):
     self.similar_keyword = {}
     if not self.corpus_list: # if corpus_list is empty
