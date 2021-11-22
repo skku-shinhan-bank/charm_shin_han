@@ -64,6 +64,8 @@ class IssueCounter:
         #월별
         data_month = pd.concat([month_data_0, month_data_1, month_data_2, month_data_3, month_data_5], axis=1)
         data_month = data_month.fillna(0)
+        # data_month.drop(['2020-04-30', '2020-05-31', '2020-06-30', '2020-07-31', '2020-08-31', '2020-09-30',
+        # '2020-10-31', '2020-11-30', '2020-12-31'])
 
         #주별
         data_week = pd.concat([week_data_0, week_data_1, week_data_2, week_data_3, week_data_5], axis=1)
@@ -116,7 +118,7 @@ class IssueCounter:
         issue0_data = issue0_data.rename(columns={0:"x_label"})
         issue0_data = issue0_data.rename(columns={issue:"y"})
         issue0_data = issue0_data.rename_axis('x')
-        
+
         js = issue0_data.to_json(orient = 'table')
         return js
     

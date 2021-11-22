@@ -88,3 +88,23 @@ class SuddenKeyword:
             keyword_rank = pd.concat([keyword_rank, pre_keyword_rank], axis=1)
 
         return keyword_rank
+
+    def make_json(index, sudden_keyword):
+        print("{\n\t", end='')
+        print("\"x\":\"{0}\",\n\t".format(index), end='')
+        print("\"y\":{0} \n".format(sudden_keyword), end='')
+        print("},")    
+    
+    def make_list(keyword_rank):
+        keyword_rankk = keyword_rank.values.tolist()
+        keyword_rankk = np.transpose(keyword_rankk)
+
+        sudden_keyword = []
+        for i in keyword_rankk:
+            temp = []
+            for j in i:
+                if j != 'nan':
+                    temp.append(j)
+            sudden_keyword.append(temp)
+        
+        return sudden_keyword

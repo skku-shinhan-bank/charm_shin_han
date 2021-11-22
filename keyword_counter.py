@@ -43,7 +43,7 @@ class KeywordCouter:
         count = count.rename(columns={1:'로그인'})
         count = count.rename(columns={2:'회원가입'})
         count = count.rename(columns={3:'금융'})
-        count = count.rename(columns={5:'앱외부'})
+        count = count.rename(columns={4:'앱외부'})
         count = count.set_index(keys=[top5], inplace=False)
 
         count.plot()
