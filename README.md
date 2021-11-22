@@ -103,10 +103,13 @@ from charm_shin_han.keyword_extracter import KeywordExtracter
 import torch
 
 train_data = [
-  'hello', 'hi', 'im', 'shinhan', 'app review'
+  'hello', 'hi', 'im', 'shinhan', 'app review', ':D'
 ]
 synonym_data = {
   'hello':'hi'
+}
+stopword = {
+  ':D'
 }
 ke = KeywordExtracter()
 
@@ -116,7 +119,7 @@ ke.get_similar_keyword('shinhan') # get similar keyword of 'shinhan'
 
 #Options
 
-keyword_rank = ke.analyze(train_data, synonym_dict = synonym_data) # using USER-DEFINED synonym_dict to combine synonyms
+keyword_rank = ke.analyze(train_data, synonym_dict = synonym_data, stopword = stopword) # using USER-DEFINED synonym_dict to combine synonyms and stopword to remove stopwords
 keyword_rank = ke.analyze(train_data, ngram_threshold = 10, pmi_threshold = 1E-06, sim_threshold = 15, keyword_threshold = 5) # change threshold values (Default: ngram_threshold = 5, pmi_threshold = 0.0001, sim_threshold = 10, keyword_threshold = 3)
 keyword_rank = ke.analyze(train_data, use_noun = True, use_prodicate = False) # Choose whether to register nouns or prodicates to keyword 
 ```

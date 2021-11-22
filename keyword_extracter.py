@@ -37,7 +37,7 @@ class KeywordExtracter:
     return short_dict
 
   def analyze(self, data, ngram_threshold = 5, pmi_threshold = 0.0001, sim_threshold = 10, keyword_threshold = 3,
-              use_noun = True, use_predicate = True, synonym_dict = {}): # return self.keyword_rank as List[(keyword as str, frequency as int), ....]
+              use_noun = True, use_predicate = True, synonym_dict = {}, stopword = []): # return self.keyword_rank as List[(keyword as str, frequency as int), ....]
     # data: (list type) review to be analyzed
     # ngram_threshold: The minimum value of the number of words to be registered as n-gram
     # pmi_threshold: The minimum value of the PMI value of n-gram to be registered as keyword
@@ -149,6 +149,9 @@ class KeywordExtracter:
     for rev in self.corpus_list:
       for term in rev:
         if self.keyword_tf[term] < keyword_threshold: # if the keyword frequency is less then keyword_threshold, delete it from the corpus list.
+          rev.remove(term)
+          continue
+        if term in stopword:
           rev.remove(term)
 
     print("TF-IDF")
