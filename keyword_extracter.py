@@ -104,7 +104,7 @@ class KeywordExtracter:
       pos_sent = self.pos(sent)
       temp_corpus = []
       for i, word in enumerate(pos_sent):
-        if word[1] in append_pos_list:
+        if word[1] in append_pos_list and word[1] not in stopword:
           if i < len(pos_sent) - 1: # bi-gram과 tri-gram 간의 PMI 값을 비교한 뒤 더 높은 쪽을 단어로 추가함. PMI threshold를 넘지 못했다면 monogram을 대신 추가하고 넘김
             if i < len(pos_sent) - 2:
               bigram_score = ngram_score[(word[0], pos_sent[i+1][0])]
