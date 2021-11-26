@@ -17,6 +17,7 @@ class KeywordExtracter:
     # self.keyword_rank: ranking of keyword
     # self.tfidf_matrix: contains tf-idf value of each word in the self.corpus_list
     self.keyword_tf = defaultdict(int)  # Term Frequency value of keyword
+    self.ngram_keyword = set() # n-grams used as keywords
 
   def to_surface(self, tok1, tok2, tok3=''):
     if (tok1+tok2+tok3 in self.synonym_dict):
@@ -36,7 +37,7 @@ class KeywordExtracter:
     short_dict = sorted(short_dict.items(), reverse=True, key = lambda item: item[1]) #sorting
     return short_dict
 
-  def analyze(self, data, ngram_threshold = 5, pmi_threshold = 0.0001, sim_threshold = 10, keyword_threshold = 3,
+  def analyze(self, data, ngram_threshold = 5, pmi_threshold = 1e-04, rel_threshold = 10, keyword_threshold = 3,
               use_noun = True, use_predicate = True, synonym_dict = {}, stopword = []): # return self.keyword_rank as List[(keyword as str, frequency as int), ....]
     # data: (list type) review to be analyzed
     # ngram_threshold: The minimum value of the number of words to be registered as n-gram
@@ -45,6 +46,10 @@ class KeywordExtracter:
     # use_noun: make nouns can be keywords
     # use_predicate: make predicates can be keywords
     # synonym_dict: (dictionary type) convert words to their synonym
+
+    if use_noun == False and use_predicate == False:
+      print("The value of use_noun and use_predicate cannot be both False. At least one of them should be True")
+      return 
     self.corpus_list = []
     self.synonym_dict = synonym_dict
 
@@ -69,7 +74,16 @@ class KeywordExtracter:
       ngram_corpus = []
       for i, word in enumerate(pos_sent):
         temp_corpus.append(word[0]) # append monogram regardless of POS
-        if word[1] in append_pos_list:
+        if word[1] in noun_list and use_noun: # for nouns
+          if i < len(pos_sent) - 1:
+            if pos_sent[i+1][1] not in noun_list: # we want to get compound word having noun morphemes, so only check if the next morpheme is noun
+              continue
+            ngram_corpus.append(tuple([word[0], pos_sent[i+1][0]])) # tuple을 써야 hashing이 가능하기에 n-gram은 tuple로 추가
+          if i < len(pos_sent) - 2:
+            if pos_sent[i+2][1] not in noun_list:
+              continue
+            ngram_corpus.append(tuple([word[0], pos_sent[i+1][0], pos_sent[i+2][0]]))
+        if word[1] in predicate_list and use_predicate: # for predicates
           if i < len(pos_sent) - 1:
             if pos_sent[i+1][1] in josa_list: # 조사가 나온 경우 n-gram에서 빼기 위함
               continue
@@ -113,6 +127,7 @@ class KeywordExtracter:
                 bigram = self.to_surface(word[0], pos_sent[i+1][0])
                 temp_corpus.append(bigram)
                 self.keyword_set.add(bigram)
+                self.ngram_keyword.add(bigram)
                 self.keyword_tf[bigram] += 1
                 i+=1
                 continue
@@ -120,6 +135,7 @@ class KeywordExtracter:
                 trigram = self.to_surface(word[0], pos_sent[i+1][0], pos_sent[i+2][0])
                 temp_corpus.append(trigram)
                 self.keyword_set.add(trigram)
+                self.ngram_keyword.add(trigram)
                 self.keyword_tf[trigram] += 1
                 i+=2
                 continue
@@ -128,6 +144,7 @@ class KeywordExtracter:
                 bigram = self.to_surface(word[0], pos_sent[i+1][0])
                 temp_corpus.append(bigram)
                 self.keyword_set.add(bigram)
+                self.ngram_keyword.add(bigram)
                 self.keyword_tf[bigram] += 1
                 i+=1
                 continue
@@ -170,37 +187,37 @@ class KeywordExtracter:
         self.keyword_rank[kw] = 1
 
     self.keyword_rank = sorted(self.keyword_rank.items(), reverse=True, key = lambda item: item[1]) #sorting
-    # Extracting similar keyword list!
-    self.get_similar_keyword_list(sim_threshold = sim_threshold) # get similar keyword list
+    # Extracting related keyword list!
+    self.get_related_keyword_list(rel_threshold = rel_threshold) # get related keyword list
     return self.keyword_rank
 
-  def get_similar_keyword_list(self, sim_threshold = 10):
-    self.similar_keyword = {}
+  def get_related_keyword_list(self, rel_threshold = 10):
+    self.related_keyword = {}
     if not self.corpus_list: # if corpus_list is empty
       print("Analyze the data first!")
       return
     for rev in notebook.tqdm(self.corpus_list):
       for term in rev:
-        if term not in self.similar_keyword:
-          self.similar_keyword[term] = {}
+        if term not in self.related_keyword:
+          self.related_keyword[term] = {}
       for i, term1 in enumerate(rev):
         for term2 in rev[i+1:]:
           if term1 == term2:
             continue # avoid duplication problem
-          if term2 not in self.similar_keyword[term1]:
-            self.similar_keyword[term1][term2] = 0
-          self.similar_keyword[term1][term2] += 1
-          if term1 not in self.similar_keyword[term2]:
-            self.similar_keyword[term2][term1] = 0
-          self.similar_keyword[term2][term1] += 1
-    for term1 in self.similar_keyword:
-      for term2 in self.similar_keyword[term1]:
-        self.similar_keyword[term1][term2] -= sim_threshold
-        self.similar_keyword[term1][term2] /= self.keyword_tf[term1] * self.keyword_tf[term2]
-  def get_similar_keyword(self, keyword):
-    if keyword not in self.similar_keyword:
+          if term2 not in self.related_keyword[term1]:
+            self.related_keyword[term1][term2] = 0
+          self.related_keyword[term1][term2] += 1
+          if term1 not in self.related_keyword[term2]:
+            self.related_keyword[term2][term1] = 0
+          self.related_keyword[term2][term1] += 1
+    for term1 in self.related_keyword:
+      for term2 in self.related_keyword[term1]:
+        self.related_keyword[term1][term2] -= rel_threshold
+        self.related_keyword[term1][term2] /= self.keyword_tf[term1] * self.keyword_tf[term2]
+  def get_related_keyword(self, keyword):
+    if keyword not in self.related_keyword:
       return
-    return sorted(self.similar_keyword[keyword].items(), reverse=True, key = lambda item: item[1])
+    return sorted(self.related_keyword[keyword].items(), reverse=True, key = lambda item: item[1])
   def view_review(self, data, review_idx):
     print(data[review_idx])
     print(self.dic_list[review_idx])

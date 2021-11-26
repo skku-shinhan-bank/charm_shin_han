@@ -115,11 +115,11 @@ ke = KeywordExtracter()
 
 keyword_rank = ke.analyze(train_data) # default
 
-ke.get_similar_keyword('shinhan') # get similar keyword of 'shinhan'
+ke.get_related_keyword('shinhan') # get related keywords of 'shinhan'
 
 #Options
 
 keyword_rank = ke.analyze(train_data, synonym_dict = synonym_data, stopword = stopword) # using USER-DEFINED synonym_dict to combine synonyms and stopword to remove stopwords
-keyword_rank = ke.analyze(train_data, ngram_threshold = 10, pmi_threshold = 1E-06, sim_threshold = 15, keyword_threshold = 5) # change threshold values (Default: ngram_threshold = 5, pmi_threshold = 0.0001, sim_threshold = 10, keyword_threshold = 3)
+keyword_rank = ke.analyze(train_data, ngram_threshold = 10, pmi_threshold = 1E-06, rel_threshold = 15, keyword_threshold = 5) # change threshold values (Default: ngram_threshold = 5, pmi_threshold = 0.0001, rel_threshold = 10, keyword_threshold = 3)
 keyword_rank = ke.analyze(train_data, use_noun = True, use_prodicate = False) # Choose whether to register nouns or prodicates to keyword 
 ```
