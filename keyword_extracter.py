@@ -202,7 +202,7 @@ class KeywordExtracter:
           self.related_keyword[term] = {}
       for i, term1 in enumerate(rev):
         for term2 in rev[i+1:]:
-          if term1 == term2:
+          if term1 == term2 or len(term2) == 1:
             continue # avoid duplication problem
           if term2 not in self.related_keyword[term1]:
             self.related_keyword[term1][term2] = 0
