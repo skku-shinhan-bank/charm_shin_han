@@ -14,13 +14,6 @@ KoElectra Classification
 pip install -r koelectra-training-requirements.txt
 ```
 
-Keyword Extracter
-
-```
-pip install -r keyword-extracter-requirements.txt
-```
-
-
 ## usage
 
 ### Data Maker

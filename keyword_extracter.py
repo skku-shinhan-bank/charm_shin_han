@@ -191,7 +191,7 @@ class KeywordExtracter:
     self.get_related_keyword_list(rel_threshold = rel_threshold) # get related keyword list
     return self.keyword_rank
 
-  def get_related_keyword_list(self, rel_threshold = 10):
+  def get_related_keyword_list(self, rel_threshold = 10):g
     self.related_keyword = {}
     if not self.corpus_list: # if corpus_list is empty
       print("Analyze the data first!")
