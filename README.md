@@ -88,3 +88,31 @@ device = torch.device(ctx)
 trainer = KoElectraClassificationTrainer()
 trainer.train(train_data=train_data, train_label=train_label, test_data=test_data, test_label=test_label, config=config, device=device, model_output_path='output.pth')
 ```
+
+### Keyword Extracter
+
+```python
+from charm_shin_han.keyword_extracter import KeywordExtracter
+import torch
+
+train_data = [
+  'hello', 'hi', 'im', 'shinhan', 'app review', ':D'
+]
+synonym_data = {
+  'hello':'hi'
+}
+stopword = {
+  ':D'
+}
+ke = KeywordExtracter()
+
+keyword_rank = ke.analyze(train_data) # default
+
+ke.get_related_keyword('shinhan') # get related keywords of 'shinhan'
+
+#Options
+
+keyword_rank = ke.analyze(train_data, synonym_dict = synonym_data, stopword = stopword) # using USER-DEFINED synonym_dict to combine synonyms and stopword to remove stopwords
+keyword_rank = ke.analyze(train_data, ngram_threshold = 10, pmi_threshold = 1E-06, rel_threshold = 15, keyword_threshold = 5) # change threshold values (Default: ngram_threshold = 5, pmi_threshold = 0.0001, rel_threshold = 10, keyword_threshold = 3)
+keyword_rank = ke.analyze(train_data, use_noun = True, use_prodicate = False) # Choose whether to register nouns or prodicates to keyword 
+```
